@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Raca" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="materialAlertDialogTheme">
+            @style/ThemeOverlay.Material3.MaterialAlertDialog.Centered
+        </item>
+    </style>
+
+    <style name="Theme.Raca.NoActionBar.Splash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.Raca</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+    </style>
+</resources>
