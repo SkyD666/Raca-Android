@@ -30,8 +30,7 @@ const val APPEARANCE_SCREEN_ROUTE = "appearanceScreen"
 
 @Composable
 fun AppearanceScreen() {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
 
     var openDarkBottomSheet by rememberSaveable { mutableStateOf(false) }

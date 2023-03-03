@@ -33,8 +33,7 @@ const val SEARCH_CONFIG_SCREEN_ROUTE = "searchConfigScreen"
 
 @Composable
 fun SearchConfigScreen() {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
     Scaffold(
         topBar = {

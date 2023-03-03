@@ -19,6 +19,7 @@
     <string name="add_screen_tag_field_hint">按下回车以添加</string>
     <string name="search_config_screen_name">搜索选项</string>
     <string name="home_screen_close_search">关闭</string>
+    <string name="home_screen_clear_search_text">清除文字</string>
     <string name="search_config_screen_common_category">常规</string>
     <string name="search_config_screen_use_regex">使用正则表达式</string>
     <string name="search_config_screen_use_regex_description">将搜索框中的内容作为正则表达式进行搜索</string>

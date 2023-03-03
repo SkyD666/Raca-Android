@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -27,8 +26,7 @@ const val IMPORT_EXPORT_SCREEN_ROUTE = "importExportScreen"
 
 @Composable
 fun ImportExportScreen() {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
 
     Scaffold(

@@ -6,11 +6,6 @@ import androidx.room.PrimaryKey
 
 const val ARTICLE_TABLE_NAME = "Article"
 
-private const val ID_COLUMN = "id"
-private const val TITLE_COLUMN = "title"
-private const val ARTICLE_COLUMN = "article"
-private const val CREATE_TIME_COLUMN = "createTime"
-
 @Entity(tableName = ARTICLE_TABLE_NAME)
 data class ArticleBean(
     @PrimaryKey(autoGenerate = true)
@@ -39,6 +34,11 @@ data class ArticleBean(
     }
 
     companion object {
+        const val ID_COLUMN = "id"
+        const val TITLE_COLUMN = "title"
+        const val ARTICLE_COLUMN = "article"
+        const val CREATE_TIME_COLUMN = "createTime"
+
         val columnName: List<Any> =
             listOf(ID_COLUMN, TITLE_COLUMN, ARTICLE_COLUMN, CREATE_TIME_COLUMN)
     }

@@ -102,7 +102,15 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
                     leadingIcon = {
                         if (active) {
-                            Icon(Icons.Default.Search, contentDescription = null)
+                            IconButton(onClick = {
+                                focusManager.clearFocus()
+                                active = false
+                            }) {
+                                Icon(
+                                    Icons.Default.ArrowBack,
+                                    contentDescription = stringResource(id = R.string.home_screen_close_search)
+                                )
+                            }
                         } else {
                             IconButton(onClick = { menuExpanded = true }) {
                                 Icon(Icons.Default.Menu, contentDescription = null)
@@ -120,13 +128,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                             viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
                         }
                         if (active) {
-                            IconButton(onClick = {
-                                focusManager.clearFocus()
-                                active = false
-                            }) {
+                            IconButton(onClick = { query = "" }) {
                                 Icon(
-                                    Icons.Default.Close,
-                                    stringResource(R.string.home_screen_close_search)
+                                    Icons.Default.Clear,
+                                    stringResource(R.string.home_screen_clear_search_text)
                                 )
                             }
                         } else {

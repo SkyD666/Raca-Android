@@ -26,8 +26,7 @@ const val EXPORT_SCREEN_ROUTE = "exportScreen"
 
 @Composable
 fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -63,6 +62,11 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
             )
         }
     ) {
+        val pickDirLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.OpenDocumentTree()
+        ) { uri ->
+            dirUri = uri
+        }
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,11 +79,6 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                 )
             }
             item {
-                val pickDirLauncher = rememberLauncherForActivityResult(
-                    ActivityResultContracts.OpenDocumentTree()
-                ) { uri ->
-                    dirUri = uri
-                }
                 BaseSettingsItem(
                     icon = rememberVectorPainter(image = Icons.Default.Folder),
                     text = stringResource(id = R.string.export_screen_select_dir),

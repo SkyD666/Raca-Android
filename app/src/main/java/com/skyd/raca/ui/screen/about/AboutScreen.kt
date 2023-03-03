@@ -36,8 +36,7 @@ const val ABOUT_SCREEN_ROUTE = "aboutScreen"
 
 @Composable
 fun AboutScreen() {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
     val context = LocalContext.current
     Scaffold(

@@ -5,10 +5,6 @@ import androidx.room.Entity
 
 const val TAG_TABLE_NAME = "Tag"
 
-private const val ARTICLE_ID_COLUMN = "articleId"
-private const val TAG_COLUMN = "tag"
-private const val CREATE_TIME_COLUMN = "createTime"
-
 @Entity(tableName = TAG_TABLE_NAME, primaryKeys = ["articleId", "tag"])
 data class TagBean(
     @ColumnInfo(name = ARTICLE_ID_COLUMN)
@@ -31,6 +27,10 @@ data class TagBean(
     }
 
     companion object {
+        const val ARTICLE_ID_COLUMN = "articleId"
+        const val TAG_COLUMN = "tag"
+        const val CREATE_TIME_COLUMN = "createTime"
+
         val columnName: List<Any> =
             listOf(ARTICLE_ID_COLUMN, TAG_COLUMN, CREATE_TIME_COLUMN)
     }

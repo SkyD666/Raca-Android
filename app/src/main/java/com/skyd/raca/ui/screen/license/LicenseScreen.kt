@@ -25,8 +25,7 @@ const val LICENSE_SCREEN_ROUTE = "licenseScreen"
 
 @Composable
 fun LicenseScreen() {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
     Scaffold(
         topBar = {

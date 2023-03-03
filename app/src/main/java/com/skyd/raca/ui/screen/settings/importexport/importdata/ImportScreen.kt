@@ -27,8 +27,7 @@ const val IMPORT_SCREEN_ROUTE = "importScreen"
 
 @Composable
 fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -67,6 +66,16 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
             )
         }
     ) {
+        val pickArticleFileLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { fileUri ->
+            articleUri = fileUri
+        }
+        val pickTagFileLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { fileUri ->
+            tagUri = fileUri
+        }
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,32 +88,22 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
                 )
             }
             item {
-                val pickFileLauncher = rememberLauncherForActivityResult(
-                    ActivityResultContracts.GetContent()
-                ) { fileUri ->
-                    articleUri = fileUri
-                }
                 BaseSettingsItem(
                     icon = rememberVectorPainter(image = Icons.Default.Article),
                     text = stringResource(id = R.string.import_screen_select_article_table),
                     descriptionText = articleUri?.path,
                     onClick = {
-                        pickFileLauncher.launch("text/*")
+                        pickArticleFileLauncher.launch("text/*")
                     }
                 )
             }
             item {
-                val pickFileLauncher = rememberLauncherForActivityResult(
-                    ActivityResultContracts.GetContent()
-                ) { fileUri ->
-                    tagUri = fileUri
-                }
                 BaseSettingsItem(
                     icon = rememberVectorPainter(image = Icons.Default.Article),
                     text = stringResource(id = R.string.import_screen_select_tag_table),
                     descriptionText = tagUri?.path,
                     onClick = {
-                        pickFileLauncher.launch("text/*")
+                        pickTagFileLauncher.launch("text/*")
                     }
                 )
             }
