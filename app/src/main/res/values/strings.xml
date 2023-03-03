@@ -69,4 +69,16 @@
     <string name="export_screen_waiting">正在导出…</string>
     <string name="import_export_screen_import_description">选择外部文件以导入数据到数据库</string>
     <string name="import_export_screen_export_description">将数据库的所有内容导出到文件</string>
+    <string name="easy_usage_screen_name">便捷使用</string>
+    <string name="easy_usage_screen_send_category">发送</string>
+    <string name="easy_usage_screen_use_auto_fill">自动填充</string>
+    <string name="easy_usage_screen_use_auto_fill_not_support_description">Android 8 以下系统不支持此功能</string>
+    <string name="easy_usage_screen_use_auto_fill_description">输入框内输入关键词，长按，选择自动填充，然后清空输入框即可</string>
+    <string name="setting_screen_easy_usage_description">一些方便使用的功能</string>
+    <string name="request_permission_failed">请求权限失败：%s</string>
+    <string name="request_permissions_success">请求权限成功！</string>
+    <string name="global_input_hint">请输入关键词</string>
+    <string name="easy_usage_screen_add_category">添加</string>
+    <string name="easy_usage_screen_process_text_add">快速添加选中文本</string>
+    <string name="easy_usage_screen_process_text_add_description">选中要添加的段落，在弹出的上下文菜单中选择 %s</string>
 </resources>

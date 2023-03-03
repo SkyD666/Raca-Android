@@ -33,17 +33,20 @@
 ## 💡主要功能
 
 1. 支持为段落打**标签**
-3. 支持设置**搜索域**（设置搜索**数据库表的字段**）
-4. 支持使用**正则表达式搜索**
-6. 支持**导入导出数据库**
-8. 支持**深色模式**
-9. ......
+2. 支持设置**搜索域**（设置搜索**数据库表的字段**）
+3. 支持使用**正则表达式搜索**
+4. 支持**导入导出数据库**
+5. 支持根据关键词**自动填充**输入框
+6. 支持通过选中段落后的**上下文菜单快捷添加段落**
+7. 支持**深色模式**
+8. ......
 
 ## 🤩应用截图
 
-<img src="image/ic_main_screen.jpg" alt="ic_main_screen" style="zoom:60%;" /> <img src="image/ic_main_screen_search.jpg" alt="ic_main_screen_search" style="zoom:60%;" />
-<img src="image/ic_add_screen_edit.jpg" alt="ic_add_screen_edit" style="zoom:60%;" /> <img src="image/ic_search_config_screen.jpg" alt="ic_search_config_screen" style="zoom:60%;" />
-<img src="image/ic_more_screen.jpg" alt="ic_more_screen" style="zoom:60%;" /> <img src="image/ic_about_screen.jpg" alt="ic_about_screen" style="zoom:60%;" />
+<img src="image/ic_main_screen.jpg" alt="ic_main_screen" style="zoom:50%;" /> <img src="image/ic_main_screen_search.jpg" alt="ic_main_screen_search" style="zoom:50%;" />
+<img src="image/ic_add_screen_edit.jpg" alt="ic_add_screen_edit" style="zoom:50%;" /> <img src="image/ic_search_config_screen.jpg" alt="ic_search_config_screen" style="zoom:50%;" />
+<img src="image/ic_process_text_menu.jpg" alt="ic_process_text_menu" style="zoom:50%;" /> <img src="image/ic_auto_fill_menu.jpg" alt="ic_auto_fill_menu" style="zoom:50%;" />
+<img src="image/ic_more_screen.jpg" alt="ic_more_screen" style="zoom:50%;" /> <img src="image/ic_about_screen.jpg" alt="ic_about_screen" style="zoom:50%;" />
 
 ## 🛠主要技术栈
 

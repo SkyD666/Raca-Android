@@ -3,6 +3,7 @@ package com.skyd.raca.ui.screen.settings
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Scaffold
@@ -20,6 +21,7 @@ import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.settings.appearance.APPEARANCE_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.easyusage.EASY_USAGE_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 
 const val SETTINGS_SCREEN_ROUTE = "settingsScreen"
@@ -57,6 +59,14 @@ fun SettingsScreen() {
                     text = stringResource(id = R.string.appearance_screen_name),
                     descriptionText = stringResource(id = R.string.setting_screen_appearance_description),
                     onClick = { navController.navigate(APPEARANCE_SCREEN_ROUTE) }
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(Icons.Default.AccessibilityNew),
+                    text = stringResource(id = R.string.easy_usage_screen_name),
+                    descriptionText = stringResource(id = R.string.setting_screen_easy_usage_description),
+                    onClick = { navController.navigate(EASY_USAGE_SCREEN_ROUTE) }
                 )
             }
         }

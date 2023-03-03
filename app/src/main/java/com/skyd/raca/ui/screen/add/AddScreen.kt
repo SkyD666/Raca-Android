@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 const val ADD_SCREEN_ROUTE = "addScreen"
 
 @Composable
-fun AddScreen(articleId: Long, viewModel: AddViewModel = hiltViewModel()) {
+fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltViewModel()) {
     var openDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -51,6 +51,8 @@ fun AddScreen(articleId: Long, viewModel: AddViewModel = hiltViewModel()) {
 
     if (articleId != 0L) {
         viewModel.sendUiIntent(AddIntent.GetArticleWithTags(articleId))
+    } else {
+        articleText = article
     }
 
     LaunchedEffect(Unit) {
@@ -182,9 +184,9 @@ fun AddScreen(articleId: Long, viewModel: AddViewModel = hiltViewModel()) {
         if (addArticleResultUiState !is AddArticleResultUiState.SUCCESS) {
             when (getArticleWithTagsUiState) {
                 is GetArticleWithTagsUiState.SUCCESS -> {
-                    val article = getArticleWithTagsUiState.articleWithTags.article
-                    titleText = article.title
-                    articleText = article.article
+                    val articleBean = getArticleWithTagsUiState.articleWithTags.article
+                    titleText = articleBean.title
+                    articleText = articleBean.article
                     tags.clear()
                     tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
                 }

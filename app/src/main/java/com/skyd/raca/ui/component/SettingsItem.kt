@@ -138,7 +138,7 @@ fun BaseSettingsItem(
                     modifier = Modifier.padding(top = 5.dp),
                     text = descriptionText,
                     style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 2
+                    maxLines = 3
                 )
             }
         }

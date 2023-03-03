@@ -40,62 +40,64 @@ class HomeRepository @Inject constructor() : BaseRepository() {
         }
     }
 
-    private fun genSql(k: String): SimpleSQLiteQuery {
-        return SimpleSQLiteQuery("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(k)}")
-    }
-
-    private fun getFilter(k: String): String {
-        if (k.isBlank()) return "1"
-
-        var filter = "0"
-
-        // 转义输入，防止SQL注入
-        val keyword = if (useRegexSearch) {
-            DatabaseUtils.sqlEscapeString(k)
-        } else {
-            DatabaseUtils.sqlEscapeString("%$k%")
+    companion object {
+        fun genSql(k: String): SimpleSQLiteQuery {
+            return SimpleSQLiteQuery("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(k)}")
         }
 
-        val tables = allSearchDomain.keys
-        for (table in tables) {
-            val columns = allSearchDomain[table].orEmpty()
+        private fun getFilter(k: String): String {
+            if (k.isBlank()) return "1"
 
-            if (table.first == ARTICLE_TABLE_NAME) {
-                for (column in columns) {
-                    if (!getSearchDomain(table.first, column.first)) {
-                        continue
-                    }
-                    filter += if (useRegexSearch) {
-                        " OR ${column.first} REGEXP $keyword"
-                    } else {
-                        " OR ${column.first} LIKE $keyword"
-                    }
-                }
+            var filter = "0"
+
+            // 转义输入，防止SQL注入
+            val keyword = if (useRegexSearch) {
+                DatabaseUtils.sqlEscapeString(k)
             } else {
-                var hasQuery = false
-                var subSelect = "(SELECT DISTINCT articleId FROM ${table.first} WHERE 0 "
-                for (column in columns) {
-                    if (!getSearchDomain(table.first, column.first)) {
+                DatabaseUtils.sqlEscapeString("%$k%")
+            }
+
+            val tables = allSearchDomain.keys
+            for (table in tables) {
+                val columns = allSearchDomain[table].orEmpty()
+
+                if (table.first == ARTICLE_TABLE_NAME) {
+                    for (column in columns) {
+                        if (!getSearchDomain(table.first, column.first)) {
+                            continue
+                        }
+                        filter += if (useRegexSearch) {
+                            " OR ${column.first} REGEXP $keyword"
+                        } else {
+                            " OR ${column.first} LIKE $keyword"
+                        }
+                    }
+                } else {
+                    var hasQuery = false
+                    var subSelect = "(SELECT DISTINCT articleId FROM ${table.first} WHERE 0 "
+                    for (column in columns) {
+                        if (!getSearchDomain(table.first, column.first)) {
+                            continue
+                        }
+                        subSelect += if (useRegexSearch) {
+                            " OR ${column.first} REGEXP $keyword"
+                        } else {
+                            " OR ${column.first} LIKE $keyword"
+                        }
+                        hasQuery = true
+                    }
+                    if (!hasQuery) {
                         continue
                     }
-                    subSelect += if (useRegexSearch) {
-                        " OR ${column.first} REGEXP $keyword"
-                    } else {
-                        " OR ${column.first} LIKE $keyword"
-                    }
-                    hasQuery = true
+                    subSelect += ")"
+                    filter += " OR id IN $subSelect"
                 }
-                if (!hasQuery) {
-                    continue
-                }
-                subSelect += ")"
-                filter += " OR id IN $subSelect"
             }
-        }
 
-        if (filter == "0") {
-            filter += " OR 1"
+            if (filter == "0") {
+                filter += " OR 1"
+            }
+            return filter
         }
-        return filter
     }
 }
