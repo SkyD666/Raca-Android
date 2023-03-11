@@ -69,7 +69,7 @@ fun AppearanceScreen() {
 
 @Composable
 private fun DarkModeSheet(onDismissRequest: () -> Unit) {
-    val bottomSheetState = rememberSheetState()
+    val bottomSheetState = rememberModalBottomSheetState()
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,

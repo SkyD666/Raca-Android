@@ -11,7 +11,7 @@ data class AddState(
 sealed class AddArticleResultUiState {
     object INIT : AddArticleResultUiState()
     object FAILED : AddArticleResultUiState()
-    data class SUCCESS(val articleId: Long) : AddArticleResultUiState()
+    data class SUCCESS(val articleUuid: String) : AddArticleResultUiState()
 }
 
 sealed class GetArticleWithTagsUiState {

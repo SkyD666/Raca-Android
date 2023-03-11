@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.ext.plus
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
 const val ADD_SCREEN_ROUTE = "addScreen"
 
 @Composable
-fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltViewModel()) {
+fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hiltViewModel()) {
     var openDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -49,8 +50,8 @@ fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltVi
     var articleText by rememberSaveable { mutableStateOf("") }
     val tags = remember { mutableStateListOf<TagBean>() }
 
-    if (articleId != 0L) {
-        viewModel.sendUiIntent(AddIntent.GetArticleWithTags(articleId))
+    if (articleUuid.isNotBlank()) {
+        viewModel.sendUiIntent(AddIntent.GetArticleWithTags(articleUuid))
     } else {
         articleText = article
     }
@@ -66,7 +67,7 @@ fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltVi
                 title = {
                     Text(
                         text = stringResource(
-                            if (articleId == 0L) R.string.add_screen_name
+                            if (articleUuid.isBlank()) R.string.add_screen_name
                             else R.string.add_screen_name_edit
                         )
                     )
@@ -89,7 +90,7 @@ fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltVi
                                 focusManager.clearFocus()
                                 val articleWithTags = ArticleWithTags(
                                     article = ArticleBean(title = titleText, article = articleText)
-                                        .apply { id = articleId },
+                                        .apply { uuid = articleUuid },
                                     tags = tags.toList()
                                 )
                                 viewModel.sendUiIntent(
@@ -180,7 +181,7 @@ fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltVi
         }
     }
 
-    viewModel.uiStateFlow.collectAsState().value.apply {
+    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
         if (addArticleResultUiState !is AddArticleResultUiState.SUCCESS) {
             when (getArticleWithTagsUiState) {
                 is GetArticleWithTagsUiState.SUCCESS -> {
@@ -202,7 +203,7 @@ fun AddScreen(articleId: Long, article: String, viewModel: AddViewModel = hiltVi
             }
             is AddArticleResultUiState.SUCCESS -> {
                 val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
-                savedStateHandle?.set("articleId", addArticleResultUiState.articleId)
+                savedStateHandle?.set("articleUuid", addArticleResultUiState.articleUuid)
                 dialogMessage = stringResource(R.string.add_screen_success)
                 openDialog = true
             }

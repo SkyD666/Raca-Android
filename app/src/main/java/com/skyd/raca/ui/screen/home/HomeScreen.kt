@@ -19,13 +19,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
 import com.skyd.raca.R
 import com.skyd.raca.appContext
-import com.skyd.raca.config.currentArticleId
+import com.skyd.raca.config.currentArticleUuid
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
+import com.skyd.raca.ui.component.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
@@ -43,13 +45,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    viewModel.uiStateFlow.collectAsState().value.apply {
-        currentArticleId = when (articleDetailUiState) {
+    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
+        currentArticleUuid = when (articleDetailUiState) {
             is ArticleDetailUiState.SUCCESS -> {
-                articleDetailUiState.articleWithTags.article.id
+                articleDetailUiState.articleWithTags.article.uuid
             }
             is ArticleDetailUiState.INIT -> {
-                articleDetailUiState.articleId
+                articleDetailUiState.articleUuid
             }
         }
     }
@@ -119,11 +121,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     },
                     trailingIcon = {
                         val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-                        val articleIdState = savedStateHandle
-                            ?.getStateFlow<Long>("articleId", 0)
-                            ?.collectAsState()
-                        articleIdState?.value?.let {
-                            savedStateHandle.remove<Long>("articleId")
+                        val articleUuidState = savedStateHandle
+                            ?.getStateFlow("articleUuid", "")
+                            ?.collectAsStateWithLifecycle()
+                        articleUuidState?.value?.let {
+                            savedStateHandle.remove<String>("articleUuid")
                             viewModel.sendUiIntent(HomeIntent.GetArticleDetails(it))
                             viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
                         }
@@ -143,7 +145,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                         }
                     },
                 ) {
-                    viewModel.uiStateFlow.collectAsState().value.apply {
+                    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
                         when (searchResultUiState) {
                             SearchResultUiState.INIT -> {
 
@@ -154,7 +156,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                                         focusManager.clearFocus()
                                         active = false
                                         viewModel.sendUiIntent(
-                                            HomeIntent.GetArticleDetails(it.article.id)
+                                            HomeIntent.GetArticleDetails(it.article.uuid)
                                         )
                                     }
                                 )
@@ -165,12 +167,14 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 HomeMenu()
             }
 
-            viewModel.uiStateFlow.collectAsState().value.apply {
+            viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
                 when (articleDetailUiState) {
                     is ArticleDetailUiState.INIT -> {
-                        viewModel.sendUiIntent(
-                            HomeIntent.GetArticleDetails(articleDetailUiState.articleId)
-                        )
+                        if (articleDetailUiState.articleUuid.isNotBlank()) {
+                            viewModel.sendUiIntent(
+                                HomeIntent.GetArticleDetails(articleDetailUiState.articleUuid)
+                            )
+                        }
                     }
                     is ArticleDetailUiState.SUCCESS -> {
                         MainCard(
@@ -182,13 +186,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
             }
         }
 
-        if (openDeleteWarningDialog && currentArticleId != 0L) {
+        if (openDeleteWarningDialog && currentArticleUuid.isNotBlank()) {
             DeleteWarningDialog(
                 { openDeleteWarningDialog = false },
                 { openDeleteWarningDialog = false },
                 {
                     openDeleteWarningDialog = false
-                    viewModel.sendUiIntent(HomeIntent.DeleteArticleWithTags(currentArticleId))
+                    viewModel.sendUiIntent(HomeIntent.DeleteArticleWithTags(currentArticleUuid))
                 }
             )
         }
@@ -221,7 +225,7 @@ private fun HomeMenu(viewModel: HomeViewModel = hiltViewModel()) {
     var editMenuItemEnabled by remember { mutableStateOf(false) }
     var deleteMenuItemEnabled by remember { mutableStateOf(false) }
 
-    viewModel.uiStateFlow.collectAsState().value.apply {
+    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
         if (articleDetailUiState is ArticleDetailUiState.SUCCESS) {
             editMenuItemEnabled = true
             deleteMenuItemEnabled = true
@@ -240,7 +244,7 @@ private fun HomeMenu(viewModel: HomeViewModel = hiltViewModel()) {
             text = { Text(stringResource(R.string.home_screen_edit)) },
             onClick = {
                 menuExpanded = false
-                navController.navigate("$ADD_SCREEN_ROUTE?articleId=${currentArticleId}")
+                navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
             },
             leadingIcon = {
                 Icon(
@@ -307,7 +311,7 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
                         }
                     },
                     onDoubleClick = {
-                        navController.navigate("$ADD_SCREEN_ROUTE?articleId=${currentArticleId}")
+                        navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
                     },
                     onClick = {}
                 )
@@ -348,34 +352,4 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
             }
         }
     }
-}
-
-@Composable
-private fun DeleteWarningDialog(
-    onDismissRequest: () -> Unit,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        icon = {
-            Icon(imageVector = Icons.Default.Warning, contentDescription = null)
-        },
-        title = {
-            Text(text = stringResource(R.string.dialog_warning))
-        },
-        text = {
-            Text(text = stringResource(R.string.home_screen_delete_warning))
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.dialog_ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.dialog_cancel))
-            }
-        }
-    )
 }

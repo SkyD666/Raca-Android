@@ -2,7 +2,7 @@ package com.skyd.raca.ui.screen.home
 
 import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUiIntent
-import com.skyd.raca.config.currentArticleId
+import com.skyd.raca.config.currentArticleUuid
 import com.skyd.raca.model.respository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -12,7 +12,7 @@ class HomeViewModel @Inject constructor(var homeRepo: HomeRepository) :
     BaseViewModel<HomeState, HomeIntent>() {
     override fun initUiState(): HomeState {
         return HomeState(
-            ArticleDetailUiState.INIT(currentArticleId),
+            ArticleDetailUiState.INIT(currentArticleUuid),
             SearchResultUiState.INIT,
         )
     }
@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(var homeRepo: HomeRepository) :
             }
             is HomeIntent.GetArticleDetails -> {
                 requestDataWithFlow(showLoading = false,
-                    request = { homeRepo.requestArticleWithTagsDetail(intent.articleId) },
+                    request = { homeRepo.requestArticleWithTagsDetail(intent.articleUuid) },
                     successCallback = { data ->
                         sendUiState {
                             copy(articleDetailUiState = ArticleDetailUiState.SUCCESS(data))
@@ -41,10 +41,10 @@ class HomeViewModel @Inject constructor(var homeRepo: HomeRepository) :
             }
             is HomeIntent.DeleteArticleWithTags -> {
                 requestDataWithFlow(showLoading = false,
-                    request = { homeRepo.requestDeleteArticleWithTagsDetail(intent.articleId) },
+                    request = { homeRepo.requestDeleteArticleWithTagsDetail(intent.articleUuid) },
                     successCallback = {
                         sendUiState {
-                            copy(articleDetailUiState = ArticleDetailUiState.INIT(0L))
+                            copy(articleDetailUiState = ArticleDetailUiState.INIT(""))
                         }
                     }
                 )

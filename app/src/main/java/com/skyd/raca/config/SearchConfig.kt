@@ -5,6 +5,7 @@ import com.skyd.raca.ext.sharedPreferences
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean.Companion.ARTICLE_COLUMN
 import com.skyd.raca.model.bean.ArticleBean.Companion.TITLE_COLUMN
+import com.skyd.raca.model.bean.ArticleBean.Companion.UUID_COLUMN
 import com.skyd.raca.model.bean.TAG_TABLE_NAME
 import com.skyd.raca.model.bean.TagBean.Companion.TAG_COLUMN
 
@@ -16,10 +17,9 @@ var useRegexSearch = sharedPreferences().getBoolean("useRegexSearch", false)
 
 val allSearchDomain: HashMap<Pair<String, String>, List<Pair<String, String>>> = hashMapOf(
     (ARTICLE_TABLE_NAME to "段落表") to listOf(
-//        ID_COLUMN to "ID",
+        UUID_COLUMN to "UUID",
         TITLE_COLUMN to "标题",
         ARTICLE_COLUMN to "段落",
-//        CREATE_TIME_COLUMN to "创建时间"
     ),
     (TAG_TABLE_NAME to "标签表") to listOf(
 //        ARTICLE_ID_COLUMN to "段落ID",

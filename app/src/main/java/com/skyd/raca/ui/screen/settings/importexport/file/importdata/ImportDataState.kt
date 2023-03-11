@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.screen.settings.importexport.importdata
+package com.skyd.raca.ui.screen.settings.importexport.file.importdata
 
 import com.skyd.raca.base.IUiState
 

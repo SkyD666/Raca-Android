@@ -7,20 +7,20 @@ import com.skyd.raca.model.bean.ArticleWithTags
 import javax.inject.Inject
 
 class AddRepository @Inject constructor() : BaseRepository() {
-    suspend fun requestAddArticleWithTags(articleWithTags: ArticleWithTags): BaseData<Long> {
+    suspend fun requestAddArticleWithTags(articleWithTags: ArticleWithTags): BaseData<String> {
         return executeRequest {
-            BaseData<Long>().apply {
+            BaseData<String>().apply {
                 code = 0
                 data = appDataBase.articleDao().addArticleWithTags(articleWithTags)
             }
         }
     }
 
-    suspend fun requestGetArticleWithTags(articleId: Long): BaseData<ArticleWithTags> {
+    suspend fun requestGetArticleWithTags(articleUuid: String): BaseData<ArticleWithTags> {
         return executeRequest {
             BaseData<ArticleWithTags>().apply {
                 code = 0
-                data = appDataBase.articleDao().getArticleWithTags(articleId)
+                data = appDataBase.articleDao().getArticleWithTags(articleUuid)
             }
         }
     }

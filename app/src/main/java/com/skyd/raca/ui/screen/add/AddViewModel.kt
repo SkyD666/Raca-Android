@@ -33,7 +33,7 @@ class AddViewModel @Inject constructor(var addRepository: AddRepository) :
             }
             is AddIntent.GetArticleWithTags -> {
                 requestDataWithFlow(showLoading = false,
-                    request = { addRepository.requestGetArticleWithTags(intent.articleId) },
+                    request = { addRepository.requestGetArticleWithTags(intent.articleUuid) },
                     successCallback = {
                         sendUiState {
                             copy(getArticleWithTagsUiState = GetArticleWithTagsUiState.SUCCESS(it))

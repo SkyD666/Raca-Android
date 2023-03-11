@@ -1,5 +1,6 @@
-package com.skyd.raca.ui.screen.settings.importexport.exportdata
+package com.skyd.raca.ui.screen.settings.importexport.file.exportdata
 
+import android.util.Log
 import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUiIntent
 import com.skyd.raca.model.respository.ExportDataRepository
@@ -20,6 +21,7 @@ class ExportDataViewModel @Inject constructor(var exportDataRepo: ExportDataRepo
                     request = { exportDataRepo.requestExportData(intent.dirUri) },
                     successCallback = {
                         sendUiState {
+                            Log.e("TAG", "copy: 123", )
                             copy(exportResultUiState = ExportResultUiState.SUCCESS(it))
                         }
                     }

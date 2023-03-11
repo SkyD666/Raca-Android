@@ -193,7 +193,7 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = { openBrowser("https://discord.gg/zkGVFq3B2S") }) {
+            IconButton(onClick = { openBrowser("https://discord.gg/pEWEjeJTa3") }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_discord_24),
                     contentDescription = stringResource(id = R.string.github)

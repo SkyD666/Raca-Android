@@ -4,6 +4,8 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'com.google.devtools.ksp'
     id 'kotlin-kapt'
+    id 'kotlin-android'
+    id 'kotlinx-serialization'
 }
 
 apply from: secret
@@ -16,8 +18,8 @@ android {
         applicationId "com.skyd.raca"
         minSdk 24
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         flavorDimensions "versionName"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -113,19 +115,21 @@ kapt {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material3:material3:$md3_version"
     implementation "androidx.compose.material3:material3-window-size-class:$md3_version"
-    implementation "androidx.compose.material:material-icons-extended:1.4.0-beta02"
+    implementation "androidx.compose.material:material-icons-extended:1.4.0-rc01"
     implementation "androidx.compose.ui:ui-tooling-preview:$md3_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.0"
     implementation "com.google.android.material:material:1.9.0-alpha02"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.0"
+    implementation "androidx.activity:activity-compose:1.6.1"
     implementation "com.google.dagger:hilt-android:2.45"
     kapt "com.google.dagger:hilt-android-compiler:2.45"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
     implementation "androidx.navigation:navigation-compose:2.5.3"
+    implementation "androidx.security:security-crypto:1.1.0-alpha05"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
@@ -137,6 +141,8 @@ dependencies {
     ksp "androidx.room:room-compiler:2.5.0"
     implementation "com.google.code.gson:gson:2.10.1"
     implementation "com.github.doyaaaaaken:kotlin-csv-jvm:1.8.0" // for JVM platform
+    implementation "com.github.thegrizzlylabs:sardine-android:0.8"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
 
     debugImplementation "androidx.compose.ui:ui-tooling:$md3_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$md3_version"

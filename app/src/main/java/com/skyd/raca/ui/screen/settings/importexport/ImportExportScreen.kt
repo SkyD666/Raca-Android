@@ -3,8 +3,7 @@ package com.skyd.raca.ui.screen.settings.importexport
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -14,13 +13,11 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.skyd.raca.R
-import com.skyd.raca.ui.component.BackIcon
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.RacaTopBar
-import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.local.LocalNavController
-import com.skyd.raca.ui.screen.settings.importexport.exportdata.EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.importdata.IMPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.importexport.cloud.webdav.WEBDAV_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.importexport.file.exportdata.EXPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.importexport.file.importdata.IMPORT_SCREEN_ROUTE
 
 const val IMPORT_EXPORT_SCREEN_ROUTE = "importExportScreen"
 
@@ -45,6 +42,11 @@ fun ImportExportScreen() {
                 .nestedScroll(scrollBehavior.nestedScrollConnection), contentPadding = paddingValues
         ) {
             item {
+                CategorySettingsItem(
+                    text = stringResource(id = R.string.import_export_screen_using_file_category)
+                )
+            }
+            item {
                 BaseSettingsItem(
                     icon = rememberVectorPainter(image = Icons.Default.FileDownload),
                     text = stringResource(id = R.string.import_screen_name),
@@ -56,6 +58,19 @@ fun ImportExportScreen() {
                     text = stringResource(id = R.string.export_screen_name),
                     descriptionText = stringResource(id = R.string.import_export_screen_export_description),
                     onClick = { navController.navigate(EXPORT_SCREEN_ROUTE) }
+                )
+            }
+            item {
+                CategorySettingsItem(
+                    text = stringResource(id = R.string.import_export_screen_using_cloud_category)
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Default.CloudSync),
+                    text = stringResource(id = R.string.webdav_screen_name),
+                    descriptionText = stringResource(id = R.string.import_export_screen_webdav_description),
+                    onClick = { navController.navigate(WEBDAV_SCREEN_ROUTE) }
                 )
             }
         }

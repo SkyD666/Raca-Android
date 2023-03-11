@@ -15,6 +15,6 @@ interface TagDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addTags(tags: List<TagBean>)
 
-    @Query(value = "DELETE FROM $TAG_TABLE_NAME WHERE articleId = :articleId")
-    fun deleteTags(articleId: Long): Int
+    @Query(value = "DELETE FROM $TAG_TABLE_NAME WHERE articleUuid LIKE :articleUuid")
+    fun deleteTags(articleUuid: String): Int
 }

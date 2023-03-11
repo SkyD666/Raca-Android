@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.screen.settings.importexport.importdata
+package com.skyd.raca.ui.screen.settings.importexport.file.importdata
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.skyd.raca.appContext
@@ -10,6 +10,7 @@ import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.respository.ImportDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.InputStream
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,36 +53,41 @@ class ImportDataViewModel @Inject constructor(var importDataRepo: ImportDataRepo
 
         val articleWithTagsList = mutableListOf<ArticleWithTags>()
 
-        val tags = mutableMapOf<Long, MutableList<TagBean>>()
+        val tags = mutableMapOf<String, MutableList<TagBean>>()
 
         val articleInputs: List<Map<String, String>> =
             csvReader().readAllWithHeader(articleInputStream)
         val tagInputs: List<Map<String, String>> = csvReader().readAllWithHeader(tagInputStream)
 
         tagInputs.forEach {
-            val articleId = it["articleId"]?.toLongOrNull() ?: return@forEach
+            val articleUuid = it["articleUuid"] ?: return@forEach
             val tag = it["tag"] ?: return@forEach
             val createTime = it["createTime"]?.toLongOrNull() ?: return@forEach
 
-            if (tags[articleId] == null) {
-                tags[articleId] = mutableListOf()
+            if (tags[articleUuid] == null) {
+                tags[articleUuid] = mutableListOf()
             }
-            tags[articleId]?.add(
+            tags[articleUuid]?.add(
                 TagBean(
-                    articleId = articleId,
+                    articleUuid = articleUuid,
                     tag = tag,
                     createTime = createTime
                 )
             )
         }
         articleInputs.forEach {
-            val id = it["id"]?.toLongOrNull() ?: return@forEach
-            val title = it["title"] ?: return@forEach
-            val article = it["article"] ?: return@forEach
-            val createTime = it["createTime"]?.toLongOrNull() ?: return@forEach
+            val title: String = it["title"] ?: return@forEach
+            val article: String = it["article"] ?: return@forEach
+            val createTime: Long = it["createTime"]?.toLongOrNull() ?: return@forEach
+            val uuid: String = it["uuid"] ?: return@forEach
+            runCatching {
+                UUID.fromString(uuid)
+            }.onFailure {
+                return@forEach
+            }
 
             val articleBean = ArticleBean(
-                id = id,
+                uuid = uuid,
                 title = title,
                 article = article,
                 createTime = createTime,
@@ -90,7 +96,7 @@ class ImportDataViewModel @Inject constructor(var importDataRepo: ImportDataRepo
             articleWithTagsList.add(
                 ArticleWithTags(
                     article = articleBean,
-                    tags = tags[id].orEmpty()
+                    tags = tags[uuid].orEmpty()
                 )
             )
         }

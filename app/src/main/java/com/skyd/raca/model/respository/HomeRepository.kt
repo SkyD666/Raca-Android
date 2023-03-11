@@ -9,7 +9,9 @@ import com.skyd.raca.config.getSearchDomain
 import com.skyd.raca.config.useRegexSearch
 import com.skyd.raca.db.appDataBase
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
+import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
+import com.skyd.raca.model.bean.TagBean
 import javax.inject.Inject
 
 class HomeRepository @Inject constructor() : BaseRepository() {
@@ -22,20 +24,20 @@ class HomeRepository @Inject constructor() : BaseRepository() {
         }
     }
 
-    suspend fun requestArticleWithTagsDetail(articleId: Long): BaseData<ArticleWithTags> {
+    suspend fun requestArticleWithTagsDetail(articleUuid: String): BaseData<ArticleWithTags> {
         return executeRequest {
             BaseData<ArticleWithTags>().apply {
                 code = 0
-                data = appDataBase.articleDao().getArticleWithTags(articleId)
+                data = appDataBase.articleDao().getArticleWithTags(articleUuid)
             }
         }
     }
 
-    suspend fun requestDeleteArticleWithTagsDetail(articleId: Long): BaseData<Int> {
+    suspend fun requestDeleteArticleWithTagsDetail(articleUuid: String): BaseData<Int> {
         return executeRequest {
             BaseData<Int>().apply {
                 code = 0
-                data = appDataBase.articleDao().deleteArticleWithTags(articleId)
+                data = appDataBase.articleDao().deleteArticleWithTags(articleUuid)
             }
         }
     }
@@ -74,7 +76,8 @@ class HomeRepository @Inject constructor() : BaseRepository() {
                     }
                 } else {
                     var hasQuery = false
-                    var subSelect = "(SELECT DISTINCT articleId FROM ${table.first} WHERE 0 "
+                    var subSelect =
+                        "(SELECT DISTINCT ${TagBean.ARTICLE_UUID_COLUMN} FROM ${table.first} WHERE 0 "
                     for (column in columns) {
                         if (!getSearchDomain(table.first, column.first)) {
                             continue
@@ -90,7 +93,7 @@ class HomeRepository @Inject constructor() : BaseRepository() {
                         continue
                     }
                     subSelect += ")"
-                    filter += " OR id IN $subSelect"
+                    filter += " OR ${ArticleBean.UUID_COLUMN} IN $subSelect"
                 }
             }
 

@@ -122,5 +122,15 @@ private fun getLicenseList(): List<LicenseBean> {
             license = "Apache-2.0 License",
             url = "https://github.com/doyaaaaaken/kotlin-csv"
         ),
+        LicenseBean(
+            name = "sardine-android",
+            license = "Apache-2.0 License",
+            url = "https://github.com/thegrizzlylabs/sardine-android"
+        ),
+        LicenseBean(
+            name = "Kotlin Serialization",
+            license = "Apache-2.0 License",
+            url = "https://github.com/Kotlin/kotlinx.serialization"
+        ),
     )
 }

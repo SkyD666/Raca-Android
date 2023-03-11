@@ -9,7 +9,7 @@ data class HomeState(
 ) : IUiState
 
 sealed class ArticleDetailUiState {
-    data class INIT(val articleId: Long) : ArticleDetailUiState()
+    data class INIT(val articleUuid: String) : ArticleDetailUiState()
     data class SUCCESS(val articleWithTags: ArticleWithTags) : ArticleDetailUiState()
 }
 

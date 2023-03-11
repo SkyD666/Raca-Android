@@ -6,6 +6,7 @@ import com.skyd.raca.db.appDataBase
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
+import java.util.*
 
 @Dao
 interface ArticleDao {
@@ -13,40 +14,54 @@ interface ArticleDao {
     @RawQuery
     fun getArticleWithTagsList(sql: SupportSQLiteQuery): List<ArticleWithTags>
 
+    @Transaction
+    @Query("SELECT * FROM $ARTICLE_TABLE_NAME")
+    fun getAllArticleWithTagsList(): List<ArticleWithTags>
+
     @Query("SELECT * FROM $ARTICLE_TABLE_NAME")
     fun getArticleList(): List<ArticleBean>
 
     @Transaction
-    @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE id = :articleId")
-    fun getArticleWithTags(articleId: Long): ArticleWithTags
+    @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE uuid LIKE :articleUuid")
+    fun getArticleWithTags(articleUuid: String): ArticleWithTags
 
     @Transaction
     @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE article LIKE :article")
     fun getArticleWithTagsList(article: String): List<ArticleWithTags>
 
-    fun addArticleWithTags(articleWithTags: ArticleWithTags): Long {
-        val articleId = addArticle(articleWithTags.article)
+    @Transaction
+    fun addArticleWithTags(articleWithTags: ArticleWithTags): String {
+        var articleUuid = articleWithTags.article.uuid
+        runCatching {
+            UUID.fromString(articleUuid)
+        }.onFailure {
+            articleUuid = UUID.randomUUID().toString()
+            articleWithTags.article.uuid = articleUuid
+        }
+        innerAddArticle(articleWithTags.article)
         articleWithTags.tags.forEach {
-            it.articleId = articleId
+            it.articleUuid = articleUuid
         }
         appDataBase.tagDao().apply {
-            deleteTags(articleId)
+            deleteTags(articleUuid)
             addTags(articleWithTags.tags)
         }
-        return articleId
+        return articleUuid
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addArticle(article: ArticleBean): Long
+    fun innerAddArticle(article: ArticleBean)
 
-    fun deleteArticleWithTags(articleId: Long): Int {
-        appDataBase.tagDao().deleteTags(articleId)
-        return innerDeleteArticle(articleId)
+    @Transaction
+    fun deleteArticleWithTags(articleUuid: String): Int {
+        appDataBase.tagDao().deleteTags(articleUuid)
+        return innerDeleteArticle(articleUuid)
     }
 
-    @Query("DELETE FROM $ARTICLE_TABLE_NAME WHERE id = :articleId")
-    fun innerDeleteArticle(articleId: Long): Int
+    @Query("DELETE FROM $ARTICLE_TABLE_NAME WHERE uuid LIKE :articleUuid")
+    fun innerDeleteArticle(articleUuid: String): Int
 
+    @Transaction
     fun importData(articleWithTagsList: List<ArticleWithTags>): Boolean {
         val mutableList = articleWithTagsList.toMutableList()
         articleWithTagsList.forEach { external ->
@@ -55,7 +70,7 @@ interface ArticleDao {
                 if (external.tags.size != internal.tags.size) {
                     val allTags = internal.tags + external.tags
                     allTags.distinctBy { it.tag }
-                    deleteArticleWithTags(internal.article.id)
+                    deleteArticleWithTags(internal.article.uuid)
                     addArticleWithTags(
                         internal.copy(tags = allTags)
                     )
@@ -63,8 +78,20 @@ interface ArticleDao {
             }
         }
         mutableList.forEach {
-            addArticleWithTags(it.copy(article = it.article.copy(id = 0L)))
+            kotlin.runCatching {
+                UUID.fromString(it.article.uuid)
+            }.onFailure { _ ->
+                it.article.uuid = UUID.randomUUID().toString()
+            }
+            addArticleWithTags(it)
         }
         return true
+    }
+
+    @Transaction
+    fun webDavImportData(articleWithTagsList: List<ArticleWithTags>) {
+        articleWithTagsList.forEach {
+            addArticleWithTags(it)
+        }
     }
 }

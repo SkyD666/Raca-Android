@@ -3,7 +3,6 @@ package com.skyd.raca.ui.component.lazyverticalgrid.adapter
 import android.content.res.Configuration
 import com.skyd.raca.appContext
 import com.skyd.raca.ext.screenIsLand
-import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags1
 import com.skyd.raca.model.bean.More1Bean
 

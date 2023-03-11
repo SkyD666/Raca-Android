@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.screen.settings.importexport.importdata
+package com.skyd.raca.ui.screen.settings.importexport.file.importdata
 
 import android.net.Uri
 import com.skyd.raca.base.IUiIntent

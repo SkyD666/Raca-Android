@@ -8,10 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -36,10 +36,12 @@ import com.skyd.raca.ui.screen.settings.easyusage.EASY_USAGE_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.easyusage.EasyUsageScreen
 import com.skyd.raca.ui.screen.settings.importexport.IMPORT_EXPORT_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.importexport.ImportExportScreen
-import com.skyd.raca.ui.screen.settings.importexport.exportdata.EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.exportdata.ExportScreen
-import com.skyd.raca.ui.screen.settings.importexport.importdata.IMPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.importdata.ImportScreen
+import com.skyd.raca.ui.screen.settings.importexport.cloud.webdav.WEBDAV_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.importexport.cloud.webdav.WebDavScreen
+import com.skyd.raca.ui.screen.settings.importexport.file.exportdata.EXPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.importexport.file.exportdata.ExportScreen
+import com.skyd.raca.ui.screen.settings.importexport.file.importdata.IMPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.importexport.file.importdata.ImportScreen
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SearchConfigScreen
 import com.skyd.raca.ui.theme.RacaTheme
@@ -59,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             val navController = rememberAnimatedNavController()
             CompositionLocalProvider(LocalNavController provides navController) {
                 this.navController = navController
-                val darkMode by refreshDarkMode.collectAsState()
+                val darkMode by refreshDarkMode.collectAsStateWithLifecycle()
                 RacaTheme(darkTheme = darkMode) {
                     AnimatedNavHost(
                         modifier = Modifier
@@ -72,11 +74,11 @@ class MainActivity : AppCompatActivity() {
                             MainScreen()
                         }
                         composable(
-                            route = "$ADD_SCREEN_ROUTE?articleId={articleId}",
-                            arguments = listOf(navArgument("articleId") { defaultValue = 0L })
+                            route = "$ADD_SCREEN_ROUTE?articleUuid={articleUuid}",
+                            arguments = listOf(navArgument("articleUuid") { defaultValue = "" })
                         ) {
                             AddScreen(
-                                articleId = it.arguments?.getLong("articleId") ?: 0L,
+                                articleUuid = it.arguments?.getString("articleUuid").orEmpty(),
                                 article = it.arguments?.getString("article").orEmpty()
                             )
                         }
@@ -106,6 +108,9 @@ class MainActivity : AppCompatActivity() {
                         }
                         composable(route = EASY_USAGE_SCREEN_ROUTE) {
                             EasyUsageScreen()
+                        }
+                        composable(route = WEBDAV_SCREEN_ROUTE) {
+                            WebDavScreen()
                         }
                     }
                 }
