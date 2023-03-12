@@ -1,6 +1,7 @@
 package com.skyd.raca.ui.screen.home
 
 import com.skyd.raca.base.BaseViewModel
+import com.skyd.raca.base.IUiEvent
 import com.skyd.raca.base.IUiIntent
 import com.skyd.raca.config.currentArticleUuid
 import com.skyd.raca.model.respository.HomeRepository
@@ -8,8 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(var homeRepo: HomeRepository) :
-    BaseViewModel<HomeState, HomeIntent>() {
+class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
+    BaseViewModel<HomeState, IUiEvent, HomeIntent>() {
     override fun initUiState(): HomeState {
         return HomeState(
             ArticleDetailUiState.INIT(currentArticleUuid),

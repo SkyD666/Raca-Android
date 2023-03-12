@@ -6,6 +6,9 @@ import androidx.annotation.Keep
 interface IUiState
 
 @Keep
+interface IUiEvent
+
+@Keep
 interface IUiIntent //event
 
 sealed class LoadUiIntent {

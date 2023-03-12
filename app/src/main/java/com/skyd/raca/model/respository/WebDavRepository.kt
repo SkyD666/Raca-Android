@@ -203,6 +203,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
             val inputAsString = sardine.get(website + APP_DIR + BACKUP_INFO_FILE)
                 .bufferedReader().use { it.readText() }
             Json.decodeFromString<List<BackupInfo>>(inputAsString)
+                .distinctBy { it.uuid }             // 保证uuid唯一
                 .associateBy { it.contentMd5 + it.uuid }
         } else mapOf()
     }

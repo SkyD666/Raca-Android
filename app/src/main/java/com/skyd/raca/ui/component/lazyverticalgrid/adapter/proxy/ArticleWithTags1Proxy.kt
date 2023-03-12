@@ -51,17 +51,22 @@ fun ArticleWithTags1Item(
                     }
                 ),
         ) {
+            if (data.article.title.isNotBlank()) {
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .padding(horizontal = 10.dp),
+                    text = data.article.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1
+                )
+            }
             Text(
                 modifier = Modifier
-                    .padding(top = 10.dp)
-                    .padding(horizontal = 10.dp),
-                text = data.article.title,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1
-            )
-            Text(
-                modifier = Modifier
-                    .padding(top = 6.dp, bottom = 10.dp)
+                    .padding(
+                        top = if (data.article.title.isNotBlank()) 6.dp else 12.dp,
+                        bottom = 12.dp
+                    )
                     .padding(horizontal = 10.dp),
                 text = data.article.article,
                 style = MaterialTheme.typography.bodyMedium,

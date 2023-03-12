@@ -8,15 +8,25 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
-abstract class BaseViewModel<UiState : IUiState, UiIntent : IUiIntent> : ViewModel() {
+abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : IUiIntent> :
+    ViewModel() {
 
-    private val _uiStateFlow = MutableStateFlow(initUiState())
+    private val _uiStateFlow by lazy { MutableStateFlow(initUiState()) }
     val uiStateFlow: StateFlow<UiState> = _uiStateFlow
 
     protected abstract fun initUiState(): UiState
 
     protected fun sendUiState(copy: UiState.() -> UiState) {
         _uiStateFlow.update { copy(_uiStateFlow.value) }
+    }
+
+    private val _uiEventFlow: Channel<UiEvent> = Channel()
+    val uiEventFlow = _uiEventFlow.receiveAsFlow()
+
+    protected fun sendUiEvent(event: UiEvent) {
+        viewModelScope.launch {
+            _uiEventFlow.send(event)
+        }
     }
 
     private val _uiIntentFlow: Channel<UiIntent> = Channel()

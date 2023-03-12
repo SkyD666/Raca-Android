@@ -19,7 +19,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ext.collectAsSharedState
 import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.local.LocalNavController
 import kotlinx.coroutines.launch
@@ -111,20 +110,20 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                 }
             }
         }
-        viewModel.uiStateFlow.collectAsSharedState {
-            when (exportResultUiState) {
-                is ExportResultUiState.SUCCESS -> {
+        viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
+            when (exportResultUiEvent) {
+                is ExportResultUiEvent.SUCCESS -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(
                                 R.string.export_screen_success,
-                                exportResultUiState.time / 1000.0
+                                exportResultUiEvent.time / 1000.0
                             ),
                             withDismissAction = true
                         )
                     }
                 }
-                ExportResultUiState.INIT -> {}
+                null -> {}
             }
         }
         if (openWaitingDialog) {

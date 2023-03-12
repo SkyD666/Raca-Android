@@ -48,16 +48,17 @@
 
 ## 🤩应用截图
 
-<img src="image/ic_main_screen.jpg" alt="ic_main_screen" style="zoom:50%;" /> <img src="image/ic_main_screen_search.jpg" alt="ic_main_screen_search" style="zoom:50%;" />
-<img src="image/ic_add_screen_edit.jpg" alt="ic_add_screen_edit" style="zoom:50%;" /> <img src="image/ic_search_config_screen.jpg" alt="ic_search_config_screen" style="zoom:50%;" />
-<img src="image/ic_process_text_menu.jpg" alt="ic_process_text_menu" style="zoom:50%;" /> <img src="image/ic_auto_fill_menu.jpg" alt="ic_auto_fill_menu" style="zoom:50%;" />
-<img src="image/ic_more_screen.jpg" alt="ic_more_screen" style="zoom:50%;" /> <img src="image/ic_about_screen.jpg" alt="ic_about_screen" style="zoom:50%;" />
+![ic_main_screen](image/ic_main_screen.jpg) ![ic_main_screen_search](image/ic_main_screen_search.jpg)
+![ic_add_screen_edit](image/ic_add_screen_edit.jpg) ![ic_search_config_screen](image/ic_search_config_screen.jpg)
+![ic_process_text_menu](image/ic_process_text_menu.jpg) ![ic_auto_fill_menu](image/ic_auto_fill_menu.jpg)
+![ic_import_export_screen](image/ic_import_export_screen.jpg) ![ic_easy_usage_screen](image/ic_easy_usage_screen.jpg)
+![ic_more_screen](image/ic_more_screen.jpg) ![ic_about_screen](image/ic_about_screen.jpg)
 
 ## 🛠主要技术栈
 
 - Jetpack **Compose**
 - **MVI** Architecture
-- **Material Design 3** (You)
+- **Material You**
 - **ViewModel**
 - **Hilt**
 - Room

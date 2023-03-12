@@ -26,8 +26,8 @@ import com.skyd.raca.ui.screen.about.ABOUT_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.about.AboutScreen
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.add.AddScreen
-import com.skyd.raca.ui.screen.license.LICENSE_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.license.LicenseScreen
+import com.skyd.raca.ui.screen.about.license.LICENSE_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.about.license.LicenseScreen
 import com.skyd.raca.ui.screen.settings.SETTINGS_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.SettingsScreen
 import com.skyd.raca.ui.screen.settings.appearance.APPEARANCE_SCREEN_ROUTE

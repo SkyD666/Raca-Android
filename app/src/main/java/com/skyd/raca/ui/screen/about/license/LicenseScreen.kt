@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.screen.license
+package com.skyd.raca.ui.screen.about.license
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

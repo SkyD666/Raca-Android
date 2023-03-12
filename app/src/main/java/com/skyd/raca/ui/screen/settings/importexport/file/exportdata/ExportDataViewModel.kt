@@ -1,17 +1,17 @@
 package com.skyd.raca.ui.screen.settings.importexport.file.exportdata
 
-import android.util.Log
 import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUiIntent
+import com.skyd.raca.base.IUiState
 import com.skyd.raca.model.respository.ExportDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ExportDataViewModel @Inject constructor(var exportDataRepo: ExportDataRepository) :
-    BaseViewModel<ExportDataState, ExportDataIntent>() {
-    override fun initUiState(): ExportDataState {
-        return ExportDataState(ExportResultUiState.INIT)
+class ExportDataViewModel @Inject constructor(private var exportDataRepo: ExportDataRepository) :
+    BaseViewModel<IUiState, ExportDataEvent, ExportDataIntent>() {
+    override fun initUiState(): IUiState {
+        return object : IUiState {}
     }
 
     override fun handleIntent(intent: IUiIntent) {
@@ -20,10 +20,9 @@ class ExportDataViewModel @Inject constructor(var exportDataRepo: ExportDataRepo
                 requestDataWithFlow(showLoading = true,
                     request = { exportDataRepo.requestExportData(intent.dirUri) },
                     successCallback = {
-                        sendUiState {
-                            Log.e("TAG", "copy: 123", )
-                            copy(exportResultUiState = ExportResultUiState.SUCCESS(it))
-                        }
+                        sendUiEvent(
+                            ExportDataEvent(exportResultUiEvent = ExportResultUiEvent.SUCCESS(it))
+                        )
                     }
                 )
             }

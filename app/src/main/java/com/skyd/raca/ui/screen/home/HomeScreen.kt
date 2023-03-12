@@ -24,6 +24,7 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.config.currentArticleUuid
+import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
@@ -44,6 +45,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    var query by remember { mutableStateOf("") }
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
         currentArticleUuid = when (articleDetailUiState) {
@@ -54,6 +56,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 articleDetailUiState.articleUuid
             }
         }
+    }
+
+    refreshArticleData.collectAsStateWithLifecycle(initialValue = null).value?.let {
+        viewModel.sendUiIntent(HomeIntent.GetArticleDetails(currentArticleUuid))
+        viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
     }
 
     Scaffold(
@@ -84,7 +91,6 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     .zIndex(1f)
                     .fillMaxWidth()
             ) {
-                var query by remember { mutableStateOf("") }
                 SearchBar(
                     modifier = Modifier.align(Alignment.TopCenter).let {
                         return@let if (active) it

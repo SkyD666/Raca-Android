@@ -23,7 +23,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ext.*
+import com.skyd.raca.ext.dateTime
+import com.skyd.raca.ext.editor
+import com.skyd.raca.ext.secretSharedPreferences
+import com.skyd.raca.ext.sharedPreferences
 import com.skyd.raca.model.bean.BackupInfo
 import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.local.LocalNavController
@@ -42,36 +45,36 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
     var openInputDialog by remember { mutableStateOf<Triple<String, String, (String) -> Unit>?>(null) }
     var openRecycleBinBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    viewModel.uiStateFlow.collectAsSharedState {
-        when (uploadResultUiState) {
-            UploadResultUiState.INIT -> {}
-            is UploadResultUiState.SUCCESS -> {
+    viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
+        when (uploadResultUiEvent) {
+            is UploadResultUiEvent.SUCCESS -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         message = appContext.getString(
                             R.string.webdav_screen_upload_success,
-                            uploadResultUiState.result.time / 1000.0f,
-                            uploadResultUiState.result.count
+                            uploadResultUiEvent.result.time / 1000.0f,
+                            uploadResultUiEvent.result.count
                         ),
                         withDismissAction = true
                     )
                 }
             }
+            null -> {}
         }
-        when (downloadResultUiState) {
-            DownloadResultUiState.INIT -> {}
-            is DownloadResultUiState.SUCCESS -> {
+        when (downloadResultUiEvent) {
+            is DownloadResultUiEvent.SUCCESS -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         message = appContext.getString(
                             R.string.webdav_screen_download_success,
-                            downloadResultUiState.result.time / 1000.0f,
-                            downloadResultUiState.result.count
+                            downloadResultUiEvent.result.time / 1000.0f,
+                            downloadResultUiEvent.result.count
                         ),
                         withDismissAction = true
                     )
                 }
             }
+            null -> {}
         }
     }
 

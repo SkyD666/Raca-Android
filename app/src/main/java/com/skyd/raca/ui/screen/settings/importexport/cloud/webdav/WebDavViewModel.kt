@@ -2,17 +2,16 @@ package com.skyd.raca.ui.screen.settings.importexport.cloud.webdav
 
 import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUiIntent
+import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.model.respository.WebDavRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class WebDavViewModel @Inject constructor(var webDavRepo: WebDavRepository) :
-    BaseViewModel<WebDavState, WebDavIntent>() {
+class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavRepository) :
+    BaseViewModel<WebDavState, WebDavEvent, WebDavIntent>() {
     override fun initUiState(): WebDavState {
         return WebDavState(
-            uploadResultUiState = UploadResultUiState.INIT,
-            downloadResultUiState = DownloadResultUiState.INIT,
             getRemoteRecycleBinResultUiState = GetRemoteRecycleBinResultUiState.INIT,
         )
     }
@@ -20,7 +19,7 @@ class WebDavViewModel @Inject constructor(var webDavRepo: WebDavRepository) :
     override fun handleIntent(intent: IUiIntent) {
         when (intent) {
             is WebDavIntent.StartDownload -> {
-                requestDataWithFlow(showLoading = true,
+                requestDataWithFlow(
                     request = {
                         webDavRepo.requestDownload(
                             website = intent.website,
@@ -29,14 +28,15 @@ class WebDavViewModel @Inject constructor(var webDavRepo: WebDavRepository) :
                         )
                     },
                     successCallback = {
-                        sendUiState {
-                            copy(downloadResultUiState = DownloadResultUiState.SUCCESS(it))
-                        }
+                        sendUiEvent(
+                            WebDavEvent(downloadResultUiEvent = DownloadResultUiEvent.SUCCESS(it))
+                        )
+                        refreshArticleData.tryEmit(Unit)
                     }
                 )
             }
             is WebDavIntent.StartUpload -> {
-                requestDataWithFlow(showLoading = true,
+                requestDataWithFlow(
                     request = {
                         webDavRepo.requestUpload(
                             website = intent.website,
@@ -45,14 +45,14 @@ class WebDavViewModel @Inject constructor(var webDavRepo: WebDavRepository) :
                         )
                     },
                     successCallback = {
-                        sendUiState {
-                            copy(uploadResultUiState = UploadResultUiState.SUCCESS(it))
-                        }
+                        sendUiEvent(
+                            WebDavEvent(uploadResultUiEvent = UploadResultUiEvent.SUCCESS(it))
+                        )
                     }
                 )
             }
             is WebDavIntent.GetRemoteRecycleBin -> {
-                requestDataWithFlow(showLoading = true,
+                requestDataWithFlow(
                     request = {
                         webDavRepo.requestRemoteRecycleBin(
                             website = intent.website,
@@ -71,7 +71,7 @@ class WebDavViewModel @Inject constructor(var webDavRepo: WebDavRepository) :
                 )
             }
             is WebDavIntent.DeleteFromRemoteRecycleBin -> {
-                requestDataWithFlow(showLoading = true,
+                requestDataWithFlow(
                     request = {
                         webDavRepo.requestDeleteFromRemoteRecycleBin(
                             website = intent.website,
@@ -96,7 +96,7 @@ class WebDavViewModel @Inject constructor(var webDavRepo: WebDavRepository) :
                 )
             }
             is WebDavIntent.ClearRemoteRecycleBin -> {
-                requestDataWithFlow(showLoading = true,
+                requestDataWithFlow(
                     request = {
                         webDavRepo.requestClearRemoteRecycleBin(
                             website = intent.website,

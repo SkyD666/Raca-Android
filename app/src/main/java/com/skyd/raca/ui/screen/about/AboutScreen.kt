@@ -28,7 +28,7 @@ import com.skyd.raca.ui.component.BackIcon
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
-import com.skyd.raca.ui.screen.license.LICENSE_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.about.license.LICENSE_SCREEN_ROUTE
 import com.skyd.raca.util.CommonUtil
 import com.skyd.raca.util.CommonUtil.openBrowser
 

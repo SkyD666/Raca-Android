@@ -4,6 +4,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUiIntent
+import com.skyd.raca.base.IUiState
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
@@ -14,10 +15,10 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ImportDataViewModel @Inject constructor(var importDataRepo: ImportDataRepository) :
-    BaseViewModel<ImportDataState, ImportDataIntent>() {
-    override fun initUiState(): ImportDataState {
-        return ImportDataState(ImportResultUiState.INIT)
+class ImportDataViewModel @Inject constructor(private var importDataRepo: ImportDataRepository) :
+    BaseViewModel<IUiState, ImportDataEvent, ImportDataIntent>() {
+    override fun initUiState(): IUiState {
+        return object : IUiState {}
     }
 
     override fun handleIntent(intent: IUiIntent) {
@@ -36,9 +37,9 @@ class ImportDataViewModel @Inject constructor(var importDataRepo: ImportDataRepo
                         }
                     },
                     successCallback = {
-                        sendUiState {
-                            copy(importResultUiState = ImportResultUiState.SUCCESS(it))
-                        }
+                        sendUiEvent(
+                            ImportDataEvent(importResultUiEvent = ImportResultUiEvent.SUCCESS(it))
+                        )
                     }
                 )
             }
