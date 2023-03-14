@@ -20,8 +20,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.*
-import com.skyd.raca.ui.local.LocalNavController
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.dialog.WaitingDialog
 import kotlinx.coroutines.launch
 
 const val IMPORT_SCREEN_ROUTE = "importScreen"
@@ -29,7 +32,6 @@ const val IMPORT_SCREEN_ROUTE = "importScreen"
 @Composable
 fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var openWaitingDialog by remember { mutableStateOf(false) }
@@ -43,9 +45,6 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
                 style = RacaTopBarStyle.Large,
                 title = { Text(text = stringResource(R.string.import_screen_name)) },
                 scrollBehavior = scrollBehavior,
-                navigationIcon = {
-                    BackIcon { navController.popBackStack() }
-                },
                 actions = {
                     IconButton(
                         enabled = articleUri != null && tagUri != null,
@@ -155,22 +154,9 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
                 null -> {}
             }
         }
-        if (openWaitingDialog) {
-            WaitingDialog()
-        }
+        WaitingDialog(
+            visible = openWaitingDialog,
+            text = stringResource(R.string.import_screen_waiting)
+        )
     }
-}
-
-@Composable
-private fun WaitingDialog() {
-    AlertDialog(
-        onDismissRequest = { },
-        icon = {
-            CircularProgressIndicator()
-        },
-        title = {
-            Text(text = stringResource(R.string.import_screen_waiting))
-        },
-        confirmButton = {}
-    )
 }

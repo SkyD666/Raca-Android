@@ -2,21 +2,23 @@ package com.skyd.raca.ui.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.skyd.raca.R
+import com.skyd.raca.ui.component.dialog.RacaDialog
 
 @Composable
 fun DeleteWarningDialog(
+    visible: Boolean,
     onDismissRequest: () -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    AlertDialog(
+    RacaDialog(
+        visible = visible,
         onDismissRequest = onDismissRequest,
         icon = {
             Icon(imageVector = Icons.Default.Warning, contentDescription = null)

@@ -2,16 +2,18 @@ package com.skyd.raca.model.respository
 
 import android.database.DatabaseUtils
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseData
 import com.skyd.raca.base.BaseRepository
 import com.skyd.raca.config.allSearchDomain
-import com.skyd.raca.config.getSearchDomain
-import com.skyd.raca.config.useRegexSearch
 import com.skyd.raca.db.appDataBase
+import com.skyd.raca.ext.dataStore
+import com.skyd.raca.ext.get
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
+import com.skyd.raca.model.preference.UseRegexSearchPreference
 import javax.inject.Inject
 
 class HomeRepository @Inject constructor() : BaseRepository() {
@@ -50,6 +52,9 @@ class HomeRepository @Inject constructor() : BaseRepository() {
         private fun getFilter(k: String): String {
             if (k.isBlank()) return "1"
 
+            val useRegexSearch = appContext.dataStore.get(UseRegexSearchPreference.key) ?: false
+            val searchDomainDao = appDataBase.searchDomainDao()
+
             var filter = "0"
 
             // 转义输入，防止SQL注入
@@ -65,7 +70,7 @@ class HomeRepository @Inject constructor() : BaseRepository() {
 
                 if (table.first == ARTICLE_TABLE_NAME) {
                     for (column in columns) {
-                        if (!getSearchDomain(table.first, column.first)) {
+                        if (!searchDomainDao.getSearchDomain(table.first, column.first)) {
                             continue
                         }
                         filter += if (useRegexSearch) {
@@ -79,7 +84,7 @@ class HomeRepository @Inject constructor() : BaseRepository() {
                     var subSelect =
                         "(SELECT DISTINCT ${TagBean.ARTICLE_UUID_COLUMN} FROM ${table.first} WHERE 0 "
                     for (column in columns) {
-                        if (!getSearchDomain(table.first, column.first)) {
+                        if (!searchDomainDao.getSearchDomain(table.first, column.first)) {
                             continue
                         }
                         subSelect += if (useRegexSearch) {

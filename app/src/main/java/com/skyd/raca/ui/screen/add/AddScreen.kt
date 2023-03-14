@@ -25,12 +25,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.ext.plus
+import com.skyd.raca.ext.popBackStackWithLifecycle
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
-import com.skyd.raca.ui.component.BackIcon
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.TopBarIcon
+import com.skyd.raca.ui.component.dialog.RacaDialog
 import com.skyd.raca.ui.local.LocalNavController
 import kotlinx.coroutines.launch
 
@@ -39,7 +40,6 @@ const val ADD_SCREEN_ROUTE = "addScreen"
 @Composable
 fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hiltViewModel()) {
     var openDialog by remember { mutableStateOf(false) }
-    var dialogMessage by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -51,7 +51,9 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
     val tags = remember { mutableStateListOf<TagBean>() }
 
     if (articleUuid.isNotBlank()) {
-        viewModel.sendUiIntent(AddIntent.GetArticleWithTags(articleUuid))
+        LaunchedEffect(Unit) {
+            viewModel.sendUiIntent(AddIntent.GetArticleWithTags(articleUuid))
+        }
     } else {
         articleText = article
     }
@@ -72,7 +74,6 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
                         )
                     )
                 },
-                navigationIcon = { BackIcon { navController.popBackStack() } },
                 actions = {
                     TopBarIcon(
                         imageVector = Icons.Default.Done,
@@ -170,15 +171,20 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
             }
         }
 
-        if (openDialog) {
-            SuccessDialog(dialogMessage, {
+        RacaDialog(
+            visible = openDialog,
+            icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
+            title = { Text(text = stringResource(R.string.dialog_tip)) },
+            text = { Text(text = stringResource(R.string.add_screen_success)) },
+            onDismissRequest = {
                 openDialog = false
-                navController.popBackStack()
-            }, {
+                navController.popBackStackWithLifecycle()
+            },
+            confirmButton = {
                 openDialog = false
-                navController.popBackStack()
-            })
-        }
+                navController.popBackStackWithLifecycle()
+            }
+        )
     }
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
@@ -204,30 +210,8 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
             is AddArticleResultUiState.SUCCESS -> {
                 val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
                 savedStateHandle?.set("articleUuid", addArticleResultUiState.articleUuid)
-                dialogMessage = stringResource(R.string.add_screen_success)
                 openDialog = true
             }
         }
     }
-}
-
-@Composable
-private fun SuccessDialog(message: String, onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        icon = {
-            Icon(imageVector = Icons.Default.Info, contentDescription = null)
-        },
-        title = {
-            Text(text = stringResource(R.string.dialog_tip))
-        },
-        text = {
-            Text(text = message)
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.dialog_ok))
-            }
-        }
-    )
 }

@@ -19,8 +19,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.*
-import com.skyd.raca.ui.local.LocalNavController
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.dialog.WaitingDialog
 import kotlinx.coroutines.launch
 
 const val EXPORT_SCREEN_ROUTE = "exportScreen"
@@ -28,7 +31,6 @@ const val EXPORT_SCREEN_ROUTE = "exportScreen"
 @Composable
 fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var openWaitingDialog by remember { mutableStateOf(false) }
@@ -41,9 +43,6 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                 style = RacaTopBarStyle.Large,
                 title = { Text(text = stringResource(R.string.export_screen_name)) },
                 scrollBehavior = scrollBehavior,
-                navigationIcon = {
-                    BackIcon { navController.popBackStack() }
-                },
                 actions = {
                     IconButton(
                         enabled = dirUri != null,
@@ -126,22 +125,9 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                 null -> {}
             }
         }
-        if (openWaitingDialog) {
-            WaitingDialog()
-        }
+        WaitingDialog(
+            visible = openWaitingDialog,
+            text = stringResource(R.string.export_screen_waiting)
+        )
     }
-}
-
-@Composable
-private fun WaitingDialog() {
-    AlertDialog(
-        onDismissRequest = { },
-        icon = {
-            CircularProgressIndicator()
-        },
-        title = {
-            Text(text = stringResource(R.string.export_screen_waiting))
-        },
-        confirmButton = {}
-    )
 }

@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.shape
+package com.skyd.raca.ui.component.shape
 
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.CornerSize

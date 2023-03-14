@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
+import com.skyd.raca.ext.popBackStackWithLifecycle
+import com.skyd.raca.ui.local.LocalNavController
 
 enum class RacaTopBarStyle {
     Small, Large, CenterAligned
@@ -25,7 +27,7 @@ fun RacaTopBar(
     style: RacaTopBarStyle = RacaTopBarStyle.Small,
     title: @Composable () -> Unit,
     contentPadding: @Composable () -> PaddingValues = { PaddingValues() },
-    navigationIcon: @Composable () -> Unit = {},
+    navigationIcon: @Composable () -> Unit = { BackIcon() },
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
@@ -102,6 +104,14 @@ fun TopBarIcon(
             tint = tint,
             contentDescription = contentDescription
         )
+    }
+}
+
+@Composable
+fun BackIcon() {
+    val navController = LocalNavController.current
+    BackIcon {
+        navController.popBackStackWithLifecycle()
     }
 }
 

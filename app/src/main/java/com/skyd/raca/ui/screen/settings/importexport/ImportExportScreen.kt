@@ -3,7 +3,9 @@ package com.skyd.raca.ui.screen.settings.importexport
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -13,7 +15,10 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.skyd.raca.R
-import com.skyd.raca.ui.component.*
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.settings.importexport.cloud.webdav.WEBDAV_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.importexport.file.exportdata.EXPORT_SCREEN_ROUTE
@@ -32,7 +37,6 @@ fun ImportExportScreen() {
                 style = RacaTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.import_export_screen_name)) },
-                navigationIcon = { BackIcon { navController.popBackStack() } },
             )
         }
     ) { paddingValues ->

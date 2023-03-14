@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.skyd.raca.R
-import com.skyd.raca.ui.component.BackIcon
 import com.skyd.raca.ui.component.BaseSettingsItem
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
@@ -36,7 +35,6 @@ fun SettingsScreen() {
                 style = RacaTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.settings)) },
-                navigationIcon = { BackIcon { navController.popBackStack() } },
             )
         }
     ) { paddingValues ->

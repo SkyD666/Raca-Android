@@ -113,4 +113,16 @@
     <string name="webdav_screen_last_modified_time">上次修改时间：%s</string>
     <string name="webdav_screen_delete">删除</string>
     <string name="webdav_screen_remote_recycle_bin_is_empty">远端回收站为空</string>
+    <string name="theme_dynamic">跟随系统</string>
+    <string name="appearance_screen_wallpaper_colors">壁纸颜色</string>
+    <string name="primary_color">强调色</string>
+    <string name="theme_no_palettes">无调色板</string>
+    <string name="only_android_8_1_plus">8.1 +</string>
+    <string name="appearance_screen_basic_colors">基本颜色</string>
+    <string name="dark_mode_invalid">无效值</string>
+    <string name="password_visibility_off">隐藏密码</string>
+    <string name="password_visibility_on">显示密码</string>
+    <string name="clear_input_text">清除文本</string>
+    <string name="paste">粘贴</string>
+    <string name="webdav_screen_info_incomplete">WebDav 信息不完整！</string>
 </resources>

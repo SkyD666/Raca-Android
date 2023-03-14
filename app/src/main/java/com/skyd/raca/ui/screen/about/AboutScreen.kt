@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
 import com.skyd.raca.ext.plus
 import com.skyd.raca.ext.screenIsLand
-import com.skyd.raca.ui.component.BackIcon
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
@@ -37,7 +36,6 @@ const val ABOUT_SCREEN_ROUTE = "aboutScreen"
 @Composable
 fun AboutScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val navController = LocalNavController.current
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -45,7 +43,6 @@ fun AboutScreen() {
                 style = RacaTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.about)) },
-                navigationIcon = { BackIcon { navController.popBackStack() } },
             )
         }
     ) { paddingValues ->

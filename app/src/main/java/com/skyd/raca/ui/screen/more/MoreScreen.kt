@@ -28,7 +28,7 @@ import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.about.ABOUT_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.SETTINGS_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.importexport.IMPORT_EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.shape.CurlyCornerShape
+import com.skyd.raca.ui.component.shape.CurlyCornerShape
 
 @Composable
 fun MoreScreen() {

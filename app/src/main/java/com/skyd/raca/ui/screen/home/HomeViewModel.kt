@@ -1,9 +1,12 @@
 package com.skyd.raca.ui.screen.home
 
+import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUiEvent
 import com.skyd.raca.base.IUiIntent
-import com.skyd.raca.config.currentArticleUuid
+import com.skyd.raca.ext.dataStore
+import com.skyd.raca.ext.get
+import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.model.respository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -13,7 +16,10 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
     BaseViewModel<HomeState, IUiEvent, HomeIntent>() {
     override fun initUiState(): HomeState {
         return HomeState(
-            ArticleDetailUiState.INIT(currentArticleUuid),
+            ArticleDetailUiState.INIT(
+                appContext.dataStore
+                    .get(CurrentArticleUuidPreference.key) ?: CurrentArticleUuidPreference.default
+            ),
             SearchResultUiState.INIT,
         )
     }

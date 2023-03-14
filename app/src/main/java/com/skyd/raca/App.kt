@@ -2,7 +2,10 @@ package com.skyd.raca
 
 import android.app.Application
 import android.content.Context
-import com.skyd.raca.config.initDarkMode
+import androidx.appcompat.app.AppCompatDelegate
+import com.skyd.raca.ext.dataStore
+import com.skyd.raca.ext.get
+import com.skyd.raca.model.preference.theme.DarkModePreference
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -12,7 +15,10 @@ class App : Application() {
         super.onCreate()
         appContext = this
 
-        initDarkMode()
+        AppCompatDelegate.setDefaultNightMode(
+            dataStore.get(DarkModePreference.key) ?: DarkModePreference.default
+        )
+
     }
 }
 

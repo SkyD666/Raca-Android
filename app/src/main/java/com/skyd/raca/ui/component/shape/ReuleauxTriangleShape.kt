@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.shape
+package com.skyd.raca.ui.component.shape
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect

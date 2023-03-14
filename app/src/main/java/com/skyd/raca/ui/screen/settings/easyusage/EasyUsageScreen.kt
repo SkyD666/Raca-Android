@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.getSystemService
 import com.skyd.raca.R
 import com.skyd.raca.ui.component.*
-import com.skyd.raca.ui.local.LocalNavController
 
 
 const val EASY_USAGE_SCREEN_ROUTE = "easyUsageScreen"
@@ -34,7 +33,6 @@ const val EASY_USAGE_SCREEN_ROUTE = "easyUsageScreen"
 @Composable
 fun EasyUsageScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val navController = LocalNavController.current
     val context = LocalContext.current
 
     Scaffold(
@@ -43,7 +41,6 @@ fun EasyUsageScreen() {
                 style = RacaTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.easy_usage_screen_name)) },
-                navigationIcon = { BackIcon { navController.popBackStack() } },
             )
         }
     ) { paddingValues ->

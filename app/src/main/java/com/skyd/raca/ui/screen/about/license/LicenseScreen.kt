@@ -15,10 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
 import com.skyd.raca.ext.plus
 import com.skyd.raca.model.bean.LicenseBean
-import com.skyd.raca.ui.component.BackIcon
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
-import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.util.CommonUtil.openBrowser
 
 const val LICENSE_SCREEN_ROUTE = "licenseScreen"
@@ -26,16 +24,12 @@ const val LICENSE_SCREEN_ROUTE = "licenseScreen"
 @Composable
 fun LicenseScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val navController = LocalNavController.current
     Scaffold(
         topBar = {
             RacaTopBar(
                 style = RacaTopBarStyle.Large,
                 title = { Text(text = stringResource(R.string.license_screen_name)) },
                 scrollBehavior = scrollBehavior,
-                navigationIcon = {
-                    BackIcon { navController.popBackStack() }
-                }
             )
         }
     ) {
@@ -113,11 +107,6 @@ private fun getLicenseList(): List<LicenseBean> {
             url = "https://github.com/Kotlin/kotlinx.coroutines"
         ),
         LicenseBean(
-            name = "Gson",
-            license = "Apache-2.0 License",
-            url = "https://github.com/google/gson"
-        ),
-        LicenseBean(
             name = "kotlin-csv",
             license = "Apache-2.0 License",
             url = "https://github.com/doyaaaaaken/kotlin-csv"
@@ -128,9 +117,19 @@ private fun getLicenseList(): List<LicenseBean> {
             url = "https://github.com/thegrizzlylabs/sardine-android"
         ),
         LicenseBean(
-            name = "Kotlin Serialization",
+            name = "kotlinx.serialization",
             license = "Apache-2.0 License",
             url = "https://github.com/Kotlin/kotlinx.serialization"
+        ),
+        LicenseBean(
+            name = "Monet",
+            license = "Apache-2.0 License",
+            url = "https://github.com/Kyant0/Monet"
+        ),
+        LicenseBean(
+            name = "Read You",
+            license = "GPL-3.0 License",
+            url = "https://github.com/Ashinch/ReadYou"
         ),
     )
 }

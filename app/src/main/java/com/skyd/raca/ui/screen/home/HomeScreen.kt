@@ -23,39 +23,44 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
 import com.skyd.raca.R
 import com.skyd.raca.appContext
-import com.skyd.raca.config.currentArticleUuid
 import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
+import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.ui.component.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
+import com.skyd.raca.ui.local.LocalCurrentArticleUuid
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import kotlinx.coroutines.launch
 
-var menuExpanded by mutableStateOf(false)
-var openDeleteWarningDialog by mutableStateOf(false)
+private var menuExpanded by mutableStateOf(false)
+private var openDeleteWarningDialog by mutableStateOf(false)
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val currentArticleUuid = LocalCurrentArticleUuid.current
     var query by remember { mutableStateOf("") }
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-        currentArticleUuid = when (articleDetailUiState) {
-            is ArticleDetailUiState.SUCCESS -> {
-                articleDetailUiState.articleWithTags.article.uuid
+        CurrentArticleUuidPreference.put(
+            context = context, scope = scope, value = when (articleDetailUiState) {
+                is ArticleDetailUiState.SUCCESS -> {
+                    articleDetailUiState.articleWithTags.article.uuid
+                }
+                is ArticleDetailUiState.INIT -> {
+                    articleDetailUiState.articleUuid
+                }
             }
-            is ArticleDetailUiState.INIT -> {
-                articleDetailUiState.articleUuid
-            }
-        }
+        )
     }
 
     refreshArticleData.collectAsStateWithLifecycle(initialValue = null).value?.let {
@@ -170,7 +175,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                         }
                     }
                 }
-                HomeMenu()
+                HomeMenu(viewModel = viewModel)
             }
 
             viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
@@ -194,6 +199,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 
         if (openDeleteWarningDialog && currentArticleUuid.isNotBlank()) {
             DeleteWarningDialog(
+                visible = openDeleteWarningDialog,
                 { openDeleteWarningDialog = false },
                 { openDeleteWarningDialog = false },
                 {
@@ -226,8 +232,9 @@ private fun SearchResultList(
 }
 
 @Composable
-private fun HomeMenu(viewModel: HomeViewModel = hiltViewModel()) {
+private fun HomeMenu(viewModel: HomeViewModel) {
     val navController = LocalNavController.current
+    val currentArticleUuid = LocalCurrentArticleUuid.current
     var editMenuItemEnabled by remember { mutableStateOf(false) }
     var deleteMenuItemEnabled by remember { mutableStateOf(false) }
 
@@ -249,8 +256,8 @@ private fun HomeMenu(viewModel: HomeViewModel = hiltViewModel()) {
             enabled = editMenuItemEnabled,
             text = { Text(stringResource(R.string.home_screen_edit)) },
             onClick = {
-                menuExpanded = false
                 navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
+                menuExpanded = false
             },
             leadingIcon = {
                 Icon(
@@ -277,8 +284,8 @@ private fun HomeMenu(viewModel: HomeViewModel = hiltViewModel()) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.search_config_screen_name)) },
             onClick = {
-                menuExpanded = false
                 navController.navigate(SEARCH_CONFIG_SCREEN_ROUTE)
+                menuExpanded = false
             },
             leadingIcon = {
                 Icon(
@@ -293,6 +300,7 @@ private fun HomeMenu(viewModel: HomeViewModel = hiltViewModel()) {
 @Composable
 private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: SnackbarHostState) {
     val navController = LocalNavController.current
+    val currentArticleUuid = LocalCurrentArticleUuid.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
 
