@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
+import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.plus
 import com.skyd.raca.ext.popBackStackWithLifecycle
 import com.skyd.raca.model.bean.ArticleBean
@@ -181,37 +182,39 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
                 navController.popBackStackWithLifecycle()
             },
             confirmButton = {
-                openDialog = false
-                navController.popBackStackWithLifecycle()
+                TextButton(onClick = {
+                    openDialog = false
+                    navController.popBackStackWithLifecycle()
+                }) {
+                    Text(text = stringResource(id = R.string.dialog_ok))
+                }
             }
         )
     }
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-        if (addArticleResultUiState !is AddArticleResultUiState.SUCCESS) {
-            when (getArticleWithTagsUiState) {
-                is GetArticleWithTagsUiState.SUCCESS -> {
-                    val articleBean = getArticleWithTagsUiState.articleWithTags.article
-                    titleText = articleBean.title
-                    articleText = articleBean.article
-                    tags.clear()
-                    tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
-                }
-                GetArticleWithTagsUiState.FAILED -> {}
-                GetArticleWithTagsUiState.INIT -> {}
+        when (getArticleWithTagsUiState) {
+            is GetArticleWithTagsUiState.SUCCESS -> {
+                val articleBean = getArticleWithTagsUiState.articleWithTags.article
+                titleText = articleBean.title
+                articleText = articleBean.article
+                tags.clear()
+                tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
             }
+            GetArticleWithTagsUiState.FAILED -> {}
+            GetArticleWithTagsUiState.INIT -> {}
         }
+    }
 
-        when (addArticleResultUiState) {
-            AddArticleResultUiState.INIT -> {
+    viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
+        when (addArticleResultUiEvent) {
+            AddArticleResultUiEvent.FAILED -> {
             }
-            AddArticleResultUiState.FAILED -> {
-            }
-            is AddArticleResultUiState.SUCCESS -> {
-                val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
-                savedStateHandle?.set("articleUuid", addArticleResultUiState.articleUuid)
+            is AddArticleResultUiEvent.SUCCESS -> {
+                refreshArticleData.tryEmit(Unit)
                 openDialog = true
             }
+            null -> {}
         }
     }
 }

@@ -37,21 +37,37 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
                 )
             }
             is HomeIntent.GetArticleDetails -> {
-                requestDataWithFlow(showLoading = false,
-                    request = { homeRepo.requestArticleWithTagsDetail(intent.articleUuid) },
-                    successCallback = { data ->
-                        sendUiState {
-                            copy(articleDetailUiState = ArticleDetailUiState.SUCCESS(data))
-                        }
+                if (intent.articleUuid.isBlank()) {
+                    sendUiState {
+                        copy(articleDetailUiState = ArticleDetailUiState.INIT())
                     }
-                )
+                } else {
+                    requestDataWithFlow(showLoading = false,
+                        request = { homeRepo.requestArticleWithTagsDetail(intent.articleUuid) },
+                        successCallback = { data ->
+                            CurrentArticleUuidPreference.put(
+                                context = appContext,
+                                scope = this,
+                                value = data.article.uuid
+                            )
+                            sendUiState {
+                                copy(articleDetailUiState = ArticleDetailUiState.SUCCESS(data))
+                            }
+                        }
+                    )
+                }
             }
             is HomeIntent.DeleteArticleWithTags -> {
                 requestDataWithFlow(showLoading = false,
                     request = { homeRepo.requestDeleteArticleWithTagsDetail(intent.articleUuid) },
                     successCallback = {
+                        CurrentArticleUuidPreference.put(
+                            context = appContext,
+                            scope = this,
+                            value = CurrentArticleUuidPreference.default
+                        )
                         sendUiState {
-                            copy(articleDetailUiState = ArticleDetailUiState.INIT(""))
+                            copy(articleDetailUiState = ArticleDetailUiState.INIT())
                         }
                     }
                 )

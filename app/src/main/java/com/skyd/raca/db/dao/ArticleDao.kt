@@ -2,10 +2,16 @@ package com.skyd.raca.db.dao
 
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.skyd.raca.appContext
 import com.skyd.raca.db.appDataBase
+import com.skyd.raca.ext.dataStore
+import com.skyd.raca.ext.get
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
+import com.skyd.raca.model.preference.CurrentArticleUuidPreference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.util.*
 
 @Dao
@@ -23,7 +29,7 @@ interface ArticleDao {
 
     @Transaction
     @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE uuid LIKE :articleUuid")
-    fun getArticleWithTags(articleUuid: String): ArticleWithTags
+    fun getArticleWithTags(articleUuid: String): ArticleWithTags?
 
     @Transaction
     @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE article LIKE :article")
@@ -54,7 +60,14 @@ interface ArticleDao {
 
     @Transaction
     fun deleteArticleWithTags(articleUuid: String): Int {
+        val scope = CoroutineScope(Dispatchers.IO)
         appDataBase.tagDao().deleteTags(articleUuid)
+        val currentArticleUuid = appContext.dataStore.get(CurrentArticleUuidPreference.key)
+        if (currentArticleUuid == articleUuid) {
+            CurrentArticleUuidPreference.put(
+                appContext, scope, CurrentArticleUuidPreference.default
+            )
+        }
         return innerDeleteArticle(articleUuid)
     }
 

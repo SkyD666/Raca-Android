@@ -3,6 +3,7 @@ package com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -30,7 +31,10 @@ fun More1Item(
     data: More1Bean,
     onClickListener: ((data: More1Bean) -> Unit)? = null
 ) {
-    OutlinedCard(modifier = modifier.padding(vertical = 6.dp)) {
+    OutlinedCard(
+        modifier = modifier.padding(vertical = 6.dp),
+        shape = RoundedCornerShape(16)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,7 +58,8 @@ fun More1Item(
                 Icon(
                     modifier = Modifier.size(35.dp),
                     imageVector = data.icon,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = data.iconTint
                 )
             }
             Text(

@@ -22,6 +22,7 @@ data class Settings(
 
     // Article
     val currentArticleUuid: String = CurrentArticleUuidPreference.default,
+    val query: String = QueryPreference.default,
     // Search
     val useRegexSearch: Boolean = UseRegexSearchPreference.default,
     // WebDav
@@ -44,6 +45,7 @@ fun SettingsProvider(
         LocalDarkMode provides settings.darkMode,
         // Article
         LocalCurrentArticleUuid provides settings.currentArticleUuid,
+        LocalQuery provides settings.query,
         // Search
         LocalUseRegexSearch provides settings.useRegexSearch,
         // WebDav

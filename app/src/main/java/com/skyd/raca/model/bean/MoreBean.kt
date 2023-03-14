@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class MoreBean(
     val title: String,
     val icon: ImageVector,
+    val iconTint: Color,
     val shape: Shape,
     val shapeColor: Color,
     val action: () -> Unit

@@ -97,7 +97,7 @@
     <string name="webdav_screen_upload">推送到远端</string>
     <string name="webdav_screen_upload_description">将本地数据推送到远端，冲突时会覆盖远端内容。若某段落本地没有，而远端有，则该段落会被移动到远端回收站。</string>
     <string name="webdav_screen_download">从远端拉取</string>
-    <string name="webdav_screen_download_description">从远端拉取数据，冲突时会覆盖本地内容。不会拉取远端回收站内的内容。</string>
+    <string name="webdav_screen_download_description">从远端拉取数据，冲突时会覆盖本地内容。若某段落既在本地，也在远端回收站内，则本地的该段落会被删除。若某段落本地有，而远端没有，则该段落不会被修改。</string>
     <string name="webdav_screen_download_success">拉取成功，耗时 %.2f 秒，更新 %d 条</string>
     <string name="webdav_screen_sync">同步数据</string>
     <string name="webdav_screen_sync_description">合并本地和远端数据，使其内容一致。</string>
@@ -124,5 +124,6 @@
     <string name="password_visibility_on">显示密码</string>
     <string name="clear_input_text">清除文本</string>
     <string name="paste">粘贴</string>
-    <string name="webdav_screen_info_incomplete">WebDav 信息不完整！</string>
+    <string name="webdav_screen_info_incomplete">WebDAV 信息不完整，请完善！</string>
+    <string name="autofill_service">Raca 自动填充</string>
 </resources>

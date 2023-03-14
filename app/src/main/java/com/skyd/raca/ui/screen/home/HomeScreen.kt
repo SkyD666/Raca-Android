@@ -1,5 +1,6 @@
 package com.skyd.raca.ui.screen.home
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,13 +29,14 @@ import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
-import com.skyd.raca.model.preference.CurrentArticleUuidPreference
+import com.skyd.raca.model.preference.QueryPreference
 import com.skyd.raca.ui.component.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
 import com.skyd.raca.ui.local.LocalCurrentArticleUuid
 import com.skyd.raca.ui.local.LocalNavController
+import com.skyd.raca.ui.local.LocalQuery
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import kotlinx.coroutines.launch
@@ -44,28 +47,16 @@ private var openDeleteWarningDialog by mutableStateOf(false)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val navController = LocalNavController.current
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val currentArticleUuid = LocalCurrentArticleUuid.current
-    var query by remember { mutableStateOf("") }
+    val query = LocalQuery.current
 
-    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-        CurrentArticleUuidPreference.put(
-            context = context, scope = scope, value = when (articleDetailUiState) {
-                is ArticleDetailUiState.SUCCESS -> {
-                    articleDetailUiState.articleWithTags.article.uuid
-                }
-                is ArticleDetailUiState.INIT -> {
-                    articleDetailUiState.articleUuid
-                }
-            }
-        )
-    }
-
-    refreshArticleData.collectAsStateWithLifecycle(initialValue = null).value?.let {
-        viewModel.sendUiIntent(HomeIntent.GetArticleDetails(currentArticleUuid))
+    refreshArticleData.collectAsStateWithLifecycle(initialValue = null).apply {
+        value ?: return@apply
         viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
+        viewModel.sendUiIntent(HomeIntent.GetArticleDetails(currentArticleUuid))
     }
 
     Scaffold(
@@ -84,6 +75,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     ) { innerPaddings ->
         var active by rememberSaveable { mutableStateOf(false) }
         val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
 
         Column(
             modifier = Modifier
@@ -96,16 +88,17 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     .zIndex(1f)
                     .fillMaxWidth()
             ) {
+                val searchBarHorizontalPadding: Dp by animateDpAsState(if (active) 0.dp else 16.dp)
                 SearchBar(
-                    modifier = Modifier.align(Alignment.TopCenter).let {
-                        return@let if (active) it
-                        else it.padding(horizontal = 16.dp)
-                    },
-                    onQueryChange = { query = it },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = searchBarHorizontalPadding),
+                    onQueryChange = { QueryPreference.put(context, scope, it) },
                     query = query,
                     onSearch = { keyword ->
                         viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
                         focusManager.clearFocus()
+                        keyboardController?.hide()
                     },
                     active = active,
                     onActiveChange = {
@@ -131,17 +124,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                         }
                     },
                     trailingIcon = {
-                        val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-                        val articleUuidState = savedStateHandle
-                            ?.getStateFlow("articleUuid", "")
-                            ?.collectAsStateWithLifecycle()
-                        articleUuidState?.value?.let {
-                            savedStateHandle.remove<String>("articleUuid")
-                            viewModel.sendUiIntent(HomeIntent.GetArticleDetails(it))
-                            viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
-                        }
                         if (active) {
-                            IconButton(onClick = { query = "" }) {
+                            IconButton(onClick = {
+                                QueryPreference.put(context, scope, QueryPreference.default)
+                            }) {
                                 Icon(
                                     Icons.Default.Clear,
                                     stringResource(R.string.home_screen_clear_search_text)
@@ -159,7 +145,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
                         when (searchResultUiState) {
                             SearchResultUiState.INIT -> {
-
+                                viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
                             }
                             is SearchResultUiState.SUCCESS -> {
                                 SearchResultList(dataList = searchResultUiState.articleWithTagsList,
@@ -353,7 +339,9 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
                 FlowRow(
                     modifier = Modifier
                         .padding(vertical = 6.dp, horizontal = 16.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .heightIn(max = 150.dp)
+                        .verticalScroll(rememberScrollState()),
                     mainAxisSpacing = 5.dp,
                 ) {
                     repeat(tags.size) { index ->

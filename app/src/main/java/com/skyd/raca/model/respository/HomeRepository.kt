@@ -28,9 +28,10 @@ class HomeRepository @Inject constructor() : BaseRepository() {
 
     suspend fun requestArticleWithTagsDetail(articleUuid: String): BaseData<ArticleWithTags> {
         return executeRequest {
+            val articleWithTags = appDataBase.articleDao().getArticleWithTags(articleUuid)
             BaseData<ArticleWithTags>().apply {
-                code = 0
-                data = appDataBase.articleDao().getArticleWithTags(articleUuid)
+                code = if (articleWithTags == null) 1 else 0
+                data = articleWithTags
             }
         }
     }

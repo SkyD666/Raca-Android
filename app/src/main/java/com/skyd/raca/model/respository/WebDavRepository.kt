@@ -93,7 +93,11 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
             val backupInfoMap: MutableMap<String, BackupInfo> =
                 getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
             val waitToAddList = mutableListOf<ArticleWithTags>()
-            val excludedMap = excludeRemoteUnchanged(backupInfoMap, allArticleWithTagsList)
+            val (excludedMap, willBeDeletedList) =
+                excludeRemoteUnchanged(backupInfoMap, allArticleWithTagsList)
+            willBeDeletedList.forEach {
+                appDataBase.articleDao().deleteArticleWithTags(articleUuid = it)
+            }
             excludedMap.forEach { entry ->
                 val inputAsString = sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid)
                     .bufferedReader().use { it.readText() }
@@ -104,7 +108,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
                 code = 0
                 data = WebDavResultInfo(
                     time = System.currentTimeMillis() - startTime,
-                    count = waitToAddList.size
+                    count = waitToAddList.size + willBeDeletedList.size
                 )
             }
         }
@@ -155,22 +159,23 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
     private fun excludeRemoteUnchanged(
         backupInfoMap: Map<String, BackupInfo>,
         allArticleWithTagsList: List<ArticleWithTags>
-    ): Map<String, BackupInfo> {
+    ): Pair<Map<String, BackupInfo>, List<String>> {
         val md5UuidKeyMap = backupInfoMap.toMutableMap()
-        val uuidKeyMap = backupInfoMap.values.associateBy { it.uuid }.toMutableMap()
+        val willBeDeletedList = mutableListOf<String>()
         allArticleWithTagsList.forEach {
             val md5 = it.md5()
             val uuid = it.article.uuid
             val backupInfo = backupInfoMap[md5 + uuid]
-            if (backupInfo != null && (backupInfo.isDeleted || backupInfo.uuid == uuid)) {
+            if (backupInfo != null) {
+                if (backupInfo.isDeleted) {
+                    // 在本地但在远端回收站的段落，稍后会在本地被移除
+                    willBeDeletedList.add(it.article.uuid)
+                }
                 md5UuidKeyMap.remove(md5 + uuid)
             }
-            uuidKeyMap.remove(uuid)
         }
-        uuidKeyMap.forEach { (_, u) ->
-            md5UuidKeyMap.remove(u.contentMd5 + u.uuid)
-        }
-        return md5UuidKeyMap
+        // 过滤除掉不在本地但在远端回收站的段落
+        return md5UuidKeyMap.filter { !it.value.isDeleted } to willBeDeletedList
     }
 
     private fun excludeLocalUnchanged(

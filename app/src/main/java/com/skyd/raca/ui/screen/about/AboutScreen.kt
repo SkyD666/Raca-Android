@@ -126,7 +126,8 @@ private fun TextArea(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center
         )
         Card(
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier.padding(top = 20.dp),
+            shape = RoundedCornerShape(16)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(

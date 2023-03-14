@@ -24,7 +24,8 @@ interface SearchDomainDao {
         return getSearchDomainOrNull(tableName, columnName)
             ?: if (tableName == ARTICLE_TABLE_NAME &&
                 (columnName == ArticleBean.TITLE_COLUMN ||
-                        columnName == ArticleBean.ARTICLE_COLUMN)
+                        columnName == ArticleBean.ARTICLE_COLUMN ||
+                        columnName == ArticleBean.UUID_COLUMN)
             ) true else tableName == TAG_TABLE_NAME && columnName == TagBean.TAG_COLUMN
     }
 

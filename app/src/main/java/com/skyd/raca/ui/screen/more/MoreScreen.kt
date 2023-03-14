@@ -2,6 +2,7 @@ package com.skyd.raca.ui.screen.more
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Egg
@@ -62,22 +63,25 @@ fun MoreScreen() {
             More1Bean(
                 title = stringResource(R.string.import_export_screen_name),
                 icon = Icons.Default.ImportExport,
+                iconTint = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(30),
-                shapeColor = MaterialTheme.colorScheme.primaryContainer,
+                shapeColor = MaterialTheme.colorScheme.primary,
                 action = { navController.navigate(IMPORT_EXPORT_SCREEN_ROUTE) }
             ),
             More1Bean(
                 title = stringResource(R.string.settings),
                 icon = Icons.Default.Settings,
-                shape = RoundedCornerShape(100),
-                shapeColor = MaterialTheme.colorScheme.secondaryContainer,
+                iconTint = MaterialTheme.colorScheme.onSecondary,
+                shape = CircleShape,
+                shapeColor = MaterialTheme.colorScheme.secondary,
                 action = { navController.navigate(SETTINGS_SCREEN_ROUTE) }
             ),
             More1Bean(
                 title = stringResource(R.string.about),
                 icon = Icons.Default.Info,
-                shape = CurlyCornerShape(amp = 6.0),
-                shapeColor = MaterialTheme.colorScheme.tertiaryContainer,
+                iconTint = MaterialTheme.colorScheme.onTertiary,
+                shape = CurlyCornerShape(amp = 5.0, count = 10),
+                shapeColor = MaterialTheme.colorScheme.tertiary,
                 action = { navController.navigate(ABOUT_SCREEN_ROUTE) }
             )
         )

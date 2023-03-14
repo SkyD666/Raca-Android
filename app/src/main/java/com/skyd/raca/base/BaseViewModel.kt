@@ -2,6 +2,7 @@ package com.skyd.raca.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -63,7 +64,8 @@ abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : 
     protected fun <T : Any> requestDataWithFlow(
         showLoading: Boolean = true,
         request: suspend () -> BaseData<T>,
-        successCallback: (T) -> Unit,
+        successCallback: CoroutineScope.(T) -> Unit,
+        successButDataIsNullCallback: CoroutineScope.() -> Unit = {},
         failCallback: suspend (String) -> Unit = { errMsg ->
             //默认异常处理，子类可以进行覆写
             sendLoadUiIntent(LoadUiIntent.Error(errMsg))
@@ -80,7 +82,12 @@ abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : 
                 when (baseData.state) {
                     ReqState.Success -> {
                         sendLoadUiIntent(LoadUiIntent.ShowMainView)
-                        baseData.data?.let { successCallback(it) }
+                        val data = baseData.data
+                        if (data == null) {
+                            successButDataIsNullCallback()
+                        } else {
+                            successCallback(data)
+                        }
                     }
                     ReqState.Error -> baseData.msg?.let { error(it) }
                 }

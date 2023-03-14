@@ -25,6 +25,7 @@ val LocalCustomPrimaryColor = compositionLocalOf { CustomPrimaryColorPreference.
 
 // Article
 val LocalCurrentArticleUuid = compositionLocalOf { CurrentArticleUuidPreference.default }
+val LocalQuery = compositionLocalOf { QueryPreference.default }
 
 // Search
 val LocalUseRegexSearch = compositionLocalOf { UseRegexSearchPreference.default }

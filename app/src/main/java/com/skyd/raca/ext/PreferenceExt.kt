@@ -15,6 +15,7 @@ fun Preferences.toSettings(): Settings {
 
         // Article
         currentArticleUuid = CurrentArticleUuidPreference.fromPreferences(this),
+        query = QueryPreference.fromPreferences(this),
 
         // Search
         useRegexSearch = UseRegexSearchPreference.fromPreferences(this),
