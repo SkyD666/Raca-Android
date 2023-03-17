@@ -30,13 +30,13 @@ import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
 import com.skyd.raca.model.preference.QueryPreference
+import com.skyd.raca.model.preference.rememberQuery
 import com.skyd.raca.ui.component.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
 import com.skyd.raca.ui.local.LocalCurrentArticleUuid
 import com.skyd.raca.ui.local.LocalNavController
-import com.skyd.raca.ui.local.LocalQuery
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val currentArticleUuid = LocalCurrentArticleUuid.current
-    val query = LocalQuery.current
+    var query by rememberQuery()
 
     refreshArticleData.collectAsStateWithLifecycle(initialValue = null).apply {
         value ?: return@apply
@@ -93,12 +93,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(horizontal = searchBarHorizontalPadding),
-                    onQueryChange = { QueryPreference.put(context, scope, it) },
+                    onQueryChange = { query = it },
                     query = query,
                     onSearch = { keyword ->
-                        viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
                         focusManager.clearFocus()
                         keyboardController?.hide()
+                        QueryPreference.put(context, scope, keyword)
+                        viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
                     },
                     active = active,
                     onActiveChange = {

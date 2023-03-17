@@ -15,10 +15,13 @@ abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : 
 
     protected abstract fun initUiState(): UiState
 
+    /**
+     * 若 IUIChange 是 Event，则发送出去，不纳入 UiState
+     */
     private fun Flow<IUIChange>.sendEvent(): Flow<UiState> = mapNotNull {
         val (state, event) = it.checkStateOrEvent()
         if (event != null) {
-            uiEventChannel.send(event)
+            uiEventChannel.send(event)      // 此时 state 为 null
         }
         state
     }
@@ -49,6 +52,16 @@ abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : 
         }
     }
 
+    /**
+     * 若 T 是给定的类型则执行...
+     */
+    inline fun <reified T> Flow<*>.doIsInstance(
+        crossinline transform: suspend (value: T) -> Flow<IUIChange>
+    ): Flow<IUIChange> = filterIsInstance<T>().flatMapConcat { transform(it) }
+
+    /**
+     * Flow<BaseData<T>> 转为 Flow<IUIChange>
+     */
     protected fun <T> Flow<BaseData<T>>.mapToUIChange(
         transform: (UiState).(value: T) -> IUIChange
     ): Flow<IUIChange> = map {
@@ -64,6 +77,9 @@ abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : 
         }
     }
 
+    /**
+     * 在每个 UiIntent 结束调用
+     */
     protected fun <T> Flow<T>.defaultFinally(): Flow<T> = onCompletion {
         sendLoadUiIntent(LoadUiIntent.Loading(false))
     }.catch {

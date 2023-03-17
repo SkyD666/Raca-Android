@@ -27,7 +27,7 @@
         您还在为记不住小作文内容，面临<b>前面、中间、后面都忘了</b>的尴尬处境吗？使用这款工具将<b>帮助您记录您所遇到的小作文</b>，再也不因为忘记而烦恼！😋
     </p>
     <p>
-        使用<b> MVI </b>结构，完全采用<b> Material You </b>设计风格。<b>所有页面均使用 Jetpack Compose </b>开发。
+        使用<b> <a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a> </b>架构，完全采用<b> Material You </b>设计风格。<b>所有页面均使用 Jetpack Compose </b>开发。
     </p>
     <p>
         <a href="https://github.com/SkyD666/Raca" style="text-decoration:none" >
@@ -35,9 +35,6 @@
         </a>
     </p>
 </div>
-
-
-
 
 ## 💡主要功能
 

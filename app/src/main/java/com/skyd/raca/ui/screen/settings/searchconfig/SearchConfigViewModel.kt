@@ -6,8 +6,6 @@ import com.skyd.raca.base.IUiEvent
 import com.skyd.raca.model.respository.SearchConfigRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
 
@@ -23,7 +21,7 @@ class SearchConfigViewModel @Inject constructor(private var searchConfigRepo: Se
     override fun IUIChange.checkStateOrEvent() = this as? SearchConfigState to this as? IUiEvent
 
     override fun Flow<SearchConfigIntent>.handleIntent(): Flow<IUIChange> = merge(
-        filterIsInstance<SearchConfigIntent.GetSearchDomain>().flatMapConcat {
+        doIsInstance<SearchConfigIntent.GetSearchDomain> {
             searchConfigRepo.requestGetSearchDomain()
                 .mapToUIChange { data ->
                     copy(searchDomainResultUiState = SearchDomainResultUiState.SUCCESS(data))
@@ -31,7 +29,7 @@ class SearchConfigViewModel @Inject constructor(private var searchConfigRepo: Se
                 .defaultFinally()
         },
 
-        filterIsInstance<SearchConfigIntent.SetSearchDomain>().flatMapConcat { intent ->
+        doIsInstance<SearchConfigIntent.SetSearchDomain> { intent ->
             searchConfigRepo.requestSetSearchDomain(intent.searchDomainBean)
                 .mapToUIChange { data ->
                     copy(searchDomainResultUiState = SearchDomainResultUiState.SUCCESS(data))

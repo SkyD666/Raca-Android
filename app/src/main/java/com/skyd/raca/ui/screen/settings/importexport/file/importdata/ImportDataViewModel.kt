@@ -11,8 +11,6 @@ import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.respository.ImportDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.merge
 import java.io.InputStream
 import java.util.*
@@ -28,7 +26,7 @@ class ImportDataViewModel @Inject constructor(private var importDataRepo: Import
     override fun IUIChange.checkStateOrEvent() = this as? IUiState to this as? ImportDataEvent
 
     override fun Flow<ImportDataIntent>.handleIntent(): Flow<IUIChange> = merge(
-        filterIsInstance<ImportDataIntent.StartImport>().flatMapConcat { intent ->
+        doIsInstance<ImportDataIntent.StartImport> { intent ->
             val contentResolver = appContext.contentResolver
             val articleInputStream = contentResolver.openInputStream(intent.articleUri)
             val tagInputStream = contentResolver.openInputStream(intent.tagUri)

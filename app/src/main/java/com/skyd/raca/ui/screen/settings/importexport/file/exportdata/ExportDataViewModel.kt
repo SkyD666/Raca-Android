@@ -6,8 +6,6 @@ import com.skyd.raca.base.IUiState
 import com.skyd.raca.model.respository.ExportDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
 
@@ -21,7 +19,7 @@ class ExportDataViewModel @Inject constructor(private var exportDataRepo: Export
     override fun IUIChange.checkStateOrEvent() = this as? IUiState to this as? ExportDataEvent
 
     override fun Flow<ExportDataIntent>.handleIntent(): Flow<IUIChange> = merge(
-        filterIsInstance<ExportDataIntent.StartExport>().flatMapConcat { intent ->
+        doIsInstance<ExportDataIntent.StartExport> { intent ->
             exportDataRepo.requestExportData(intent.dirUri)
                 .mapToUIChange { data ->
                     ExportDataEvent(exportResultUiEvent = ExportResultUiEvent.SUCCESS(data))
