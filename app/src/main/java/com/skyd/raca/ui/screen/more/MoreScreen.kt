@@ -25,11 +25,11 @@ import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.More1Proxy
+import com.skyd.raca.ui.component.shape.CurlyCornerShape
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.about.ABOUT_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.SETTINGS_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.importexport.IMPORT_EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.component.shape.CurlyCornerShape
 
 @Composable
 fun MoreScreen() {
@@ -80,7 +80,10 @@ fun MoreScreen() {
                 title = stringResource(R.string.about),
                 icon = Icons.Default.Info,
                 iconTint = MaterialTheme.colorScheme.onTertiary,
-                shape = CurlyCornerShape(amp = 5.0, count = 10),
+                shape = CurlyCornerShape(
+                    amp = with(LocalDensity.current) { 2.dp.toPx() },
+                    count = 10
+                ),
                 shapeColor = MaterialTheme.colorScheme.tertiary,
                 action = { navController.navigate(ABOUT_SCREEN_ROUTE) }
             )
@@ -102,5 +105,4 @@ fun MoreScreen() {
             contentPadding = it
         )
     }
-
 }

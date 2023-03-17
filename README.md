@@ -5,16 +5,19 @@
     <h1>😅 Raca (Android)</h1>
     <p>
         <a href="https://github.com/SkyD666/Raca-Android/releases/latest" style="text-decoration:none">
-            <img src="https://img.shields.io/github/v/release/SkyD666/Raca-Android?display_name=release" alt="GitHub release (latest by date)"/>
+            <img src="https://img.shields.io/github/v/release/SkyD666/Raca-Android?display_name=release&style=for-the-badge" alt="GitHub release (latest by date)"/>
         </a>
         <a href="https://github.com/SkyD666/Raca-Android/releases/latest" style="text-decoration:none" >
-            <img src="https://img.shields.io/github/downloads/SkyD666/Raca-Android/total" alt="GitHub all downloads"/>
+            <img src="https://img.shields.io/github/downloads/SkyD666/Raca-Android/total?style=for-the-badge" alt="GitHub all downloads"/>
         </a>
-        <a href="https://img.shields.io/badge/platform-Android 7.0+-brightgreen" style="text-decoration:none" >
-            <img src="https://img.shields.io/badge/platform-Android 7.0+-brightgreen" alt="Support platform"/>
+        <a href="https://www.android.com/versions/nougat-7-0" style="text-decoration:none" >
+            <img src="https://img.shields.io/badge/Android 7.0+-brightgreen?style=for-the-badge&logo=android&logoColor=white" alt="Support platform"/>
         </a>
         <a href="https://github.com/SkyD666/Raca-Android/blob/master/LICENSE" style="text-decoration:none" >
-            <img src="https://img.shields.io/github/license/SkyD666/Raca-Android" alt="GitHub license"/>
+            <img src="https://img.shields.io/github/license/SkyD666/Raca-Android?style=for-the-badge" alt="GitHub license"/>
+        </a>
+        <a href="https://discord.gg/pEWEjeJTa3" style="text-decoration:none" >
+            <img src="https://img.shields.io/discord/982522006819991622?color=5865F2&label=Discord&logo=discord&logoColor=white&style=for-the-badge" alt="Discord"/>
         </a>
 	</p>
     <p>
@@ -32,6 +35,8 @@
         </a>
     </p>
 </div>
+
+
 
 
 ## 💡主要功能

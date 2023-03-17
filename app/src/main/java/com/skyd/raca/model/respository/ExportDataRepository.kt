@@ -1,7 +1,6 @@
 package com.skyd.raca.model.respository
 
 import android.net.Uri
-import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.skyd.raca.appContext
@@ -12,10 +11,11 @@ import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.TAG_TABLE_NAME
 import com.skyd.raca.model.bean.TagBean
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ExportDataRepository @Inject constructor() : BaseRepository() {
-    suspend fun requestExportData(dirUri: Uri): BaseData<Long> {
+    suspend fun requestExportData(dirUri: Uri): Flow<BaseData<Long>> {
         return executeRequest {
             val startTime = System.currentTimeMillis()
             val articleList = appDataBase.articleDao().getArticleList()

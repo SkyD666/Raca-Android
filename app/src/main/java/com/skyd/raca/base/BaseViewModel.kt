@@ -2,7 +2,6 @@ package com.skyd.raca.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -12,92 +11,68 @@ import kotlinx.coroutines.launch
 abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : IUiIntent> :
     ViewModel() {
 
-    private val _uiStateFlow by lazy { MutableStateFlow(initUiState()) }
-    val uiStateFlow: StateFlow<UiState> = _uiStateFlow
+    private val _uiIntentFlow: MutableSharedFlow<UiIntent> = MutableSharedFlow()
 
     protected abstract fun initUiState(): UiState
 
-    protected fun sendUiState(copy: UiState.() -> UiState) {
-        _uiStateFlow.update { copy(_uiStateFlow.value) }
-    }
-
-    private val _uiEventFlow: Channel<UiEvent> = Channel()
-    val uiEventFlow = _uiEventFlow.receiveAsFlow()
-
-    protected fun sendUiEvent(event: UiEvent) {
-        viewModelScope.launch {
-            _uiEventFlow.send(event)
+    private fun Flow<IUIChange>.sendEvent(): Flow<UiState> = mapNotNull {
+        val (state, event) = it.checkStateOrEvent()
+        if (event != null) {
+            uiEventChannel.send(event)
         }
+        state
     }
 
-    private val _uiIntentFlow: Channel<UiIntent> = Channel()
-    val uiIntentFlow: Flow<UiIntent> = _uiIntentFlow.receiveAsFlow()
+    protected abstract fun IUIChange.checkStateOrEvent(): Pair<UiState?, UiEvent?>
 
-    private val _loadUiIntentFlow: Channel<LoadUiIntent> = Channel()
-    val loadUiIntentFlow: Flow<LoadUiIntent> = _loadUiIntentFlow.receiveAsFlow()
+    private val uiEventChannel: Channel<UiEvent> = Channel()
+    val uiEventFlow = uiEventChannel.receiveAsFlow()
+
+    private val _loadUiIntentFlow: MutableSharedFlow<LoadUiIntent> = MutableSharedFlow()
+    val loadUiIntentFlow: SharedFlow<LoadUiIntent> = _loadUiIntentFlow
 
     fun sendUiIntent(uiIntent: UiIntent) {
         viewModelScope.launch {
-            _uiIntentFlow.send(uiIntent)
+            sendLoadUiIntent(LoadUiIntent.Loading(true))
+            _uiIntentFlow.emit(uiIntent)
         }
     }
 
-    init {
-        viewModelScope.launch {
-            uiIntentFlow.collect {
-                handleIntent(it)
-            }
-        }
-    }
-
-    protected abstract fun handleIntent(intent: IUiIntent)
+    protected abstract fun Flow<UiIntent>.handleIntent(): Flow<IUIChange>
 
     /**
      * 发送当前加载状态：Loading、Error、Normal
      */
     private fun sendLoadUiIntent(loadUiIntent: LoadUiIntent) {
         viewModelScope.launch {
-            _loadUiIntentFlow.send(loadUiIntent)
+            _loadUiIntentFlow.emit(loadUiIntent)
         }
     }
 
-    protected fun <T : Any> requestDataWithFlow(
-        showLoading: Boolean = true,
-        request: suspend () -> BaseData<T>,
-        successCallback: CoroutineScope.(T) -> Unit,
-        successButDataIsNullCallback: CoroutineScope.() -> Unit = {},
-        failCallback: suspend (String) -> Unit = { errMsg ->
-            //默认异常处理，子类可以进行覆写
-            sendLoadUiIntent(LoadUiIntent.Error(errMsg))
-        },
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // 是否展示Loading
-            if (showLoading) {
-                sendLoadUiIntent(LoadUiIntent.Loading(true))
+    protected fun <T> Flow<BaseData<T>>.mapToUIChange(
+        transform: (UiState).(value: T) -> IUIChange
+    ): Flow<IUIChange> = map {
+        when (it.state) {
+            ReqState.Success -> {
+                val data = it.data
+                if (data != null) {
+                    sendLoadUiIntent(LoadUiIntent.ShowMainView)
+                    uiStateFlow.value.transform(data)
+                } else error(it.msg.toString())
             }
-            val baseData: BaseData<T>
-            try {
-                baseData = request()
-                when (baseData.state) {
-                    ReqState.Success -> {
-                        sendLoadUiIntent(LoadUiIntent.ShowMainView)
-                        val data = baseData.data
-                        if (data == null) {
-                            successButDataIsNullCallback()
-                        } else {
-                            successCallback(data)
-                        }
-                    }
-                    ReqState.Error -> baseData.msg?.let { error(it) }
-                }
-            } catch (e: Exception) {
-                e.message?.let { failCallback(it) }
-            } finally {
-                if (showLoading) {
-                    sendLoadUiIntent(LoadUiIntent.Loading(false))
-                }
-            }
+            else -> error(it.msg.toString())
         }
     }
+
+    protected fun <T> Flow<T>.defaultFinally(): Flow<T> = onCompletion {
+        sendLoadUiIntent(LoadUiIntent.Loading(false))
+    }.catch {
+        sendLoadUiIntent(LoadUiIntent.Error(it.message.toString()))
+    }
+
+    val uiStateFlow: StateFlow<UiState> = _uiIntentFlow
+        .handleIntent()
+        .sendEvent()
+        .flowOn(Dispatchers.IO)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, initUiState())
 }

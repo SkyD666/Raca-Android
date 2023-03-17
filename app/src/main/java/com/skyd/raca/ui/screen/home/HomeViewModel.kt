@@ -1,14 +1,16 @@
 package com.skyd.raca.ui.screen.home
 
+import androidx.lifecycle.viewModelScope
 import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseViewModel
+import com.skyd.raca.base.IUIChange
 import com.skyd.raca.base.IUiEvent
-import com.skyd.raca.base.IUiIntent
 import com.skyd.raca.ext.dataStore
 import com.skyd.raca.ext.get
 import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.model.respository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,54 +26,47 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
         )
     }
 
-    override fun handleIntent(intent: IUiIntent) {
-        when (intent) {
-            is HomeIntent.GetArticleWithTagsList -> {
-                requestDataWithFlow(showLoading = false,
-                    request = { homeRepo.requestArticleWithTagsList(intent.keyword) },
-                    successCallback = { data ->
-                        sendUiState {
-                            copy(searchResultUiState = SearchResultUiState.SUCCESS(data))
-                        }
-                    }
-                )
-            }
-            is HomeIntent.GetArticleDetails -> {
-                if (intent.articleUuid.isBlank()) {
-                    sendUiState {
-                        copy(articleDetailUiState = ArticleDetailUiState.INIT())
-                    }
-                } else {
-                    requestDataWithFlow(showLoading = false,
-                        request = { homeRepo.requestArticleWithTagsDetail(intent.articleUuid) },
-                        successCallback = { data ->
-                            CurrentArticleUuidPreference.put(
-                                context = appContext,
-                                scope = this,
-                                value = data.article.uuid
-                            )
-                            sendUiState {
-                                copy(articleDetailUiState = ArticleDetailUiState.SUCCESS(data))
-                            }
-                        }
-                    )
+    override fun IUIChange.checkStateOrEvent() = this as? HomeState? to this as? IUiEvent
+
+    override fun Flow<HomeIntent>.handleIntent(): Flow<IUIChange> = merge(
+        filterIsInstance<HomeIntent.GetArticleWithTagsList>().flatMapConcat { intent ->
+            homeRepo.requestArticleWithTagsList(intent.keyword)
+                .mapToUIChange { data ->
+                    copy(searchResultUiState = SearchResultUiState.SUCCESS(data))
                 }
-            }
-            is HomeIntent.DeleteArticleWithTags -> {
-                requestDataWithFlow(showLoading = false,
-                    request = { homeRepo.requestDeleteArticleWithTagsDetail(intent.articleUuid) },
-                    successCallback = {
+                .defaultFinally()
+        },
+
+        filterIsInstance<HomeIntent.GetArticleDetails>().flatMapConcat { intent ->
+            if (intent.articleUuid.isBlank()) {
+                flow {
+                    emit(uiStateFlow.value.copy(articleDetailUiState = ArticleDetailUiState.INIT()))
+                }.defaultFinally()
+            } else {
+                homeRepo.requestArticleWithTagsDetail(intent.articleUuid)
+                    .mapToUIChange { data ->
                         CurrentArticleUuidPreference.put(
                             context = appContext,
-                            scope = this,
-                            value = CurrentArticleUuidPreference.default
+                            scope = viewModelScope,
+                            value = data.article.uuid
                         )
-                        sendUiState {
-                            copy(articleDetailUiState = ArticleDetailUiState.INIT())
-                        }
+                        copy(articleDetailUiState = ArticleDetailUiState.SUCCESS(data))
                     }
-                )
+                    .defaultFinally()
             }
-        }
-    }
+        },
+
+        filterIsInstance<HomeIntent.DeleteArticleWithTags>().flatMapConcat { intent ->
+            homeRepo.requestDeleteArticleWithTagsDetail(intent.articleUuid)
+                .mapToUIChange {
+                    CurrentArticleUuidPreference.put(
+                        context = appContext,
+                        scope = viewModelScope,
+                        value = CurrentArticleUuidPreference.default
+                    )
+                    copy(articleDetailUiState = ArticleDetailUiState.INIT())
+                }
+                .defaultFinally()
+        },
+    )
 }

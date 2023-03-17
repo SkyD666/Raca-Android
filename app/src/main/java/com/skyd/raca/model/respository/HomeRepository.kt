@@ -14,10 +14,11 @@ import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.preference.UseRegexSearchPreference
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class HomeRepository @Inject constructor() : BaseRepository() {
-    suspend fun requestArticleWithTagsList(keyword: String): BaseData<List<ArticleWithTags>> {
+    suspend fun requestArticleWithTagsList(keyword: String): Flow<BaseData<List<ArticleWithTags>>> {
         return executeRequest {
             BaseData<List<ArticleWithTags>>().apply {
                 code = 0
@@ -26,7 +27,7 @@ class HomeRepository @Inject constructor() : BaseRepository() {
         }
     }
 
-    suspend fun requestArticleWithTagsDetail(articleUuid: String): BaseData<ArticleWithTags> {
+    suspend fun requestArticleWithTagsDetail(articleUuid: String): Flow<BaseData<ArticleWithTags>> {
         return executeRequest {
             val articleWithTags = appDataBase.articleDao().getArticleWithTags(articleUuid)
             BaseData<ArticleWithTags>().apply {
@@ -36,7 +37,7 @@ class HomeRepository @Inject constructor() : BaseRepository() {
         }
     }
 
-    suspend fun requestDeleteArticleWithTagsDetail(articleUuid: String): BaseData<Int> {
+    suspend fun requestDeleteArticleWithTagsDetail(articleUuid: String): Flow<BaseData<Int>> {
         return executeRequest {
             BaseData<Int>().apply {
                 code = 0

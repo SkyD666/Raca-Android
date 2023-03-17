@@ -3,13 +3,16 @@ package com.skyd.raca.base
 import androidx.annotation.Keep
 
 @Keep
-interface IUiState
+interface IUIChange
 
 @Keep
-interface IUiEvent
+interface IUiState : IUIChange
 
 @Keep
-interface IUiIntent //event
+interface IUiEvent : IUIChange
+
+@Keep
+interface IUiIntent
 
 sealed class LoadUiIntent {
     data class Loading(var isShow: Boolean) : LoadUiIntent()

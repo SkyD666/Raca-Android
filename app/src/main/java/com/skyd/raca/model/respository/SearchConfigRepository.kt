@@ -4,10 +4,11 @@ import com.skyd.raca.base.BaseData
 import com.skyd.raca.base.BaseRepository
 import com.skyd.raca.db.appDataBase
 import com.skyd.raca.model.bean.SearchDomainBean
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SearchConfigRepository @Inject constructor() : BaseRepository() {
-    suspend fun requestGetSearchDomain(): BaseData<Map<String, Boolean>> {
+    suspend fun requestGetSearchDomain(): Flow<BaseData<Map<String, Boolean>>> {
         return executeRequest {
             val map = mutableMapOf<String, Boolean>()
             appDataBase.searchDomainDao().getAllSearchDomain().forEach {
@@ -20,7 +21,9 @@ class SearchConfigRepository @Inject constructor() : BaseRepository() {
         }
     }
 
-    suspend fun requestSetSearchDomain(searchDomainBean: SearchDomainBean): BaseData<Map<String, Boolean>> {
+    suspend fun requestSetSearchDomain(
+        searchDomainBean: SearchDomainBean
+    ): Flow<BaseData<Map<String, Boolean>>> {
         return executeRequest {
             appDataBase.searchDomainDao().setSearchDomain(searchDomainBean)
             val map = mutableMapOf<String, Boolean>()

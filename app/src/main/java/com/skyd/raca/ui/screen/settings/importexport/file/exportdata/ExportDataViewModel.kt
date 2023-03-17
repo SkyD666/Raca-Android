@@ -1,10 +1,14 @@
 package com.skyd.raca.ui.screen.settings.importexport.file.exportdata
 
 import com.skyd.raca.base.BaseViewModel
-import com.skyd.raca.base.IUiIntent
+import com.skyd.raca.base.IUIChange
 import com.skyd.raca.base.IUiState
 import com.skyd.raca.model.respository.ExportDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,18 +18,15 @@ class ExportDataViewModel @Inject constructor(private var exportDataRepo: Export
         return object : IUiState {}
     }
 
-    override fun handleIntent(intent: IUiIntent) {
-        when (intent) {
-            is ExportDataIntent.StartExport -> {
-                requestDataWithFlow(showLoading = true,
-                    request = { exportDataRepo.requestExportData(intent.dirUri) },
-                    successCallback = {
-                        sendUiEvent(
-                            ExportDataEvent(exportResultUiEvent = ExportResultUiEvent.SUCCESS(it))
-                        )
-                    }
-                )
-            }
-        }
-    }
+    override fun IUIChange.checkStateOrEvent() = this as? IUiState to this as? ExportDataEvent
+
+    override fun Flow<ExportDataIntent>.handleIntent(): Flow<IUIChange> = merge(
+        filterIsInstance<ExportDataIntent.StartExport>().flatMapConcat { intent ->
+            exportDataRepo.requestExportData(intent.dirUri)
+                .mapToUIChange { data ->
+                    ExportDataEvent(exportResultUiEvent = ExportResultUiEvent.SUCCESS(data))
+                }
+                .defaultFinally()
+        },
+    )
 }

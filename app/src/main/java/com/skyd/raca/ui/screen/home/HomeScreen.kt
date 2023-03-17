@@ -328,17 +328,18 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp, bottom = if (tags.isEmpty()) 16.dp else 6.dp)
                     .verticalScroll(rememberScrollState())
                     .weight(weight = 1f, fill = false),
                 text = articleBean.article,
                 style = MaterialTheme.typography.bodyLarge
             )
             if (tags.isNotEmpty()) {
-                Divider()
                 FlowRow(
                     modifier = Modifier
-                        .padding(vertical = 6.dp, horizontal = 16.dp)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 6.dp)
                         .fillMaxWidth()
                         .heightIn(max = 150.dp)
                         .verticalScroll(rememberScrollState()),

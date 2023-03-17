@@ -12,7 +12,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class CurlyCornerShape(
-    private val amp: Double = 16.0,
+    private val amp: Float = 16f,
     private val count: Int = 12,
 ) : CornerBasedShape(
     topStart = ZeroCornerSize,
@@ -22,13 +22,13 @@ class CurlyCornerShape(
 ) {
 
     private fun sineCircleXYatAngle(
-        d1: Double,
-        d2: Double,
-        d3: Double,
-        d4: Double,
-        d5: Double,
+        d1: Float,
+        d2: Float,
+        d3: Float,
+        d4: Float,
+        d5: Float,
         i: Int,
-    ): List<Double> = (i.toDouble() * d5).run {
+    ): List<Float> = (i * d5).run {
         listOf(
             (sin(this) * d4 + d3) * cos(d5) + d1,
             (sin(this) * d4 + d3) * sin(d5) + d2
@@ -43,22 +43,20 @@ class CurlyCornerShape(
         bottomStart: Float,
         layoutDirection: LayoutDirection,
     ): Outline {
-        val d = 2.0
-        val r2: Double = size.width / d
-        var r13: Double = size.height / d
-        val r18 = size.width / 2.0 - amp
+        val d = 2f
+        val r2: Float = size.width / d
+        var r13: Float = size.height / d
+        val r18: Float = size.width / 2f - amp
         val path = Path()
-        path.moveTo((d * r2 - amp).toFloat(), r13.toFloat())
+        path.moveTo((d * r2 - amp), r13)
         var i = 0
         while (true) {
             val i2 = i + 1
             val d3 = r13
-            val r5: List<Double> = sineCircleXYatAngle(
-                r2, r13, r18, amp, Math.toRadians(
-                    i.toDouble()
-                ), count
+            val r5: List<Float> = sineCircleXYatAngle(
+                r2, r13, r18, amp, Math.toRadians(i.toDouble()).toFloat(), count
             )
-            path.lineTo(r5[0].toFloat(), r5[1].toFloat())
+            path.lineTo(r5[0], r5[1])
             if (i2 >= 360) {
                 path.close()
                 return Outline.Generic(path)

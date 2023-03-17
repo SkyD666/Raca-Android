@@ -10,6 +10,7 @@ import com.skyd.raca.model.bean.WebDavResultInfo
 import com.skyd.raca.util.md5
 import com.thegrizzlylabs.sardineandroid.Sardine
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -28,7 +29,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         website: String,
         username: String,
         password: String
-    ): BaseData<List<BackupInfo>> {
+    ): Flow<BaseData<List<BackupInfo>>> {
         return executeRequest {
             val sardine: Sardine = initWebDav(website, username, password)
             val backupInfoMap: List<BackupInfo> = getMd5UuidKeyBackupInfoMap(sardine, website)
@@ -45,7 +46,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         username: String,
         password: String,
         uuid: String
-    ): BaseData<Unit> {
+    ): Flow<BaseData<Unit>> {
         return executeRequest {
             val sardine: Sardine = initWebDav(website, username, password)
             val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
@@ -64,7 +65,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         website: String,
         username: String,
         password: String,
-    ): BaseData<Unit> {
+    ): Flow<BaseData<Unit>> {
         return executeRequest {
             val sardine: Sardine = initWebDav(website, username, password)
             val (willBeDeletedMap, othersMap) = getMd5UuidKeyBackupInfoMap(sardine, website).run {
@@ -85,7 +86,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         website: String,
         username: String,
         password: String
-    ): BaseData<WebDavResultInfo> {
+    ): Flow<BaseData<WebDavResultInfo>> {
         return executeRequest {
             val startTime = System.currentTimeMillis()
             val allArticleWithTagsList = appDataBase.articleDao().getAllArticleWithTagsList()
@@ -118,7 +119,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         website: String,
         username: String,
         password: String
-    ): BaseData<WebDavResultInfo> {
+    ): Flow<BaseData<WebDavResultInfo>> {
         return executeRequest {
             val startTime = System.currentTimeMillis()
             val allArticleWithTagsList = appDataBase.articleDao().getAllArticleWithTagsList()

@@ -129,7 +129,10 @@ private fun TextArea(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(top = 20.dp),
             shape = RoundedCornerShape(16)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = stringResource(id = R.string.about_screen_description_1),
                     style = MaterialTheme.typography.bodyLarge,

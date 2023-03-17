@@ -3,13 +3,17 @@ package com.skyd.raca.ui.screen.settings.importexport.file.importdata
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseViewModel
-import com.skyd.raca.base.IUiIntent
+import com.skyd.raca.base.IUIChange
 import com.skyd.raca.base.IUiState
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.respository.ImportDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.merge
 import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
@@ -21,30 +25,25 @@ class ImportDataViewModel @Inject constructor(private var importDataRepo: Import
         return object : IUiState {}
     }
 
-    override fun handleIntent(intent: IUiIntent) {
-        when (intent) {
-            is ImportDataIntent.StartImport -> {
-                requestDataWithFlow(showLoading = true,
-                    request = {
-                        val contentResolver = appContext.contentResolver
-                        val articleInputStream = contentResolver.openInputStream(intent.articleUri)
-                        val tagInputStream = contentResolver.openInputStream(intent.tagUri)
-                        importDataRepo.requestImportData(
-                            readArticleTagCsv(articleInputStream, tagInputStream)
-                        ).apply {
-                            articleInputStream?.close()
-                            tagInputStream?.close()
-                        }
-                    },
-                    successCallback = {
-                        sendUiEvent(
-                            ImportDataEvent(importResultUiEvent = ImportResultUiEvent.SUCCESS(it))
-                        )
-                    }
-                )
+    override fun IUIChange.checkStateOrEvent() = this as? IUiState to this as? ImportDataEvent
+
+    override fun Flow<ImportDataIntent>.handleIntent(): Flow<IUIChange> = merge(
+        filterIsInstance<ImportDataIntent.StartImport>().flatMapConcat { intent ->
+            val contentResolver = appContext.contentResolver
+            val articleInputStream = contentResolver.openInputStream(intent.articleUri)
+            val tagInputStream = contentResolver.openInputStream(intent.tagUri)
+            importDataRepo.requestImportData(
+                readArticleTagCsv(articleInputStream, tagInputStream)
+            ).apply {
+                articleInputStream?.close()
+                tagInputStream?.close()
             }
-        }
-    }
+                .mapToUIChange { data ->
+                    ImportDataEvent(importResultUiEvent = ImportResultUiEvent.SUCCESS(data))
+                }
+                .defaultFinally()
+        },
+    )
 
     private fun readArticleTagCsv(
         articleInputStream: InputStream?,
