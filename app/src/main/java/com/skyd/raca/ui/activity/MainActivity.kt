@@ -37,16 +37,18 @@ import com.skyd.raca.ui.screen.settings.SETTINGS_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.SettingsScreen
 import com.skyd.raca.ui.screen.settings.appearance.APPEARANCE_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.appearance.AppearanceScreen
+import com.skyd.raca.ui.screen.settings.data.DATA_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.DataScreen
+import com.skyd.raca.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.importexport.ImportExportScreen
+import com.skyd.raca.ui.screen.settings.data.importexport.cloud.webdav.WEBDAV_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.importexport.cloud.webdav.WebDavScreen
+import com.skyd.raca.ui.screen.settings.data.importexport.file.exportdata.EXPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.importexport.file.exportdata.ExportScreen
+import com.skyd.raca.ui.screen.settings.data.importexport.file.importdata.IMPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.importexport.file.importdata.ImportScreen
 import com.skyd.raca.ui.screen.settings.easyusage.EASY_USAGE_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.easyusage.EasyUsageScreen
-import com.skyd.raca.ui.screen.settings.importexport.IMPORT_EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.ImportExportScreen
-import com.skyd.raca.ui.screen.settings.importexport.cloud.webdav.WEBDAV_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.cloud.webdav.WebDavScreen
-import com.skyd.raca.ui.screen.settings.importexport.file.exportdata.EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.file.exportdata.ExportScreen
-import com.skyd.raca.ui.screen.settings.importexport.file.importdata.IMPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.importexport.file.importdata.ImportScreen
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SearchConfigScreen
 import com.skyd.raca.ui.theme.RacaTheme
@@ -154,6 +156,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 composable(route = WEBDAV_SCREEN_ROUTE) {
                     WebDavScreen()
+                }
+                composable(route = DATA_SCREEN_ROUTE) {
+                    DataScreen()
                 }
             }
         }

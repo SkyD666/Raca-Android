@@ -1,6 +1,9 @@
 package com.skyd.raca.ui.screen.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -31,7 +34,7 @@ import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
 import com.skyd.raca.model.preference.QueryPreference
 import com.skyd.raca.model.preference.rememberQuery
-import com.skyd.raca.ui.component.DeleteWarningDialog
+import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
@@ -52,6 +55,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val currentArticleUuid = LocalCurrentArticleUuid.current
     var query by rememberQuery()
+    var articleWithTags by remember { mutableStateOf<ArticleWithTags?>(null) }
 
     refreshArticleData.collectAsStateWithLifecycle(initialValue = null).apply {
         value ?: return@apply
@@ -89,85 +93,105 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     .fillMaxWidth()
             ) {
                 val searchBarHorizontalPadding: Dp by animateDpAsState(if (active) 0.dp else 16.dp)
-                SearchBar(
+                Box(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .padding(horizontal = searchBarHorizontalPadding),
-                    onQueryChange = { query = it },
-                    query = query,
-                    onSearch = { keyword ->
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                        QueryPreference.put(context, scope, keyword)
-                        viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
-                    },
-                    active = active,
-                    onActiveChange = {
-                        active = it
-                        if (!active) focusManager.clearFocus()
-                    },
-                    placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
-                    leadingIcon = {
-                        if (active) {
-                            IconButton(onClick = {
-                                focusManager.clearFocus()
-                                active = false
-                            }) {
-                                Icon(
-                                    Icons.Default.ArrowBack,
-                                    contentDescription = stringResource(id = R.string.home_screen_close_search)
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = { menuExpanded = true }) {
-                                Icon(Icons.Default.Menu, contentDescription = null)
-                            }
-                        }
-                    },
-                    trailingIcon = {
-                        if (active) {
-                            IconButton(onClick = {
-                                QueryPreference.put(context, scope, QueryPreference.default)
-                            }) {
-                                Icon(
-                                    Icons.Default.Clear,
-                                    stringResource(R.string.home_screen_clear_search_text)
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = {
-                                navController.navigate(ADD_SCREEN_ROUTE)
-                            }) {
-                                Icon(Icons.Default.Add, stringResource(R.string.home_screen_add))
-                            }
-                        }
-                    },
+                        .padding(horizontal = searchBarHorizontalPadding)
                 ) {
-                    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-                        when (searchResultUiState) {
-                            SearchResultUiState.INIT -> {
-                                viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
+                    SearchBar(
+                        onQueryChange = { query = it },
+                        query = query,
+                        onSearch = { keyword ->
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            QueryPreference.put(context, scope, keyword)
+                            viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
+                        },
+                        active = active,
+                        onActiveChange = {
+                            active = it
+                            if (!active) focusManager.clearFocus()
+                        },
+                        placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
+                        leadingIcon = {
+                            if (active) {
+                                IconButton(onClick = {
+                                    focusManager.clearFocus()
+                                    active = false
+                                }) {
+                                    Icon(
+                                        Icons.Default.ArrowBack,
+                                        contentDescription = stringResource(id = R.string.home_screen_close_search)
+                                    )
+                                }
+                            } else {
+                                IconButton(onClick = { menuExpanded = true }) {
+                                    Icon(Icons.Default.Menu, contentDescription = null)
+                                }
                             }
-                            is SearchResultUiState.SUCCESS -> {
-                                SearchResultList(dataList = searchResultUiState.articleWithTagsList,
-                                    onItemClickListener = {
-                                        focusManager.clearFocus()
-                                        active = false
-                                        viewModel.sendUiIntent(
-                                            HomeIntent.GetArticleDetails(it.article.uuid)
-                                        )
-                                    }
-                                )
+                        },
+                        trailingIcon = {
+                            if (active) {
+                                IconButton(onClick = {
+                                    QueryPreference.put(context, scope, QueryPreference.default)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = stringResource(R.string.home_screen_clear_search_text)
+                                    )
+                                }
+                            } else {
+                                IconButton(onClick = {
+                                    navController.navigate(ADD_SCREEN_ROUTE)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = stringResource(R.string.home_screen_add)
+                                    )
+                                }
+                            }
+                        },
+                    ) {
+                        viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
+                            when (searchResultUiState) {
+                                SearchResultUiState.INIT -> {
+                                    viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
+                                }
+                                is SearchResultUiState.SUCCESS -> {
+                                    SearchResultList(dataList = searchResultUiState.articleWithTagsList,
+                                        onItemClickListener = {
+                                            focusManager.clearFocus()
+                                            active = false
+                                            viewModel.sendUiIntent(
+                                                HomeIntent.GetArticleDetails(it.article.uuid)
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
+                    HomeMenu(viewModel = viewModel)
                 }
-                HomeMenu(viewModel = viewModel)
+            }
+
+            AnimatedVisibility(
+                visible = articleWithTags != null,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                articleWithTags?.let {
+                    MainCard(
+                        articleWithTags = it,
+                        snackbarHostState = snackbarHostState
+                    )
+                }
             }
 
             viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
                 when (articleDetailUiState) {
                     is ArticleDetailUiState.INIT -> {
+                        articleWithTags = null
                         if (articleDetailUiState.articleUuid.isNotBlank()) {
                             viewModel.sendUiIntent(
                                 HomeIntent.GetArticleDetails(articleDetailUiState.articleUuid)
@@ -175,10 +199,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                         }
                     }
                     is ArticleDetailUiState.SUCCESS -> {
-                        MainCard(
-                            articleWithTags = articleDetailUiState.articleWithTags,
-                            snackbarHostState = snackbarHostState
-                        )
+                        articleWithTags = articleDetailUiState.articleWithTags
                     }
                 }
             }

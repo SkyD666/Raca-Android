@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.screen.settings.importexport.file.importdata
+package com.skyd.raca.ui.screen.settings.data.importexport.file.importdata
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.skyd.raca.appContext

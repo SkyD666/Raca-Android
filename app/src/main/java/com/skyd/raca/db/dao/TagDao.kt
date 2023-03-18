@@ -17,4 +17,7 @@ interface TagDao {
 
     @Query(value = "DELETE FROM $TAG_TABLE_NAME WHERE articleUuid LIKE :articleUuid")
     fun deleteTags(articleUuid: String): Int
+
+    @Query("DELETE FROM $TAG_TABLE_NAME")
+    fun deleteAllTags()
 }

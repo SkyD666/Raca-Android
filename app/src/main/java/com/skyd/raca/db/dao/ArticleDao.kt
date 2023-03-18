@@ -71,6 +71,14 @@ interface ArticleDao {
         return innerDeleteArticle(articleUuid)
     }
 
+    @Transaction
+    fun deleteAllArticleWithTags() {
+        val scope = CoroutineScope(Dispatchers.IO)
+        CurrentArticleUuidPreference.put(appContext, scope, CurrentArticleUuidPreference.default)
+        appDataBase.tagDao().deleteAllTags()
+        deleteAllArticles()
+    }
+
     @Query("DELETE FROM $ARTICLE_TABLE_NAME WHERE uuid LIKE :articleUuid")
     fun innerDeleteArticle(articleUuid: String): Int
 
@@ -101,10 +109,13 @@ interface ArticleDao {
         return true
     }
 
-    @Transaction
+
     fun webDavImportData(articleWithTagsList: List<ArticleWithTags>) {
         articleWithTagsList.forEach {
             addArticleWithTags(it)
         }
     }
+
+    @Query("DELETE FROM $ARTICLE_TABLE_NAME")
+    fun deleteAllArticles()
 }

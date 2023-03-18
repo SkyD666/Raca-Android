@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.screen.settings.importexport.file.importdata
+package com.skyd.raca.ui.screen.settings.data.importexport.file.exportdata
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -6,9 +6,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -27,54 +26,46 @@ import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import kotlinx.coroutines.launch
 
-const val IMPORT_SCREEN_ROUTE = "importScreen"
+const val EXPORT_SCREEN_ROUTE = "exportScreen"
 
 @Composable
-fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
+fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var openWaitingDialog by remember { mutableStateOf(false) }
 
-    var articleUri by remember { mutableStateOf<Uri?>(null) }
-    var tagUri by remember { mutableStateOf<Uri?>(null) }
+    var dirUri by remember { mutableStateOf<Uri?>(null) }
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             RacaTopBar(
                 style = RacaTopBarStyle.Large,
-                title = { Text(text = stringResource(R.string.import_screen_name)) },
+                title = { Text(text = stringResource(R.string.export_screen_name)) },
                 scrollBehavior = scrollBehavior,
                 actions = {
                     IconButton(
-                        enabled = articleUri != null && tagUri != null,
+                        enabled = dirUri != null,
                         onClick = {
-                            val a = articleUri
-                            val t = tagUri
-                            if (a == null || t == null) return@IconButton
+                            val a = dirUri ?: return@IconButton
                             viewModel.sendUiIntent(
-                                ImportDataIntent.StartImport(articleUri = a, tagUri = t)
+                                ExportDataIntent.StartExport(dirUri = a)
                             )
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Done,
-                            contentDescription = stringResource(R.string.import_screen_start_import)
+                            contentDescription = stringResource(R.string.export_screen_start_export)
                         )
                     }
                 }
             )
         }
     ) {
-        val pickArticleFileLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.GetContent()
-        ) { fileUri ->
-            articleUri = fileUri
-        }
-        val pickTagFileLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.GetContent()
-        ) { fileUri ->
-            tagUri = fileUri
+        val pickDirLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.OpenDocumentTree()
+        ) { uri ->
+            dirUri = uri
         }
         LazyColumn(
             modifier = Modifier
@@ -84,40 +75,17 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
         ) {
             item {
                 CategorySettingsItem(
-                    text = stringResource(id = R.string.import_screen_select_file_category)
+                    text = stringResource(id = R.string.export_screen_select_dir_category)
                 )
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Article),
-                    text = stringResource(id = R.string.import_screen_select_article_table),
-                    descriptionText = articleUri?.path,
+                    icon = rememberVectorPainter(image = Icons.Default.Folder),
+                    text = stringResource(id = R.string.export_screen_select_dir),
+                    descriptionText = dirUri?.path,
                     onClick = {
-                        pickArticleFileLauncher.launch("text/*")
+                        pickDirLauncher.launch(null)
                     }
-                )
-            }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Article),
-                    text = stringResource(id = R.string.import_screen_select_tag_table),
-                    descriptionText = tagUri?.path,
-                    onClick = {
-                        pickTagFileLauncher.launch("text/*")
-                    }
-                )
-            }
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.import_screen_strategy_category)
-                )
-            }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Warning),
-                    text = stringResource(id = R.string.import_screen_conflict_strategy),
-                    descriptionText = stringResource(id = R.string.import_screen_conflict_strategy_description),
-                    onClick = {}
                 )
             }
         }
@@ -127,7 +95,10 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
                 is LoadUiIntent.Error -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
-                            message = appContext.getString(R.string.import_screen_failed),
+                            message = appContext.getString(
+                                R.string.export_screen_failed,
+                                loadUiIntent.msg
+                            ),
                             withDismissAction = true
                         )
                     }
@@ -139,13 +110,13 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
             }
         }
         viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
-            when (importResultUiEvent) {
-                is ImportResultUiEvent.SUCCESS -> {
+            when (exportResultUiEvent) {
+                is ExportResultUiEvent.SUCCESS -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(
-                                R.string.import_screen_success,
-                                importResultUiEvent.time / 1000.0f
+                                R.string.export_screen_success,
+                                exportResultUiEvent.time / 1000.0
                             ),
                             withDismissAction = true
                         )
@@ -156,7 +127,7 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
         }
         WaitingDialog(
             visible = openWaitingDialog,
-            title = stringResource(R.string.import_screen_waiting)
+            title = stringResource(R.string.export_screen_waiting)
         )
     }
 }

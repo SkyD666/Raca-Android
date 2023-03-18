@@ -126,4 +126,11 @@
     <string name="paste">粘贴</string>
     <string name="webdav_screen_info_incomplete">WebDAV 信息不完整，请完善！</string>
     <string name="autofill_service">Raca 自动填充</string>
+    <string name="data_screen_name">数据选项</string>
+    <string name="data_screen_import_export_description">导入与导出段落数据。</string>
+    <string name="data_screen_delete_all">删除本地所有段落</string>
+    <string name="data_screen_delete_all_description">删除本地所有段落数据，包括段落主体、标题和标签等，此操作不可逆！</string>
+    <string name="setting_screen_data_description">管理段落数据。</string>
+    <string name="data_screen_failed">操作失败：%s</string>
+    <string name="data_screen_delete_all_success">所有段落数据已清空，耗时 %.2f 秒</string>
 </resources>

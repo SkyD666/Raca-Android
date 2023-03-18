@@ -1,15 +1,13 @@
-package com.skyd.raca.ui.screen.settings.importexport.file.exportdata
+package com.skyd.raca.ui.screen.settings.data
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -20,72 +18,52 @@ import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
 import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
+import com.skyd.raca.ui.local.LocalNavController
+import com.skyd.raca.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
 import kotlinx.coroutines.launch
 
-const val EXPORT_SCREEN_ROUTE = "exportScreen"
+const val DATA_SCREEN_ROUTE = "dataScreen"
 
 @Composable
-fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
+fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
     var openWaitingDialog by remember { mutableStateOf(false) }
 
-    var dirUri by remember { mutableStateOf<Uri?>(null) }
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             RacaTopBar(
                 style = RacaTopBarStyle.Large,
-                title = { Text(text = stringResource(R.string.export_screen_name)) },
                 scrollBehavior = scrollBehavior,
-                actions = {
-                    IconButton(
-                        enabled = dirUri != null,
-                        onClick = {
-                            val a = dirUri ?: return@IconButton
-                            viewModel.sendUiIntent(
-                                ExportDataIntent.StartExport(dirUri = a)
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Done,
-                            contentDescription = stringResource(R.string.export_screen_start_export)
-                        )
-                    }
-                }
+                title = { Text(text = stringResource(R.string.data_screen_name)) },
             )
         }
-    ) {
-        val pickDirLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.OpenDocumentTree()
-        ) { uri ->
-            dirUri = uri
-        }
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentPadding = it
+                .nestedScroll(scrollBehavior.nestedScrollConnection), contentPadding = paddingValues
         ) {
             item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.export_screen_select_dir_category)
-                )
-            }
-            item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Folder),
-                    text = stringResource(id = R.string.export_screen_select_dir),
-                    descriptionText = dirUri?.path,
-                    onClick = {
-                        pickDirLauncher.launch(null)
-                    }
+                    icon = rememberVectorPainter(image = Icons.Default.ImportExport),
+                    text = stringResource(id = R.string.import_export_screen_name),
+                    descriptionText = stringResource(id = R.string.data_screen_import_export_description),
+                    onClick = { navController.navigate(IMPORT_EXPORT_SCREEN_ROUTE) }
+                )
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Default.Delete),
+                    text = stringResource(id = R.string.data_screen_delete_all),
+                    descriptionText = stringResource(id = R.string.data_screen_delete_all_description),
+                    onClick = { openDeleteWarningDialog = true }
                 )
             }
         }
@@ -96,8 +74,7 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(
-                                R.string.export_screen_failed,
-                                loadUiIntent.msg
+                                R.string.data_screen_failed, loadUiIntent.msg
                             ),
                             withDismissAction = true
                         )
@@ -110,13 +87,13 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
             }
         }
         viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
-            when (exportResultUiEvent) {
-                is ExportResultUiEvent.SUCCESS -> {
+            when (deleteAllResultUiEvent) {
+                is DeleteAllResultUiEvent.SUCCESS -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(
-                                R.string.export_screen_success,
-                                exportResultUiEvent.time / 1000.0
+                                R.string.data_screen_delete_all_success,
+                                deleteAllResultUiEvent.time / 1000.0f
                             ),
                             withDismissAction = true
                         )
@@ -125,9 +102,16 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                 null -> {}
             }
         }
-        WaitingDialog(
-            visible = openWaitingDialog,
-            title = stringResource(R.string.export_screen_waiting)
+
+        WaitingDialog(visible = openWaitingDialog)
+        DeleteWarningDialog(
+            visible = openDeleteWarningDialog,
+            onDismissRequest = { openDeleteWarningDialog = false },
+            onDismiss = { openDeleteWarningDialog = false },
+            onConfirm = {
+                viewModel.sendUiIntent(DataIntent.Start)
+                openDeleteWarningDialog = false
+            }
         )
     }
 }

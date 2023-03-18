@@ -1,4 +1,4 @@
-package com.skyd.raca.ui.component
+package com.skyd.raca.ui.component.dialog
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
