@@ -127,7 +127,7 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
         }
         WaitingDialog(
             visible = openWaitingDialog,
-            text = stringResource(R.string.export_screen_waiting)
+            title = stringResource(R.string.export_screen_waiting)
         )
     }
 }

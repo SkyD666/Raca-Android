@@ -12,20 +12,21 @@ import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.TAG_TABLE_NAME
 import com.skyd.raca.model.bean.TagBean
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ExportDataRepository @Inject constructor() : BaseRepository() {
     suspend fun requestExportData(dirUri: Uri): Flow<BaseData<Long>> {
-        return executeRequest {
+        return flow {
             val startTime = System.currentTimeMillis()
             val articleList = appDataBase.articleDao().getArticleList()
             val tagList = appDataBase.tagDao().getTagList()
             val (success, msg) = export(dirUri, articleList, tagList)
-            BaseData<Long>().apply {
+            emitBaseData(BaseData<Long>().apply {
                 code = if (success) 0 else -1
                 data = System.currentTimeMillis() - startTime
                 this.msg = msg
-            }
+            })
         }
     }
 

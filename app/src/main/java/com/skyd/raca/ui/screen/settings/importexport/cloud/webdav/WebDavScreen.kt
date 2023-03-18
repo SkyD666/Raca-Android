@@ -24,6 +24,8 @@ import com.skyd.raca.ext.dateTime
 import com.skyd.raca.ext.editor
 import com.skyd.raca.ext.secretSharedPreferences
 import com.skyd.raca.model.bean.BackupInfo
+import com.skyd.raca.model.bean.WebDavResultInfo
+import com.skyd.raca.model.bean.WebDavWaitingInfo
 import com.skyd.raca.model.preference.WebDavServerPreference
 import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.component.dialog.TextFieldDialog
@@ -40,6 +42,8 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var openWaitingDialog by remember { mutableStateOf(false) }
+    var waitingDialogCurrent by remember { mutableStateOf<Int?>(null) }
+    var waitingDialogTotal by remember { mutableStateOf<Int?>(null) }
     var openDeleteWarningDialog by rememberSaveable { mutableStateOf<String?>(null) }
     var openInputDialog by remember { mutableStateOf(false) }
     var inputDialogInfo by remember {
@@ -221,11 +225,17 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                 is LoadUiIntent.ShowMainView -> {}
                 is LoadUiIntent.Loading -> {
                     openWaitingDialog = loadUiIntent.isShow
+                    waitingDialogCurrent = null
+                    waitingDialogTotal = null
                 }
             }
         }
 
-        WaitingDialog(visible = openWaitingDialog)
+        WaitingDialog(
+            visible = openWaitingDialog,
+            currentValue = waitingDialogCurrent,
+            totalValue = waitingDialogTotal
+        )
         DeleteWarningDialog(
             visible = openDeleteWarningDialog != null,
             onDismissRequest = { openDeleteWarningDialog = null },
@@ -274,30 +284,40 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
     viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
         when (uploadResultUiEvent) {
             is UploadResultUiEvent.SUCCESS -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = appContext.getString(
-                            R.string.webdav_screen_upload_success,
-                            uploadResultUiEvent.result.time / 1000.0f,
-                            uploadResultUiEvent.result.count
-                        ),
-                        withDismissAction = true
-                    )
+                val state = uploadResultUiEvent.result
+                if (state is WebDavResultInfo) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = appContext.getString(
+                                R.string.webdav_screen_upload_success,
+                                state.time / 1000.0f, state.count
+                            ),
+                            withDismissAction = true
+                        )
+                    }
+                } else if (state is WebDavWaitingInfo) {
+                    waitingDialogCurrent = state.current
+                    waitingDialogTotal = state.total
                 }
             }
             null -> {}
         }
         when (downloadResultUiEvent) {
             is DownloadResultUiEvent.SUCCESS -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = appContext.getString(
-                            R.string.webdav_screen_download_success,
-                            downloadResultUiEvent.result.time / 1000.0f,
-                            downloadResultUiEvent.result.count
-                        ),
-                        withDismissAction = true
-                    )
+                val state = downloadResultUiEvent.result
+                if (state is WebDavResultInfo) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = appContext.getString(
+                                R.string.webdav_screen_download_success,
+                                state.time / 1000.0f, state.count
+                            ),
+                            withDismissAction = true
+                        )
+                    }
+                } else if (state is WebDavWaitingInfo) {
+                    waitingDialogCurrent = state.current
+                    waitingDialogTotal = state.total
                 }
             }
             null -> {}

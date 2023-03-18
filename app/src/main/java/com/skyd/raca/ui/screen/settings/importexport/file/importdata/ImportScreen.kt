@@ -156,7 +156,7 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
         }
         WaitingDialog(
             visible = openWaitingDialog,
-            text = stringResource(R.string.import_screen_waiting)
+            title = stringResource(R.string.import_screen_waiting)
         )
     }
 }

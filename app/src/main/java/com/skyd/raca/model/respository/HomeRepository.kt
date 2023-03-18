@@ -15,34 +15,35 @@ import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.preference.UseRegexSearchPreference
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class HomeRepository @Inject constructor() : BaseRepository() {
     suspend fun requestArticleWithTagsList(keyword: String): Flow<BaseData<List<ArticleWithTags>>> {
-        return executeRequest {
-            BaseData<List<ArticleWithTags>>().apply {
+        return flow {
+            emitBaseData(BaseData<List<ArticleWithTags>>().apply {
                 code = 0
                 data = appDataBase.articleDao().getArticleWithTagsList(genSql(keyword))
-            }
+            })
         }
     }
 
     suspend fun requestArticleWithTagsDetail(articleUuid: String): Flow<BaseData<ArticleWithTags>> {
-        return executeRequest {
+        return flow {
             val articleWithTags = appDataBase.articleDao().getArticleWithTags(articleUuid)
-            BaseData<ArticleWithTags>().apply {
+            emitBaseData(BaseData<ArticleWithTags>().apply {
                 code = if (articleWithTags == null) 1 else 0
                 data = articleWithTags
-            }
+            })
         }
     }
 
     suspend fun requestDeleteArticleWithTagsDetail(articleUuid: String): Flow<BaseData<Int>> {
-        return executeRequest {
-            BaseData<Int>().apply {
+        return flow {
+            emitBaseData(BaseData<Int>().apply {
                 code = 0
                 data = appDataBase.articleDao().deleteArticleWithTags(articleUuid)
-            }
+            })
         }
     }
 

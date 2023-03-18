@@ -5,11 +5,12 @@ import com.skyd.raca.base.BaseRepository
 import com.skyd.raca.db.appDataBase
 import com.skyd.raca.model.bean.ArticleWithTags
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ImportDataRepository @Inject constructor() : BaseRepository() {
     suspend fun requestImportData(articleWithTagsList: List<ArticleWithTags>?): Flow<BaseData<Long>> {
-        return executeRequest {
+        return flow {
             if (articleWithTagsList == null) {
                 error("articleWithTagsList is null")
             } else {
@@ -17,10 +18,10 @@ class ImportDataRepository @Inject constructor() : BaseRepository() {
                 if (!appDataBase.articleDao().importData(articleWithTagsList)) {
                     error("importData failed!")
                 }
-                BaseData<Long>().apply {
+                emitBaseData(BaseData<Long>().apply {
                     code = 0
                     data = System.currentTimeMillis() - startTime
-                }
+                })
             }
         }
     }

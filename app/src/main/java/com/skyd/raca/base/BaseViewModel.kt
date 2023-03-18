@@ -83,6 +83,7 @@ abstract class BaseViewModel<UiState : IUiState, UiEvent : IUiEvent, UiIntent : 
     protected fun <T> Flow<T>.defaultFinally(): Flow<T> = onCompletion {
         sendLoadUiIntent(LoadUiIntent.Loading(false))
     }.catch {
+        it.printStackTrace()
         sendLoadUiIntent(LoadUiIntent.Error(it.message.toString()))
     }
 

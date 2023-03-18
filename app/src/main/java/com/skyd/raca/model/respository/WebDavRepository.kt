@@ -4,13 +4,13 @@ import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseData
 import com.skyd.raca.base.BaseRepository
 import com.skyd.raca.db.appDataBase
-import com.skyd.raca.model.bean.ArticleWithTags
-import com.skyd.raca.model.bean.BackupInfo
-import com.skyd.raca.model.bean.WebDavResultInfo
+import com.skyd.raca.model.bean.*
 import com.skyd.raca.util.md5
 import com.thegrizzlylabs.sardineandroid.Sardine
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -30,14 +30,14 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         username: String,
         password: String
     ): Flow<BaseData<List<BackupInfo>>> {
-        return executeRequest {
+        return flow {
             val sardine: Sardine = initWebDav(website, username, password)
             val backupInfoMap: List<BackupInfo> = getMd5UuidKeyBackupInfoMap(sardine, website)
                 .filter { it.value.isDeleted }.values.toList()
-            BaseData<List<BackupInfo>>().apply {
+            emitBaseData(BaseData<List<BackupInfo>>().apply {
                 code = 0
                 data = backupInfoMap
-            }
+            })
         }
     }
 
@@ -47,17 +47,17 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         password: String,
         uuid: String
     ): Flow<BaseData<Unit>> {
-        return executeRequest {
+        return flow {
             val sardine: Sardine = initWebDav(website, username, password)
             val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
                 .associateBy { it.uuid }.toMutableMap()
             backupInfoMap.remove(uuid)
             updateBackupInfo(sardine, website, backupInfoMap.values.toList())
             sardine.delete(website + APP_DIR + BACKUP_DIR + uuid)
-            BaseData<Unit>().apply {
+            emitBaseData(BaseData<Unit>().apply {
                 code = 0
                 data = Unit
-            }
+            })
         }
     }
 
@@ -66,7 +66,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         username: String,
         password: String,
     ): Flow<BaseData<Unit>> {
-        return executeRequest {
+        return flow {
             val sardine: Sardine = initWebDav(website, username, password)
             val (willBeDeletedMap, othersMap) = getMd5UuidKeyBackupInfoMap(sardine, website).run {
                 filter { it.value.isDeleted } to filter { !it.value.isDeleted }
@@ -75,10 +75,10 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
             willBeDeletedMap.forEach { (_, u) ->
                 sardine.delete(website + APP_DIR + BACKUP_DIR + u.uuid)
             }
-            BaseData<Unit>().apply {
+            emitBaseData(BaseData<Unit>().apply {
                 code = 0
                 data = Unit
-            }
+            })
         }
     }
 
@@ -86,8 +86,8 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         website: String,
         username: String,
         password: String
-    ): Flow<BaseData<WebDavResultInfo>> {
-        return executeRequest {
+    ): Flow<BaseData<WebDavInfo>> {
+        return flow {
             val startTime = System.currentTimeMillis()
             val allArticleWithTagsList = appDataBase.articleDao().getAllArticleWithTagsList()
             val sardine: Sardine = initWebDav(website, username, password)
@@ -96,22 +96,26 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
             val waitToAddList = mutableListOf<ArticleWithTags>()
             val (excludedMap, willBeDeletedList) =
                 excludeRemoteUnchanged(backupInfoMap, allArticleWithTagsList)
+            val totalCount = excludedMap.size + willBeDeletedList.size
+            var currentCount = 0
             willBeDeletedList.forEach {
                 appDataBase.articleDao().deleteArticleWithTags(articleUuid = it)
+                emitProgressData(current = ++currentCount, total = totalCount)
             }
             excludedMap.forEach { entry ->
                 val inputAsString = sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid)
                     .bufferedReader().use { it.readText() }
                 waitToAddList += Json.decodeFromString<ArticleWithTags>(inputAsString)
+                emitProgressData(current = ++currentCount, total = totalCount)
             }
             appDataBase.articleDao().webDavImportData(waitToAddList)
-            BaseData<WebDavResultInfo>().apply {
+            emitBaseData(BaseData<WebDavInfo>().apply {
                 code = 0
                 data = WebDavResultInfo(
                     time = System.currentTimeMillis() - startTime,
-                    count = waitToAddList.size + willBeDeletedList.size
+                    count = totalCount
                 )
-            }
+            })
         }
     }
 
@@ -119,8 +123,8 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         website: String,
         username: String,
         password: String
-    ): Flow<BaseData<WebDavResultInfo>> {
-        return executeRequest {
+    ): Flow<BaseData<WebDavInfo>> {
+        return flow {
             val startTime = System.currentTimeMillis()
             val allArticleWithTagsList = appDataBase.articleDao().getAllArticleWithTagsList()
             val sardine: Sardine = initWebDav(website, username, password)
@@ -147,13 +151,13 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
                 )
             }
             updateBackupInfo(sardine, website, backupInfoMap)
-            BaseData<WebDavResultInfo>().apply {
+            emitBaseData(BaseData<WebDavInfo>().apply {
                 code = 0
                 data = WebDavResultInfo(
                     time = System.currentTimeMillis() - startTime,
                     count = excludedList.size + willBeDeletedMap.size
                 )
-            }
+            })
         }
     }
 
@@ -252,5 +256,15 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
             sardine.createDirectory(website + APP_DIR + BACKUP_DIR)
         }
         return sardine
+    }
+
+    private suspend fun FlowCollector<BaseData<WebDavInfo>>.emitProgressData(
+        current: Int,
+        total: Int
+    ) {
+        emitBaseData(BaseData<WebDavInfo>().apply {
+            code = 0
+            data = WebDavWaitingInfo(current = current, total = total)
+        })
     }
 }
