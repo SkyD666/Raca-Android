@@ -41,6 +41,27 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
         }
     }
 
+    suspend fun requestRestoreFromRemoteRecycleBin(
+        website: String,
+        username: String,
+        password: String,
+        uuid: String
+    ): Flow<BaseData<Unit>> {
+        return flow {
+            val sardine: Sardine = initWebDav(website, username, password)
+            val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
+                .associateBy { it.uuid }.toMutableMap()
+            backupInfoMap[uuid]?.let {
+                backupInfoMap[uuid] = it.copy(isDeleted = false)
+            }
+            updateBackupInfo(sardine, website, backupInfoMap.values.toList())
+            emitBaseData(BaseData<Unit>().apply {
+                code = 0
+                data = Unit
+            })
+        }
+    }
+
     suspend fun requestDeleteFromRemoteRecycleBin(
         website: String,
         username: String,

@@ -78,6 +78,8 @@ class HomeRepository @Inject constructor() : BaseRepository() {
 
             // 转义输入，防止SQL注入
             val keyword = if (useRegexSearch) {
+                // 检查正则表达式是否有效
+                runCatching { k.toRegex() }.onFailure { error(it.message.orEmpty()) }
                 DatabaseUtils.sqlEscapeString(k)
             } else {
                 DatabaseUtils.sqlEscapeString("%$k%")

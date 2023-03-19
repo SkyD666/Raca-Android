@@ -15,6 +15,13 @@ sealed class WebDavIntent : IUiIntent {
         val password: String
     ) : WebDavIntent()
 
+    data class RestoreFromRemoteRecycleBin(
+        val website: String,
+        val username: String,
+        val password: String,
+        val uuid: String
+    ) : WebDavIntent()
+
     data class DeleteFromRemoteRecycleBin(
         val website: String,
         val username: String,

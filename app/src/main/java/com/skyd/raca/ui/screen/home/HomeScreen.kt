@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
 import com.skyd.raca.R
 import com.skyd.raca.appContext
+import com.skyd.raca.base.LoadUiIntent
 import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
@@ -61,6 +62,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
         value ?: return@apply
         viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
         viewModel.sendUiIntent(HomeIntent.GetArticleDetails(currentArticleUuid))
+    }
+
+    LaunchedEffect(query) {
+        viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
     }
 
     Scaffold(
@@ -154,9 +159,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     ) {
                         viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
                             when (searchResultUiState) {
-                                SearchResultUiState.INIT -> {
-                                    viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(query))
-                                }
+                                SearchResultUiState.INIT -> {}
                                 is SearchResultUiState.SUCCESS -> {
                                     SearchResultList(dataList = searchResultUiState.articleWithTagsList,
                                         onItemClickListener = {
@@ -202,6 +205,23 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                         articleWithTags = articleDetailUiState.articleWithTags
                     }
                 }
+            }
+        }
+
+        viewModel.loadUiIntentFlow.collectAsStateWithLifecycle(initialValue = null).value?.also { loadUiIntent ->
+            when (loadUiIntent) {
+                is LoadUiIntent.Error -> {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = appContext.getString(
+                                R.string.home_screen_failed, loadUiIntent.msg
+                            ),
+                            withDismissAction = true
+                        )
+                    }
+                }
+                is LoadUiIntent.Loading -> {}
+                LoadUiIntent.ShowMainView -> {}
             }
         }
 

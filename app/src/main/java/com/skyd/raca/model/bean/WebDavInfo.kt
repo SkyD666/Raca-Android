@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
 @Keep
-interface WebDavInfo : BaseBean
+sealed interface WebDavInfo : BaseBean
 
 @Serializable
 data class WebDavResultInfo(

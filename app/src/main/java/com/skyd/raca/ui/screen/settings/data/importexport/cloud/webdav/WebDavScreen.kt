@@ -27,7 +27,10 @@ import com.skyd.raca.model.bean.BackupInfo
 import com.skyd.raca.model.bean.WebDavResultInfo
 import com.skyd.raca.model.bean.WebDavWaitingInfo
 import com.skyd.raca.model.preference.WebDavServerPreference
-import com.skyd.raca.ui.component.*
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.TextFieldDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
@@ -277,6 +280,13 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
         if (openRecycleBinBottomSheet) {
             RecycleBinBottomSheet(
                 onDismissRequest = { openRecycleBinBottomSheet = false },
+                onRestore = {
+                    viewModel.sendUiIntent(
+                        WebDavIntent.RestoreFromRemoteRecycleBin(
+                            website = server, username = account, password = password, uuid = it
+                        )
+                    )
+                },
                 onDelete = { openDeleteWarningDialog = it },
                 onClear = { openDeleteWarningDialog = "" }
             )
@@ -285,20 +295,22 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
     viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
         when (uploadResultUiEvent) {
             is UploadResultUiEvent.SUCCESS -> {
-                val state = uploadResultUiEvent.result
-                if (state is WebDavResultInfo) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = appContext.getString(
-                                R.string.webdav_screen_upload_success,
-                                state.time / 1000.0f, state.count
-                            ),
-                            withDismissAction = true
-                        )
+                when (val result = uploadResultUiEvent.result) {
+                    is WebDavResultInfo -> {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = appContext.getString(
+                                    R.string.webdav_screen_upload_success,
+                                    result.time / 1000.0f, result.count
+                                ),
+                                withDismissAction = true
+                            )
+                        }
                     }
-                } else if (state is WebDavWaitingInfo) {
-                    waitingDialogCurrent = state.current
-                    waitingDialogTotal = state.total
+                    is WebDavWaitingInfo -> {
+                        waitingDialogCurrent = result.current
+                        waitingDialogTotal = result.total
+                    }
                 }
             }
             null -> {}
@@ -329,6 +341,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
 @Composable
 private fun RecycleBinBottomSheet(
     onDismissRequest: () -> Unit,
+    onRestore: (String) -> Unit,
     onDelete: (String) -> Unit,
     onClear: () -> Unit,
     viewModel: WebDavViewModel = hiltViewModel()
@@ -391,11 +404,19 @@ private fun RecycleBinBottomSheet(
                         )
                     },
                     trailingContent = {
-                        IconButton(onClick = { onDelete(list[it].uuid) }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.webdav_screen_delete),
-                            )
+                        Row {
+                            IconButton(onClick = { onRestore(list[it].uuid) }) {
+                                Icon(
+                                    Icons.Default.RestoreFromTrash,
+                                    contentDescription = stringResource(R.string.webdav_screen_restore),
+                                )
+                            }
+                            IconButton(onClick = { onDelete(list[it].uuid) }) {
+                                Icon(
+                                    Icons.Default.DeleteForever,
+                                    contentDescription = stringResource(R.string.webdav_screen_delete),
+                                )
+                            }
                         }
                     }
                 )
