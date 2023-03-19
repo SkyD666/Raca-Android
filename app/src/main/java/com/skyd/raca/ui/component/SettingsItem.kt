@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -109,43 +110,23 @@ fun BaseSettingsItem(
     onClick: (() -> Unit)? = null,
     content: (@Composable () -> Unit)? = null
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .run { if (onClick != null) clickable { onClick() } else this }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier
-                .padding(10.dp)
-                .size(24.dp),
-            painter = icon,
-            contentDescription = null
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 10.dp)
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 2
-            )
-            if (descriptionText != null) {
+    BaseSettingsItem(
+        icon = icon,
+        text = text,
+        description = if (descriptionText != null) {
+            {
                 Text(
                     modifier = Modifier.padding(top = 5.dp),
                     text = descriptionText,
                     style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 3
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
-        }
-        content?.let {
-            Box(modifier = Modifier.padding(end = 5.dp)) { it.invoke() }
-        }
-    }
+        } else null,
+        onClick = onClick,
+        content = content,
+    )
 }
 
 @Composable
@@ -178,7 +159,8 @@ fun BaseSettingsItem(
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleLarge,
-                maxLines = 2
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
             )
             if (description != null) {
                 Box(modifier = Modifier.padding(top = 5.dp)) {
@@ -204,6 +186,7 @@ fun CategorySettingsItem(text: String) {
         text = text,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.primary,
-        maxLines = 1,
+        maxLines = 3,
+        overflow = TextOverflow.Ellipsis,
     )
 }

@@ -23,7 +23,7 @@
     <string name="search_config_screen_common_category">常规</string>
     <string name="search_config_screen_use_regex">使用正则表达式</string>
     <string name="search_config_screen_use_regex_description">将搜索框中的内容作为正则表达式进行搜索。</string>
-    <string name="search_config_screen_domain_category">搜索域</string>
+    <string name="search_config_screen_domain_category">搜索域（未选择默认搜索全部）</string>
     <string name="home_screen_edit">编辑当前项</string>
     <string name="home_screen_delete">删除当前项</string>
     <string name="dialog_tip">提示</string>
@@ -108,7 +108,7 @@
     <string name="webdav_screen_input_account">WebDAV 账号</string>
     <string name="webdav_screen_input_password">WebDAV 密码</string>
     <string name="webdav_screen_remote_recycle_bin">远端回收站</string>
-    <string name="webdav_screen_remote_recycle_bin_description">查看远端回收站的内容，即有哪些段落被逻辑删除了。</string>
+    <string name="webdav_screen_remote_recycle_bin_description">查看远端回收站的内容，有哪些段落被逻辑删除了。</string>
     <string name="webdav_screen_clear_remote_recycle_bin">清空回收站</string>
     <string name="webdav_screen_last_modified_time">上次修改时间：%s</string>
     <string name="webdav_screen_delete">删除</string>
@@ -133,4 +133,6 @@
     <string name="setting_screen_data_description">管理段落数据。</string>
     <string name="data_screen_failed">操作失败：%s</string>
     <string name="data_screen_delete_all_success">所有段落数据已清空，耗时 %.2f 秒</string>
+    <string name="search_config_screen_intersect_search_by_space">交集搜索</string>
+    <string name="search_config_screen_intersect_search_by_space_description">使用空格分割多个搜索关键字以实现“并且”条件，即对这些关键字的结果进行交集操作。</string>
 </resources>

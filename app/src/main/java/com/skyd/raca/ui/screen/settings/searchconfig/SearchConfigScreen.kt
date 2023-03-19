@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.JoinInner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -25,9 +26,11 @@ import com.skyd.raca.R
 import com.skyd.raca.base.LoadUiIntent
 import com.skyd.raca.config.allSearchDomain
 import com.skyd.raca.model.bean.SearchDomainBean
+import com.skyd.raca.model.preference.IntersectSearchBySpacePreference
 import com.skyd.raca.model.preference.UseRegexSearchPreference
 import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.component.dialog.WaitingDialog
+import com.skyd.raca.ui.local.LocalIntersectSearchBySpace
 import com.skyd.raca.ui.local.LocalUseRegexSearch
 
 const val SEARCH_CONFIG_SCREEN_ROUTE = "searchConfigScreen"
@@ -38,6 +41,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val useRegexSearch = LocalUseRegexSearch.current
+    val intersectSearchBySpace = LocalIntersectSearchBySpace.current
     val searchDomainMap = remember { mutableStateMapOf<String, Boolean>() }
     var openWaitingDialog by remember { mutableStateOf(false) }
 
@@ -75,6 +79,19 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
                     checked = remember { mutableStateOf(useRegexSearch) },
                     onCheckedChange = {
                         UseRegexSearchPreference.put(context = context, scope = scope, value = it)
+                    },
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    icon = Icons.Default.JoinInner,
+                    text = stringResource(id = R.string.search_config_screen_intersect_search_by_space),
+                    description = stringResource(id = R.string.search_config_screen_intersect_search_by_space_description),
+                    checked = remember { mutableStateOf(intersectSearchBySpace) },
+                    onCheckedChange = {
+                        IntersectSearchBySpacePreference.put(
+                            context = context, scope = scope, value = it
+                        )
                     },
                 )
             }

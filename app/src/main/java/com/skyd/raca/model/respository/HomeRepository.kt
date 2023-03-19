@@ -13,6 +13,7 @@ import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
+import com.skyd.raca.model.preference.IntersectSearchBySpacePreference
 import com.skyd.raca.model.preference.UseRegexSearchPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -49,7 +50,22 @@ class HomeRepository @Inject constructor() : BaseRepository() {
 
     companion object {
         fun genSql(k: String): SimpleSQLiteQuery {
-            return SimpleSQLiteQuery("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(k)}")
+            // 是否使用多个关键字并集查询
+            val intersectSearchBySpace =
+                appContext.dataStore.get(IntersectSearchBySpacePreference.key) ?: true
+            return if (intersectSearchBySpace) {
+                // 以多个连续的空格/制表符/换行符分割
+                val keywords = k.trim().split("\\s+".toRegex()).toSet()
+                val sql = buildString {
+                    keywords.forEachIndexed { index, s ->
+                        if (index > 0) append("INTERSECT \n")
+                        append("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(s)} \n")
+                    }
+                }
+                SimpleSQLiteQuery(sql)
+            } else {
+                SimpleSQLiteQuery("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(k)}")
+            }
         }
 
         private fun getFilter(k: String): String {

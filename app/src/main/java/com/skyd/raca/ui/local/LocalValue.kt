@@ -18,9 +18,7 @@ val LocalWindowSizeClass = compositionLocalOf<WindowSizeClass> {
 
 // Theme
 val LocalDarkMode = compositionLocalOf { DarkModePreference.default }
-
 val LocalThemeName = compositionLocalOf { ThemeNamePreference.default }
-
 val LocalCustomPrimaryColor = compositionLocalOf { CustomPrimaryColorPreference.default }
 
 // Article
@@ -29,6 +27,7 @@ val LocalQuery = compositionLocalOf { QueryPreference.default }
 
 // Search
 val LocalUseRegexSearch = compositionLocalOf { UseRegexSearchPreference.default }
+val LocalIntersectSearchBySpace = compositionLocalOf { IntersectSearchBySpacePreference.default }
 
 // WebDav
 val LocalWebDavServer = compositionLocalOf { WebDavServerPreference.default }

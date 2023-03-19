@@ -25,6 +25,7 @@ data class Settings(
     val query: String = QueryPreference.default,
     // Search
     val useRegexSearch: Boolean = UseRegexSearchPreference.default,
+    val intersectSearchBySpace: Boolean = IntersectSearchBySpacePreference.default,
     // WebDav
     val webDavServer: String = WebDavServerPreference.default,
 )
@@ -48,6 +49,7 @@ fun SettingsProvider(
         LocalQuery provides settings.query,
         // Search
         LocalUseRegexSearch provides settings.useRegexSearch,
+        LocalIntersectSearchBySpace provides settings.intersectSearchBySpace,
         // WebDav
         LocalWebDavServer provides settings.webDavServer,
     ) {

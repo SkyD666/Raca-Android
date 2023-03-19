@@ -19,6 +19,7 @@ fun Preferences.toSettings(): Settings {
 
         // Search
         useRegexSearch = UseRegexSearchPreference.fromPreferences(this),
+        intersectSearchBySpace = IntersectSearchBySpacePreference.fromPreferences(this),
 
         // WebDav
         webDavServer = WebDavServerPreference.fromPreferences(this),
