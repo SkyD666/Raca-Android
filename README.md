@@ -49,13 +49,58 @@
 9. ......
 
 ## 🤩应用截图
-
 ![ic_main_screen](image/ic_main_screen.jpg) ![ic_main_screen_search](image/ic_main_screen_search.jpg)
 ![ic_add_screen_edit](image/ic_add_screen_edit.jpg) ![ic_search_config_screen](image/ic_search_config_screen.jpg)
 ![ic_process_text_menu](image/ic_process_text_menu.jpg) ![ic_auto_fill_menu](image/ic_auto_fill_menu.jpg)
 ![ic_import_export_screen](image/ic_import_export_screen.jpg) ![ic_easy_usage_screen](image/ic_easy_usage_screen.jpg)
 ![ic_appearance_screen](image/ic_appearance_screen.jpg) ![ic_webdav_screen](image/ic_webdav_screen.jpg)
 ![ic_more_screen](image/ic_more_screen.jpg) ![ic_about_screen](image/ic_about_screen.jpg)
+
+## 🔍搜索示例
+
+<table>
+<thead>
+  <tr>
+    <th>意图</th>
+    <th>使用正则表达式时搜索栏输入的文字</th>
+    <th>不使用正则表达式时搜索栏输入的文字</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>搜索带有“原神”关键词的内容</td>
+    <td>.*原神.*</td>
+    <td>原神</td>
+  </tr>
+  <tr>
+    <td>搜索仅为“原神”两个字的内容</td>
+    <td>原神&nbsp;或者&nbsp;^原神$</td>
+    <td>⚠️无法实现</td>
+  </tr>
+  <tr>
+    <td>搜索带有“发电”&nbsp;或&nbsp;带有“原神”关键词的内容</td>
+    <td>.*发电.*|.*原神.*</td>
+    <td>⚠️无法实现</td>
+  </tr>
+  <tr>
+    <td>搜索仅为“发电”两个字&nbsp;或&nbsp;仅为“原神”两个字的内容</td>
+    <td>发电|原神&nbsp;或者&nbsp;^发电$|^原神$</td>
+    <td>⚠️无法实现</td>
+  </tr>
+  <tr>
+    <td>搜索带有“发电”&nbsp;且&nbsp;带有“原神”关键词的内容</td>
+    <td>.*发电.*&nbsp;&nbsp;&nbsp;.*原神.*</td>
+    <td>发电&nbsp;&nbsp;&nbsp;原神</td>
+  </tr>
+  <tr>
+    <td>搜索带有（“发电”&nbsp;且&nbsp;带有“原神”）&nbsp;或&nbsp;带有“ikun”关键词的内容</td>
+    <td>.*发电.*|.*ikun.*&nbsp;&nbsp;&nbsp;.*原神.*|.*ikun.*</td>
+    <td>⚠️无法实现</td>
+  </tr>
+</tbody>
+</table>
+
+注：**且** 逻辑使用 **空格、制表符、换行符** 表示，多个上述字符连接在一起时视为一个，输入框文字前后多余空格将被忽略。表格中的 **“内容”** 指的是选择的搜索域（多个搜索域的结果取并集）。
 
 ## 🛠主要技术栈
 
