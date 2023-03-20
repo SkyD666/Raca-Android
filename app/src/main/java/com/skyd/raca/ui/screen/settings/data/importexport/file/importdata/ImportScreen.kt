@@ -140,7 +140,7 @@ fun ImportScreen(viewModel: ImportDataViewModel = hiltViewModel()) {
         }
         viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
             when (importResultUiEvent) {
-                is ImportResultUiEvent.SUCCESS -> {
+                is ImportResultUiEvent.Success -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(

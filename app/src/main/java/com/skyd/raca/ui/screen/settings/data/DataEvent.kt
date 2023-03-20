@@ -7,5 +7,5 @@ data class DataEvent(
 ) : IUiEvent
 
 sealed class DeleteAllResultUiEvent {
-    data class SUCCESS(val time: Long) : DeleteAllResultUiEvent()
+    data class Success(val time: Long) : DeleteAllResultUiEvent()
 }

@@ -50,7 +50,6 @@ private var openDeleteWarningDialog by mutableStateOf(false)
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
-    val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -82,101 +81,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
             WindowInsets(0.dp)
         }
     ) { innerPaddings ->
-        var active by rememberSaveable { mutableStateOf(false) }
-        val focusManager = LocalFocusManager.current
-        val keyboardController = LocalSoftwareKeyboardController.current
 
         Column(
             modifier = Modifier
                 .padding(innerPaddings)
                 .fillMaxSize()
         ) {
-            Box(
-                Modifier
-                    .semantics { isContainer = true }
-                    .zIndex(1f)
-                    .fillMaxWidth()
-            ) {
-                val searchBarHorizontalPadding: Dp by animateDpAsState(if (active) 0.dp else 16.dp)
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(horizontal = searchBarHorizontalPadding)
-                ) {
-                    SearchBar(
-                        onQueryChange = { query = it },
-                        query = query,
-                        onSearch = { keyword ->
-                            focusManager.clearFocus()
-                            keyboardController?.hide()
-                            QueryPreference.put(context, scope, keyword)
-                            viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
-                        },
-                        active = active,
-                        onActiveChange = {
-                            active = it
-                            if (!active) focusManager.clearFocus()
-                        },
-                        placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
-                        leadingIcon = {
-                            if (active) {
-                                IconButton(onClick = {
-                                    focusManager.clearFocus()
-                                    active = false
-                                }) {
-                                    Icon(
-                                        Icons.Default.ArrowBack,
-                                        contentDescription = stringResource(id = R.string.home_screen_close_search)
-                                    )
-                                }
-                            } else {
-                                IconButton(onClick = { menuExpanded = true }) {
-                                    Icon(Icons.Default.Menu, contentDescription = null)
-                                }
-                            }
-                        },
-                        trailingIcon = {
-                            if (active) {
-                                IconButton(onClick = {
-                                    QueryPreference.put(context, scope, QueryPreference.default)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = stringResource(R.string.home_screen_clear_search_text)
-                                    )
-                                }
-                            } else {
-                                IconButton(onClick = {
-                                    navController.navigate(ADD_SCREEN_ROUTE)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = stringResource(R.string.home_screen_add)
-                                    )
-                                }
-                            }
-                        },
-                    ) {
-                        viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-                            when (searchResultUiState) {
-                                SearchResultUiState.INIT -> {}
-                                is SearchResultUiState.SUCCESS -> {
-                                    SearchResultList(dataList = searchResultUiState.articleWithTagsList,
-                                        onItemClickListener = {
-                                            focusManager.clearFocus()
-                                            active = false
-                                            viewModel.sendUiIntent(
-                                                HomeIntent.GetArticleDetails(it.article.uuid)
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    HomeMenu(viewModel = viewModel)
-                }
-            }
+            RacaSearchBar(query = { query }, onQueryChange = { query = it })
 
             AnimatedVisibility(
                 visible = articleWithTags != null,
@@ -193,7 +104,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 
             viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
                 when (articleDetailUiState) {
-                    is ArticleDetailUiState.INIT -> {
+                    is ArticleDetailUiState.Init -> {
                         articleWithTags = null
                         if (articleDetailUiState.articleUuid.isNotBlank()) {
                             viewModel.sendUiIntent(
@@ -201,7 +112,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                             )
                         }
                     }
-                    is ArticleDetailUiState.SUCCESS -> {
+                    is ArticleDetailUiState.Success -> {
                         articleWithTags = articleDetailUiState.articleWithTags
                     }
                 }
@@ -240,6 +151,107 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 }
 
 @Composable
+private fun RacaSearchBar(
+    query: () -> String,
+    onQueryChange: (String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    var active by rememberSaveable { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val searchBarHorizontalPadding: Dp by animateDpAsState(if (active) 0.dp else 16.dp)
+
+    Box(
+        Modifier
+            .semantics { isContainer = true }
+            .zIndex(1f)
+            .fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(horizontal = searchBarHorizontalPadding)
+        ) {
+            SearchBar(
+                onQueryChange = onQueryChange,
+                query = query(),
+                onSearch = { keyword ->
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    QueryPreference.put(context, scope, keyword)
+                    viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
+                },
+                active = active,
+                onActiveChange = {
+                    active = it
+                    if (!active) focusManager.clearFocus()
+                },
+                placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
+                leadingIcon = {
+                    if (active) {
+                        IconButton(onClick = {
+                            focusManager.clearFocus()
+                            active = false
+                        }) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = stringResource(id = R.string.home_screen_close_search)
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = { menuExpanded = true }) {
+                            Icon(Icons.Default.Menu, contentDescription = null)
+                        }
+                    }
+                },
+                trailingIcon = {
+                    if (active) {
+                        IconButton(onClick = {
+                            QueryPreference.put(context, scope, QueryPreference.default)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = stringResource(R.string.home_screen_clear_search_text)
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = {
+                            navController.navigate(ADD_SCREEN_ROUTE)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(R.string.home_screen_add)
+                            )
+                        }
+                    }
+                },
+            ) {
+                viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
+                    when (searchResultUiState) {
+                        SearchResultUiState.Init -> {}
+                        is SearchResultUiState.Success -> {
+                            SearchResultList(dataList = searchResultUiState.articleWithTagsList,
+                                onItemClickListener = {
+                                    focusManager.clearFocus()
+                                    active = false
+                                    viewModel.sendUiIntent(
+                                        HomeIntent.GetArticleDetails(it.article.uuid)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            HomeMenu(viewModel = viewModel)
+        }
+    }
+}
+
+@Composable
 private fun SearchResultList(
     dataList: List<Any>,
     onItemClickListener: ((data: ArticleWithTags1) -> Unit)? = null
@@ -267,7 +279,7 @@ private fun HomeMenu(viewModel: HomeViewModel) {
     var deleteMenuItemEnabled by remember { mutableStateOf(false) }
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-        if (articleDetailUiState is ArticleDetailUiState.SUCCESS) {
+        if (articleDetailUiState is ArticleDetailUiState.Success) {
             editMenuItemEnabled = true
             deleteMenuItemEnabled = true
         } else {

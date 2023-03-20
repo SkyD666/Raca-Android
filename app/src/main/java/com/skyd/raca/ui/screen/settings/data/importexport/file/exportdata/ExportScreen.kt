@@ -111,7 +111,7 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
         }
         viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
             when (exportResultUiEvent) {
-                is ExportResultUiEvent.SUCCESS -> {
+                is ExportResultUiEvent.Success -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(

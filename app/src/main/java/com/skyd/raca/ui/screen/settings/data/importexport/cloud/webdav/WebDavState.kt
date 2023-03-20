@@ -8,6 +8,6 @@ data class WebDavState(
 ) : IUiState
 
 sealed class GetRemoteRecycleBinResultUiState {
-    object INIT : GetRemoteRecycleBinResultUiState()
-    data class SUCCESS(val result: List<BackupInfo>) : GetRemoteRecycleBinResultUiState()
+    object Init : GetRemoteRecycleBinResultUiState()
+    data class Success(val result: List<BackupInfo>) : GetRemoteRecycleBinResultUiState()
 }

@@ -294,7 +294,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
     }
     viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
         when (uploadResultUiEvent) {
-            is UploadResultUiEvent.SUCCESS -> {
+            is UploadResultUiEvent.Success -> {
                 when (val result = uploadResultUiEvent.result) {
                     is WebDavResultInfo -> {
                         scope.launch {
@@ -316,7 +316,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
             null -> {}
         }
         when (downloadResultUiEvent) {
-            is DownloadResultUiEvent.SUCCESS -> {
+            is DownloadResultUiEvent.Success -> {
                 val state = downloadResultUiEvent.result
                 if (state is WebDavResultInfo) {
                     scope.launch {
@@ -350,8 +350,8 @@ private fun RecycleBinBottomSheet(
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
         list = when (getRemoteRecycleBinResultUiState) {
-            GetRemoteRecycleBinResultUiState.INIT -> emptyList()
-            is GetRemoteRecycleBinResultUiState.SUCCESS -> getRemoteRecycleBinResultUiState.result
+            GetRemoteRecycleBinResultUiState.Init -> emptyList()
+            is GetRemoteRecycleBinResultUiState.Success -> getRemoteRecycleBinResultUiState.result
         }
     }
 

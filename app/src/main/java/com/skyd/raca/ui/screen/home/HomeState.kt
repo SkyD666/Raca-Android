@@ -10,11 +10,11 @@ data class HomeState(
 ) : IUiState
 
 sealed class ArticleDetailUiState {
-    data class INIT(val articleUuid: String = CurrentArticleUuidPreference.default) : ArticleDetailUiState()
-    data class SUCCESS(val articleWithTags: ArticleWithTags) : ArticleDetailUiState()
+    data class Init(val articleUuid: String = CurrentArticleUuidPreference.default) : ArticleDetailUiState()
+    data class Success(val articleWithTags: ArticleWithTags) : ArticleDetailUiState()
 }
 
 sealed class SearchResultUiState {
-    object INIT : SearchResultUiState()
-    data class SUCCESS(val articleWithTagsList: List<ArticleWithTags>) : SearchResultUiState()
+    object Init : SearchResultUiState()
+    data class Success(val articleWithTagsList: List<ArticleWithTags>) : SearchResultUiState()
 }

@@ -88,7 +88,7 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
         }
         viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
             when (deleteAllResultUiEvent) {
-                is DeleteAllResultUiEvent.SUCCESS -> {
+                is DeleteAllResultUiEvent.Success -> {
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = appContext.getString(

@@ -7,5 +7,5 @@ data class ExportDataEvent(
 ) : IUiEvent
 
 sealed class ExportResultUiEvent {
-    data class SUCCESS(val time: Long) : ExportResultUiEvent()
+    data class Success(val time: Long) : ExportResultUiEvent()
 }

@@ -16,7 +16,7 @@ class AddViewModel @Inject constructor(private var addRepository: AddRepository)
     BaseViewModel<AddState, AddEvent, AddIntent>() {
     override fun initUiState(): AddState {
         return AddState(
-            GetArticleWithTagsUiState.INIT
+            GetArticleWithTagsUiState.Init
         )
     }
 
@@ -26,7 +26,7 @@ class AddViewModel @Inject constructor(private var addRepository: AddRepository)
         doIsInstance<AddIntent.GetArticleWithTags> { intent ->
             addRepository.requestGetArticleWithTags(intent.articleUuid)
                 .mapToUIChange { data ->
-                    copy(getArticleWithTagsUiState = GetArticleWithTagsUiState.SUCCESS(data))
+                    copy(getArticleWithTagsUiState = GetArticleWithTagsUiState.Success(data))
                 }
                 .defaultFinally()
         },
@@ -39,7 +39,7 @@ class AddViewModel @Inject constructor(private var addRepository: AddRepository)
                         scope = viewModelScope,
                         value = data
                     )
-                    AddEvent(addArticleResultUiEvent = AddArticleResultUiEvent.SUCCESS(data))
+                    AddEvent(addArticleResultUiEvent = AddArticleResultUiEvent.Success(data))
                 }
                 .defaultFinally()
         }

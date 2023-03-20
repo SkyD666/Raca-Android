@@ -20,11 +20,11 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
     BaseViewModel<HomeState, IUiEvent, HomeIntent>() {
     override fun initUiState(): HomeState {
         return HomeState(
-            ArticleDetailUiState.INIT(
+            ArticleDetailUiState.Init(
                 appContext.dataStore
                     .get(CurrentArticleUuidPreference.key) ?: CurrentArticleUuidPreference.default
             ),
-            SearchResultUiState.INIT,
+            SearchResultUiState.Init,
         )
     }
 
@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
         doIsInstance<HomeIntent.GetArticleWithTagsList> { intent ->
             homeRepo.requestArticleWithTagsList(intent.keyword)
                 .mapToUIChange { data ->
-                    copy(searchResultUiState = SearchResultUiState.SUCCESS(data))
+                    copy(searchResultUiState = SearchResultUiState.Success(data))
                 }
                 .defaultFinally()
         },
@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
         doIsInstance<HomeIntent.GetArticleDetails> { intent ->
             if (intent.articleUuid.isBlank()) {
                 flow {
-                    emit(uiStateFlow.value.copy(articleDetailUiState = ArticleDetailUiState.INIT()))
+                    emit(uiStateFlow.value.copy(articleDetailUiState = ArticleDetailUiState.Init()))
                 }.defaultFinally()
             } else {
                 homeRepo.requestArticleWithTagsDetail(intent.articleUuid)
@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
                             scope = viewModelScope,
                             value = data.article.uuid
                         )
-                        copy(articleDetailUiState = ArticleDetailUiState.SUCCESS(data))
+                        copy(articleDetailUiState = ArticleDetailUiState.Success(data))
                     }
                     .defaultFinally()
             }
@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
                         scope = viewModelScope,
                         value = CurrentArticleUuidPreference.default
                     )
-                    copy(articleDetailUiState = ArticleDetailUiState.INIT())
+                    copy(articleDetailUiState = ArticleDetailUiState.Init())
                 }
                 .defaultFinally()
         },

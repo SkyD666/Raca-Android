@@ -37,7 +37,7 @@ class ImportDataViewModel @Inject constructor(private var importDataRepo: Import
                 tagInputStream?.close()
             }
                 .mapToUIChange { data ->
-                    ImportDataEvent(importResultUiEvent = ImportResultUiEvent.SUCCESS(data))
+                    ImportDataEvent(importResultUiEvent = ImportResultUiEvent.Success(data))
                 }
                 .defaultFinally()
         },

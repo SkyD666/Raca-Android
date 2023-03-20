@@ -13,7 +13,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
     BaseViewModel<WebDavState, WebDavEvent, WebDavIntent>() {
     override fun initUiState(): WebDavState {
         return WebDavState(
-            getRemoteRecycleBinResultUiState = GetRemoteRecycleBinResultUiState.INIT,
+            getRemoteRecycleBinResultUiState = GetRemoteRecycleBinResultUiState.Init,
         )
     }
 
@@ -25,7 +25,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 website = intent.website, username = intent.username, password = intent.password
             )
                 .mapToUIChange { data ->
-                    WebDavEvent(downloadResultUiEvent = DownloadResultUiEvent.SUCCESS(data))
+                    WebDavEvent(downloadResultUiEvent = DownloadResultUiEvent.Success(data))
                 }
                 .defaultFinally()
                 .onCompletion {
@@ -38,7 +38,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 website = intent.website, username = intent.username, password = intent.password
             )
                 .mapToUIChange { data ->
-                    WebDavEvent(uploadResultUiEvent = UploadResultUiEvent.SUCCESS(data))
+                    WebDavEvent(uploadResultUiEvent = UploadResultUiEvent.Success(data))
                 }
                 .defaultFinally()
         },
@@ -50,7 +50,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 .mapToUIChange { data ->
                     copy(
                         getRemoteRecycleBinResultUiState =
-                        GetRemoteRecycleBinResultUiState.SUCCESS(data)
+                        GetRemoteRecycleBinResultUiState.Success(data)
                     )
                 }
                 .defaultFinally()
@@ -69,7 +69,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
             }.flattenConcat().mapToUIChange { data ->
                 copy(
                     getRemoteRecycleBinResultUiState =
-                    GetRemoteRecycleBinResultUiState.SUCCESS(data)
+                    GetRemoteRecycleBinResultUiState.Success(data)
                 )
             }.defaultFinally().onCompletion {
                 refreshArticleData.tryEmit(Unit)
@@ -89,7 +89,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
             }.flattenConcat().mapToUIChange { data ->
                 copy(
                     getRemoteRecycleBinResultUiState =
-                    GetRemoteRecycleBinResultUiState.SUCCESS(data)
+                    GetRemoteRecycleBinResultUiState.Success(data)
                 )
             }.defaultFinally()
         },
@@ -104,7 +104,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 .mapToUIChange { data ->
                     copy(
                         getRemoteRecycleBinResultUiState =
-                        GetRemoteRecycleBinResultUiState.SUCCESS(data)
+                        GetRemoteRecycleBinResultUiState.Success(data)
                     )
                 }
                 .defaultFinally()

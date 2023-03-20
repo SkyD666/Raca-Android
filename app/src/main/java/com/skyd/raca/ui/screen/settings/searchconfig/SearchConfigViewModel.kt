@@ -14,7 +14,7 @@ class SearchConfigViewModel @Inject constructor(private var searchConfigRepo: Se
     BaseViewModel<SearchConfigState, IUiEvent, SearchConfigIntent>() {
     override fun initUiState(): SearchConfigState {
         return SearchConfigState(
-            searchDomainResultUiState = SearchDomainResultUiState.INIT
+            searchDomainResultUiState = SearchDomainResultUiState.Init
         )
     }
 
@@ -24,7 +24,7 @@ class SearchConfigViewModel @Inject constructor(private var searchConfigRepo: Se
         doIsInstance<SearchConfigIntent.GetSearchDomain> {
             searchConfigRepo.requestGetSearchDomain()
                 .mapToUIChange { data ->
-                    copy(searchDomainResultUiState = SearchDomainResultUiState.SUCCESS(data))
+                    copy(searchDomainResultUiState = SearchDomainResultUiState.Success(data))
                 }
                 .defaultFinally()
         },
@@ -32,7 +32,7 @@ class SearchConfigViewModel @Inject constructor(private var searchConfigRepo: Se
         doIsInstance<SearchConfigIntent.SetSearchDomain> { intent ->
             searchConfigRepo.requestSetSearchDomain(intent.searchDomainBean)
                 .mapToUIChange { data ->
-                    copy(searchDomainResultUiState = SearchDomainResultUiState.SUCCESS(data))
+                    copy(searchDomainResultUiState = SearchDomainResultUiState.Success(data))
                 }
                 .defaultFinally()
         },

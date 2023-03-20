@@ -22,7 +22,7 @@ class ExportDataViewModel @Inject constructor(private var exportDataRepo: Export
         doIsInstance<ExportDataIntent.StartExport> { intent ->
             exportDataRepo.requestExportData(intent.dirUri)
                 .mapToUIChange { data ->
-                    ExportDataEvent(exportResultUiEvent = ExportResultUiEvent.SUCCESS(data))
+                    ExportDataEvent(exportResultUiEvent = ExportResultUiEvent.Success(data))
                 }
                 .defaultFinally()
         },

@@ -8,7 +8,7 @@ data class AddState(
 ) : IUiState
 
 sealed class GetArticleWithTagsUiState {
-    object INIT : GetArticleWithTagsUiState()
-    object FAILED : GetArticleWithTagsUiState()
-    data class SUCCESS(val articleWithTags: ArticleWithTags) : GetArticleWithTagsUiState()
+    object Init : GetArticleWithTagsUiState()
+    object Failed : GetArticleWithTagsUiState()
+    data class Success(val articleWithTags: ArticleWithTags) : GetArticleWithTagsUiState()
 }

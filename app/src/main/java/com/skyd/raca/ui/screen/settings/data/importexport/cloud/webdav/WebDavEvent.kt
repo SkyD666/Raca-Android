@@ -9,9 +9,9 @@ data class WebDavEvent(
 ) : IUiEvent
 
 sealed class UploadResultUiEvent {
-    data class SUCCESS(val result: WebDavInfo) : UploadResultUiEvent()
+    data class Success(val result: WebDavInfo) : UploadResultUiEvent()
 }
 
 sealed class DownloadResultUiEvent {
-    data class SUCCESS(val result: WebDavInfo) : DownloadResultUiEvent()
+    data class Success(val result: WebDavInfo) : DownloadResultUiEvent()
 }

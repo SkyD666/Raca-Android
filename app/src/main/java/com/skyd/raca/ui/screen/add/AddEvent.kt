@@ -7,6 +7,6 @@ data class AddEvent(
 ) : IUiEvent
 
 sealed class AddArticleResultUiEvent {
-    object FAILED : AddArticleResultUiEvent()
-    data class SUCCESS(val articleUuid: String) : AddArticleResultUiEvent()
+    object Failed : AddArticleResultUiEvent()
+    data class Success(val articleUuid: String) : AddArticleResultUiEvent()
 }

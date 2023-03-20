@@ -125,11 +125,11 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
         }
         viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
             when (searchDomainResultUiState) {
-                is SearchDomainResultUiState.SUCCESS -> {
+                is SearchDomainResultUiState.Success -> {
                     searchDomainMap.clear()
                     searchDomainMap.putAll(searchDomainResultUiState.searchDomainMap)
                 }
-                SearchDomainResultUiState.INIT -> {}
+                SearchDomainResultUiState.Init -> {}
             }
         }
         WaitingDialog(visible = openWaitingDialog)

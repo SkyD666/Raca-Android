@@ -24,7 +24,7 @@ class DataViewModel @Inject constructor(private var dataRepo: DataRepository) :
         doIsInstance<DataIntent.Start> {
             dataRepo.requestDeleteAllData()
                 .mapToUIChange { data ->
-                    DataEvent(deleteAllResultUiEvent = DeleteAllResultUiEvent.SUCCESS(data))
+                    DataEvent(deleteAllResultUiEvent = DeleteAllResultUiEvent.Success(data))
                 }
                 .defaultFinally()
                 .onCompletion {

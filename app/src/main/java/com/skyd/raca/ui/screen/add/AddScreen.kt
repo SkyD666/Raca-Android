@@ -194,23 +194,23 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
 
     viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
         when (getArticleWithTagsUiState) {
-            is GetArticleWithTagsUiState.SUCCESS -> {
+            is GetArticleWithTagsUiState.Success -> {
                 val articleBean = getArticleWithTagsUiState.articleWithTags.article
                 titleText = articleBean.title
                 articleText = articleBean.article
                 tags.clear()
                 tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
             }
-            GetArticleWithTagsUiState.FAILED -> {}
-            GetArticleWithTagsUiState.INIT -> {}
+            GetArticleWithTagsUiState.Failed -> {}
+            GetArticleWithTagsUiState.Init -> {}
         }
     }
 
     viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
         when (addArticleResultUiEvent) {
-            AddArticleResultUiEvent.FAILED -> {
+            AddArticleResultUiEvent.Failed -> {
             }
-            is AddArticleResultUiEvent.SUCCESS -> {
+            is AddArticleResultUiEvent.Success -> {
                 refreshArticleData.tryEmit(Unit)
                 openDialog = true
             }

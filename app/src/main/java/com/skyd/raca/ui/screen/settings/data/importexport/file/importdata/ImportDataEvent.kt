@@ -7,5 +7,5 @@ data class ImportDataEvent(
 ) : IUiEvent
 
 sealed class ImportResultUiEvent {
-    data class SUCCESS(val time: Long) : ImportResultUiEvent()
+    data class Success(val time: Long) : ImportResultUiEvent()
 }
