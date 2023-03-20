@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import com.skyd.raca.appContext
 import com.skyd.raca.db.dao.ArticleDao
 import com.skyd.raca.db.dao.SearchDomainDao
 import com.skyd.raca.db.dao.TagDao
@@ -51,5 +50,3 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
-
-val appDataBase by lazy { AppDatabase.getInstance(appContext) }

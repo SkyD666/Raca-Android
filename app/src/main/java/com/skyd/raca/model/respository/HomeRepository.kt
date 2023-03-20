@@ -6,7 +6,8 @@ import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseData
 import com.skyd.raca.base.BaseRepository
 import com.skyd.raca.config.allSearchDomain
-import com.skyd.raca.db.appDataBase
+import com.skyd.raca.db.dao.ArticleDao
+import com.skyd.raca.db.dao.SearchDomainDao
 import com.skyd.raca.ext.dataStore
 import com.skyd.raca.ext.get
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
@@ -15,23 +16,27 @@ import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.preference.IntersectSearchBySpacePreference
 import com.skyd.raca.model.preference.UseRegexSearchPreference
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class HomeRepository @Inject constructor() : BaseRepository() {
+class HomeRepository @Inject constructor(private val articleDao: ArticleDao) : BaseRepository() {
     suspend fun requestArticleWithTagsList(keyword: String): Flow<BaseData<List<ArticleWithTags>>> {
         return flow {
             emitBaseData(BaseData<List<ArticleWithTags>>().apply {
                 code = 0
-                data = appDataBase.articleDao().getArticleWithTagsList(genSql(keyword))
+                data = articleDao.getArticleWithTagsList(genSql(keyword))
             })
         }
     }
 
     suspend fun requestArticleWithTagsDetail(articleUuid: String): Flow<BaseData<ArticleWithTags>> {
         return flow {
-            val articleWithTags = appDataBase.articleDao().getArticleWithTags(articleUuid)
+            val articleWithTags = articleDao.getArticleWithTags(articleUuid)
             emitBaseData(BaseData<ArticleWithTags>().apply {
                 code = if (articleWithTags == null) 1 else 0
                 data = articleWithTags
@@ -43,13 +48,22 @@ class HomeRepository @Inject constructor() : BaseRepository() {
         return flow {
             emitBaseData(BaseData<Int>().apply {
                 code = 0
-                data = appDataBase.articleDao().deleteArticleWithTags(articleUuid)
+                data = articleDao.deleteArticleWithTags(articleUuid)
             })
         }
     }
 
     companion object {
+        @EntryPoint
+        @InstallIn(SingletonComponent::class)
+        interface HomeRepositoryEntryPoint {
+            val searchDomainDao: SearchDomainDao
+        }
+
         fun genSql(k: String): SimpleSQLiteQuery {
+            val hiltEntryPoint = EntryPointAccessors.fromApplication(
+                appContext, HomeRepositoryEntryPoint::class.java
+            )
             // 是否使用多个关键字并集查询
             val intersectSearchBySpace =
                 appContext.dataStore.get(IntersectSearchBySpacePreference.key) ?: true
@@ -59,20 +73,27 @@ class HomeRepository @Inject constructor() : BaseRepository() {
                 val sql = buildString {
                     keywords.forEachIndexed { index, s ->
                         if (index > 0) append("INTERSECT \n")
-                        append("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(s)} \n")
+                        append(
+                            "SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${
+                                getFilter(s, hiltEntryPoint.searchDomainDao)
+                            } \n"
+                        )
                     }
                 }
                 SimpleSQLiteQuery(sql)
             } else {
-                SimpleSQLiteQuery("SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${getFilter(k)}")
+                SimpleSQLiteQuery(
+                    "SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${
+                        getFilter(k, hiltEntryPoint.searchDomainDao)
+                    }"
+                )
             }
         }
 
-        private fun getFilter(k: String): String {
+        private fun getFilter(k: String, searchDomainDao: SearchDomainDao): String {
             if (k.isBlank()) return "1"
 
             val useRegexSearch = appContext.dataStore.get(UseRegexSearchPreference.key) ?: false
-            val searchDomainDao = appDataBase.searchDomainDao()
 
             var filter = "0"
 

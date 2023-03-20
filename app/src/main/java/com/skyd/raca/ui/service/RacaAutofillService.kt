@@ -9,18 +9,22 @@ import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import com.skyd.raca.R
-import com.skyd.raca.db.appDataBase
+import com.skyd.raca.db.dao.ArticleDao
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.respository.HomeRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
 @RequiresApi(Build.VERSION_CODES.O)
+@AndroidEntryPoint
 class RacaAutofillService : AutofillService() {
-
+    @Inject
+    lateinit var articleDao: ArticleDao
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onFillRequest(
@@ -43,8 +47,9 @@ class RacaAutofillService : AutofillService() {
         }
 
         scope.launch {
-            val articleWithTagsList = appDataBase.articleDao()
-                .getArticleWithTagsList(HomeRepository.genSql(viewNode.autofillValue?.textValue.toString()))
+            val articleWithTagsList = articleDao.getArticleWithTagsList(
+                HomeRepository.genSql(viewNode.autofillValue?.textValue.toString())
+            )
             withContext(Dispatchers.Main) {
                 if (articleWithTagsList.isEmpty()) {
                     callback.onSuccess(null)

@@ -3,7 +3,7 @@ package com.skyd.raca.model.respository
 import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseData
 import com.skyd.raca.base.BaseRepository
-import com.skyd.raca.db.appDataBase
+import com.skyd.raca.db.dao.ArticleDao
 import com.skyd.raca.model.bean.*
 import com.skyd.raca.util.md5
 import com.thegrizzlylabs.sardineandroid.Sardine
@@ -18,7 +18,7 @@ import java.io.File
 import javax.inject.Inject
 
 
-class WebDavRepository @Inject constructor() : BaseRepository() {
+class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) : BaseRepository() {
     companion object {
         const val APP_DIR = "Raca/"
         const val BACKUP_DIR = "Backup/"
@@ -110,7 +110,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
     ): Flow<BaseData<WebDavInfo>> {
         return flow {
             val startTime = System.currentTimeMillis()
-            val allArticleWithTagsList = appDataBase.articleDao().getAllArticleWithTagsList()
+            val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
             val sardine: Sardine = initWebDav(website, username, password)
             val backupInfoMap: MutableMap<String, BackupInfo> =
                 getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
@@ -120,7 +120,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
             val totalCount = excludedMap.size + willBeDeletedList.size
             var currentCount = 0
             willBeDeletedList.forEach {
-                appDataBase.articleDao().deleteArticleWithTags(articleUuid = it)
+                articleDao.deleteArticleWithTags(articleUuid = it)
                 emitProgressData(current = ++currentCount, total = totalCount)
             }
             excludedMap.forEach { entry ->
@@ -129,7 +129,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
                 waitToAddList += Json.decodeFromString<ArticleWithTags>(inputAsString)
                 emitProgressData(current = ++currentCount, total = totalCount)
             }
-            appDataBase.articleDao().webDavImportData(waitToAddList)
+            articleDao.webDavImportData(waitToAddList)
             emitBaseData(BaseData<WebDavInfo>().apply {
                 code = 0
                 data = WebDavResultInfo(
@@ -147,7 +147,7 @@ class WebDavRepository @Inject constructor() : BaseRepository() {
     ): Flow<BaseData<WebDavInfo>> {
         return flow {
             val startTime = System.currentTimeMillis()
-            val allArticleWithTagsList = appDataBase.articleDao().getAllArticleWithTagsList()
+            val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
             val sardine: Sardine = initWebDav(website, username, password)
             val backupInfoMap: MutableMap<String, BackupInfo> =
                 getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
