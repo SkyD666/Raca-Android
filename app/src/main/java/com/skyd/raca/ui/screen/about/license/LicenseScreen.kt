@@ -135,5 +135,10 @@ private fun getLicenseList(): List<LicenseBean> {
             license = "GPL-3.0 License",
             url = "https://github.com/Ashinch/ReadYou"
         ),
+        LicenseBean(
+            name = "Jpinyin",
+            license = "GPL-3.0 License",
+            url = "https://mvnrepository.com/artifact/com.github.stuxuhai/jpinyin"
+        ),
     )
 }

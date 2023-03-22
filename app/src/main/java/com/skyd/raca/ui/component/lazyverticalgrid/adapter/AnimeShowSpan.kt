@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import com.skyd.raca.appContext
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags1
+import com.skyd.raca.model.bean.MiniTool1Bean
 import com.skyd.raca.model.bean.More1Bean
 
 const val MAX_SPAN_SIZE = 60
@@ -15,12 +16,14 @@ fun animeShowSpan(
     when (data) {
         is ArticleWithTags1 -> MAX_SPAN_SIZE / 2
         is More1Bean -> MAX_SPAN_SIZE / 3
+        is MiniTool1Bean -> MAX_SPAN_SIZE / 2
         else -> MAX_SPAN_SIZE / 3
     }
 } else {
     when (data) {
         is ArticleWithTags1 -> MAX_SPAN_SIZE / 1
         is More1Bean -> MAX_SPAN_SIZE / 2
+        is MiniTool1Bean -> MAX_SPAN_SIZE / 1
         else -> MAX_SPAN_SIZE / 1
     }
 }

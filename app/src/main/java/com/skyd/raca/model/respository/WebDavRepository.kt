@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import javax.inject.Inject
 
@@ -124,9 +125,9 @@ class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) :
                 emitProgressData(current = ++currentCount, total = totalCount)
             }
             excludedMap.forEach { entry ->
-                val inputAsString = sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid)
-                    .bufferedReader().use { it.readText() }
-                waitToAddList += Json.decodeFromString<ArticleWithTags>(inputAsString)
+                waitToAddList += Json.decodeFromStream<ArticleWithTags>(
+                    sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid)
+                )
                 emitProgressData(current = ++currentCount, total = totalCount)
             }
             articleDao.webDavImportData(waitToAddList)

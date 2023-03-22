@@ -33,6 +33,10 @@ import com.skyd.raca.ui.screen.about.license.LICENSE_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.about.license.LicenseScreen
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.add.AddScreen
+import com.skyd.raca.ui.screen.minitool.MINI_TOOL_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.minitool.MiniToolScreen
+import com.skyd.raca.ui.screen.minitool.abstractemoji.ABSTRACT_EMOJI_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.minitool.abstractemoji.AbstractEmojiScreen
 import com.skyd.raca.ui.screen.settings.SETTINGS_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.SettingsScreen
 import com.skyd.raca.ui.screen.settings.appearance.APPEARANCE_SCREEN_ROUTE
@@ -159,6 +163,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 composable(route = DATA_SCREEN_ROUTE) {
                     DataScreen()
+                }
+                composable(route = MINI_TOOL_SCREEN_ROUTE) {
+                    MiniToolScreen()
+                }
+                composable(route = ABSTRACT_EMOJI_SCREEN_ROUTE) {
+                    AbstractEmojiScreen()
                 }
             }
         }

@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Egg
-import androidx.compose.material.icons.filled.ImportExport
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,6 +25,7 @@ import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.More1Proxy
 import com.skyd.raca.ui.component.shape.CurlyCornerShape
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.about.ABOUT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.minitool.MINI_TOOL_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.SETTINGS_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
 
@@ -69,22 +67,30 @@ fun MoreScreen() {
                 action = { navController.navigate(IMPORT_EXPORT_SCREEN_ROUTE) }
             ),
             More1Bean(
+                title = stringResource(R.string.mini_tool_screen_name),
+                icon = Icons.Default.Extension,
+                iconTint = MaterialTheme.colorScheme.onSecondary,
+                shape = RoundedCornerShape(30),
+                shapeColor = MaterialTheme.colorScheme.secondary,
+                action = { navController.navigate(MINI_TOOL_SCREEN_ROUTE) }
+            ),
+            More1Bean(
                 title = stringResource(R.string.settings),
                 icon = Icons.Default.Settings,
-                iconTint = MaterialTheme.colorScheme.onSecondary,
+                iconTint = MaterialTheme.colorScheme.onTertiary,
                 shape = CircleShape,
-                shapeColor = MaterialTheme.colorScheme.secondary,
+                shapeColor = MaterialTheme.colorScheme.tertiary,
                 action = { navController.navigate(SETTINGS_SCREEN_ROUTE) }
             ),
             More1Bean(
                 title = stringResource(R.string.about),
                 icon = Icons.Default.Info,
-                iconTint = MaterialTheme.colorScheme.onTertiary,
+                iconTint = MaterialTheme.colorScheme.onPrimary,
                 shape = CurlyCornerShape(
                     amp = with(LocalDensity.current) { 2.dp.toPx() },
                     count = 10
                 ),
-                shapeColor = MaterialTheme.colorScheme.tertiary,
+                shapeColor = MaterialTheme.colorScheme.primary,
                 action = { navController.navigate(ABOUT_SCREEN_ROUTE) }
             )
         )
