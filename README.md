@@ -2,7 +2,7 @@
     <div>
         <img src="image/Raca.svg" style="height: 210px"/>
     </div>
-    <h1>😅 Raca (Android)</h1>
+    <h1>🤗 Raca (Android)</h1>
     <p>
         <a href="https://github.com/SkyD666/Raca-Android/releases/latest" style="text-decoration:none">
             <img src="https://img.shields.io/github/v/release/SkyD666/Raca-Android?display_name=release&style=for-the-badge" alt="GitHub release (latest by date)"/>
@@ -24,10 +24,10 @@
         <b>Raca (Record All Classic Articles)</b>，一个在本地<b>记录、查找抽象段落/评论区小作文</b>的工具。
     </p>
     <p>
-        您还在为记不住小作文内容，面临<b>前面、中间、后面都忘了</b>的尴尬处境吗？使用这款工具将<b>帮助您记录您所遇到的小作文</b>，再也不因为忘记而烦恼！😋
+        🤗您还在为记不住小作文内容，面临<b>前面、中间、后面都忘了</b>的尴尬处境吗？使用这款工具将<b>帮助您记录您所遇到的小作文</b>，再也不因为忘记而烦恼！😋
     </p>
     <p>
-        使用<b> <a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a> </b>架构，完全采用<b> Material You </b>设计风格。<b>所有页面均使用 Jetpack Compose </b>开发。
+        使用<b> <a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a> </b>架构，完全采用<b> <a href="https://m3.material.io/">Material You</a> </b>设计风格。<b>所有页面均使用 <a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a> </b>开发。
     </p>
     <p>
         <a href="https://github.com/SkyD666/Raca" style="text-decoration:none" >
@@ -35,6 +35,7 @@
         </a>
     </p>
 </div>
+
 
 ## 💡主要功能
 
@@ -45,8 +46,10 @@
 5. 支持**使用 WebDAV 同步**数据
 6. 支持根据关键词**自动填充**输入框
 7. 支持通过选中段落后的**上下文菜单快捷添加段落**
-8. 支持**深色模式**
-9. ......
+8. 支持转换为**抽象 Emoji 段落**
+9. 支持**更换和自定义主题色**
+10. 支持**深色模式**
+11. ......
 
 ## 🤩应用截图
 ![ic_main_screen](image/ic_main_screen.jpg) ![ic_main_screen_search](image/ic_main_screen_search.jpg)
@@ -54,7 +57,7 @@
 ![ic_process_text_menu](image/ic_process_text_menu.jpg) ![ic_auto_fill_menu](image/ic_auto_fill_menu.jpg)
 ![ic_import_export_screen](image/ic_import_export_screen.jpg) ![ic_easy_usage_screen](image/ic_easy_usage_screen.jpg)
 ![ic_appearance_screen](image/ic_appearance_screen.jpg) ![ic_webdav_screen](image/ic_webdav_screen.jpg)
-![ic_more_screen](image/ic_more_screen.jpg) ![ic_about_screen](image/ic_about_screen.jpg)
+![ic_abstract_emoji_screen](image/ic_abstract_emoji_screen.jpg) ![ic_about_screen](image/ic_about_screen.jpg)
 
 ## 🔍搜索示例
 
