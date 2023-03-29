@@ -127,7 +127,7 @@ private fun TextArea(modifier: Modifier = Modifier) {
         )
         Card(
             modifier = Modifier.padding(top = 20.dp),
-            shape = RoundedCornerShape(16)
+            shape = RoundedCornerShape(10)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -141,6 +141,12 @@ private fun TextArea(modifier: Modifier = Modifier) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = stringResource(id = R.string.about_screen_description_2),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = stringResource(id = R.string.about_screen_description_3),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )

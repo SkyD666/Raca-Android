@@ -35,6 +35,7 @@ import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
 import com.skyd.raca.model.preference.QueryPreference
 import com.skyd.raca.model.preference.rememberQuery
+import com.skyd.raca.ui.component.AnimatedPlaceholder
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
@@ -106,6 +107,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 when (articleDetailUiState) {
                     is ArticleDetailUiState.Init -> {
                         articleWithTags = null
+                        AnimatedPlaceholder(
+                            resId = R.raw.lottie_genshin_impact_klee_1,
+                            tip = stringResource(id = R.string.home_screen_empty_tip)
+                        )
                         if (articleDetailUiState.articleUuid.isNotBlank()) {
                             viewModel.sendUiIntent(
                                 HomeIntent.GetArticleDetails(articleDetailUiState.articleUuid)
@@ -256,6 +261,13 @@ private fun SearchResultList(
     dataList: List<Any>,
     onItemClickListener: ((data: ArticleWithTags1) -> Unit)? = null
 ) {
+    if (dataList.isEmpty()) {
+        AnimatedPlaceholder(
+            resId = R.raw.lottie_genshin_impact_klee_2,
+            tip = stringResource(id = R.string.home_screen_no_search_result_tip)
+        )
+    }
+
     val adapter = remember {
         LazyGridAdapter(
             mutableListOf(

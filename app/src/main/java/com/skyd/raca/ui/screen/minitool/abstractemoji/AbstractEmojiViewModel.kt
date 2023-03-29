@@ -26,13 +26,5 @@ class AbstractEmojiViewModel @Inject constructor(private var abstractEmojiRepo: 
                 }
                 .defaultFinally()
         },
-
-        doIsInstance<AbstractEmojiIntent.Reset> {
-            abstractEmojiRepo.requestReset()
-                .mapToUIChange {
-                    copy(abstractEmojiResultUiState = AbstractEmojiResultUiState.Init)
-                }
-                .defaultFinally()
-        },
     )
 }

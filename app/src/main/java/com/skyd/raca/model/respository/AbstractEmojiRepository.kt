@@ -28,15 +28,6 @@ class AbstractEmojiRepository @Inject constructor() : BaseRepository() {
         }
     }
 
-    suspend fun requestReset(): Flow<BaseData<Unit>> {
-        return flow {
-            emitBaseData(BaseData<Unit>().apply {
-                code = 0
-                data = Unit
-            })
-        }
-    }
-
     @OptIn(ExperimentalSerializationApi::class)
     private fun checkDict() {
         if (!this@AbstractEmojiRepository::abstractEmojiDict.isInitialized) {

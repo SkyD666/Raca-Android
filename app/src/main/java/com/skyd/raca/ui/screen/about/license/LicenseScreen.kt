@@ -87,57 +87,62 @@ private fun getLicenseList(): List<LicenseBean> {
     return listOf(
         LicenseBean(
             name = "Android Open Source Project",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://source.android.com/"
         ),
         LicenseBean(
             name = "Accompanist",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/google/accompanist"
         ),
         LicenseBean(
             name = "Hilt",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/googlecodelabs/android-hilt"
         ),
         LicenseBean(
             name = "Coil",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/coil-kt/coil"
         ),
         LicenseBean(
             name = "kotlinx.coroutines",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/Kotlin/kotlinx.coroutines"
         ),
         LicenseBean(
             name = "kotlin-csv",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/doyaaaaaken/kotlin-csv"
         ),
         LicenseBean(
             name = "sardine-android",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/thegrizzlylabs/sardine-android"
         ),
         LicenseBean(
             name = "kotlinx.serialization",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/Kotlin/kotlinx.serialization"
         ),
         LicenseBean(
             name = "Monet",
-            license = "Apache-2.0 License",
+            license = "Apache-2.0",
             url = "https://github.com/Kyant0/Monet"
         ),
         LicenseBean(
             name = "Read You",
-            license = "GPL-3.0 License",
+            license = "GPL-3.0",
             url = "https://github.com/Ashinch/ReadYou"
         ),
         LicenseBean(
+            name = "Lottie",
+            license = "MIT",
+            url = "https://github.com/airbnb/lottie"
+        ),
+        LicenseBean(
             name = "Jpinyin",
-            license = "GPL-3.0 License",
+            license = "GPL-3.0",
             url = "https://mvnrepository.com/artifact/com.github.stuxuhai/jpinyin"
         ),
     )

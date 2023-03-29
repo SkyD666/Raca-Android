@@ -38,6 +38,7 @@
     <string name="about_screen_app_full_name">(Record All Classic Articles)</string>
     <string name="about_screen_description_1">一个在本地记录、查找抽象段落/评论区小作文的工具。</string>
     <string name="about_screen_description_2">您还在为记不住小作文内容，面临前面、中间、后面都忘了的尴尬处境吗？使用这款工具将帮助您记录您所遇到的小作文，再也不因为忘记而烦恼！\uD83D\uDE0B</string>
+    <string name="about_screen_description_3">Raca 使用 MVI 架构，完全采用 Material You 设计风格。所有页面均使用 Jetpack Compose 开发。</string>
     <string name="license_screen_name">开源许可证</string>
     <string name="no_browser_found">找不到浏览器！网址：%s</string>
     <string name="github">GitHub</string>
@@ -138,8 +139,10 @@
     <string name="home_screen_failed">操作失败：%s</string>
     <string name="webdav_screen_restore">还原</string>
     <string name="mini_tool_screen_name">小工具</string>
-    <string name="abstract_emoji_screen_name">转为抽象 Emoji</string>
+    <string name="abstract_emoji_screen_name">转为抽象 Emoji 段落</string>
     <string name="abstract_emoji_screen_article">要转换的文本</string>
     <string name="abstract_emoji_screen_convert">转换</string>
-    <string name="abstract_emoji_screen_reset">重新输入</string>
+    <string name="abstract_emoji_screen_reset">清空</string>
+    <string name="home_screen_empty_tip">新建段落或从搜索结果中选择一个段落吧~</string>
+    <string name="home_screen_no_search_result_tip">空空如也呢~</string>
 </resources>
