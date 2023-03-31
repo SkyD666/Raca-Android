@@ -34,15 +34,15 @@ class RacaAutofillService : AutofillService() {
     ) {
         val structure = request.fillContexts.lastOrNull()?.structure
             ?: run {
-                callback.onSuccess(null)
+                callback.onFailure(null)
                 return
             }
         val viewNode = traverseStructure(structure) ?: run {
-            callback.onSuccess(null)
+            callback.onFailure(null)
             return
         }
         val autofillId = viewNode.autofillId ?: run {
-            callback.onSuccess(null)
+            callback.onFailure(null)
             return
         }
 

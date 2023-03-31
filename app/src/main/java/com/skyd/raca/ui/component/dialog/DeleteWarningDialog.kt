@@ -1,14 +1,14 @@
 package com.skyd.raca.ui.component.dialog
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
-import com.skyd.raca.ui.component.dialog.RacaDialog
+import com.skyd.raca.ui.component.RacaLottieAnimation
 
 @Composable
 fun DeleteWarningDialog(
@@ -21,7 +21,10 @@ fun DeleteWarningDialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
         icon = {
-            Icon(imageVector = Icons.Default.Warning, contentDescription = null)
+            RacaLottieAnimation(
+                modifier = Modifier.size(48.dp),
+                resId = R.raw.lottie_genshin_impact_qiqi_1
+            )
         },
         title = {
             Text(text = stringResource(R.string.dialog_warning))

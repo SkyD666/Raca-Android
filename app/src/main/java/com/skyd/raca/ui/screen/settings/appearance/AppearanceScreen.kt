@@ -227,7 +227,6 @@ fun Palettes(
     TextFieldDialog(
         visible = addDialogVisible,
         title = stringResource(R.string.primary_color),
-        icon = Icons.Outlined.Palette,
         value = customColorValue,
         onValueChange = {
             customColorValue = it

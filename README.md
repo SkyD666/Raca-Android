@@ -52,12 +52,12 @@
 11. ......
 
 ## 🤩应用截图
-![ic_main_screen](image/ic_main_screen.jpg) ![ic_main_screen_search](image/ic_main_screen_search.jpg)
+![ic_home_screen](image/ic_home_screen.jpg) ![ic_main_screen_search](image/ic_main_screen_search.jpg)
 ![ic_add_screen_edit](image/ic_add_screen_edit.jpg) ![ic_search_config_screen](image/ic_search_config_screen.jpg)
 ![ic_process_text_menu](image/ic_process_text_menu.jpg) ![ic_auto_fill_menu](image/ic_auto_fill_menu.jpg)
 ![ic_import_export_screen](image/ic_import_export_screen.jpg) ![ic_easy_usage_screen](image/ic_easy_usage_screen.jpg)
 ![ic_appearance_screen](image/ic_appearance_screen.jpg) ![ic_webdav_screen](image/ic_webdav_screen.jpg)
-![ic_abstract_emoji_screen](image/ic_abstract_emoji_screen.jpg) ![ic_about_screen](image/ic_about_screen.jpg)
+![ic_abstract_emoji_screen](image/ic_abstract_emoji_screen.jpg) ![ic_more_screen](image/ic_more_screen.jpg)
 
 ## 🔍搜索示例
 

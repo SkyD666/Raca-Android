@@ -27,10 +27,7 @@ import com.skyd.raca.model.bean.BackupInfo
 import com.skyd.raca.model.bean.WebDavResultInfo
 import com.skyd.raca.model.bean.WebDavWaitingInfo
 import com.skyd.raca.model.preference.WebDavServerPreference
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
-import com.skyd.raca.ui.component.RacaTopBar
-import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.TextFieldDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
@@ -266,7 +263,6 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
         )
         TextFieldDialog(
             visible = openInputDialog,
-            icon = Icons.Default.Input,
             title = inputDialogInfo.first,
             value = inputDialogInfo.second,
             maxLines = 1,
@@ -383,7 +379,10 @@ private fun RecycleBinBottomSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(imageVector = Icons.Default.Lightbulb, contentDescription = null)
+                        RacaLottieAnimation(
+                            modifier = Modifier.size(48.dp),
+                            resId = R.raw.lottie_genshin_impact_paimon_1
+                        )
                         Text(
                             modifier = Modifier.padding(start = 10.dp),
                             textAlign = TextAlign.Center,

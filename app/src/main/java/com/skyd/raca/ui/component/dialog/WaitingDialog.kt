@@ -2,7 +2,10 @@ package com.skyd.raca.ui.component.dialog
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -11,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
+import com.skyd.raca.ui.component.RacaLottieAnimation
 
 @Composable
 fun WaitingDialog(
@@ -57,7 +61,10 @@ fun WaitingDialog(
         visible = visible,
         onDismissRequest = { },
         icon = {
-            CircularProgressIndicator()
+            RacaLottieAnimation(
+                modifier = Modifier.size(48.dp),
+                resId = R.raw.lottie_genshin_impact_klee_3
+            )
         },
         title = {
             Text(text = title)

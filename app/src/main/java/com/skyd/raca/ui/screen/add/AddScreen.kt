@@ -7,7 +7,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -174,7 +173,6 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
 
         RacaDialog(
             visible = openDialog,
-            icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
             title = { Text(text = stringResource(R.string.dialog_tip)) },
             text = { Text(text = stringResource(R.string.add_screen_success)) },
             onDismissRequest = {

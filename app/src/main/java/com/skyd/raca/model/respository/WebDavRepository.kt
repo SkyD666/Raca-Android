@@ -11,7 +11,6 @@ import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -125,9 +124,9 @@ class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) :
                 emitProgressData(current = ++currentCount, total = totalCount)
             }
             excludedMap.forEach { entry ->
-                waitToAddList += Json.decodeFromStream<ArticleWithTags>(
-                    sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid)
-                )
+                sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid).use { inputStream ->
+                    waitToAddList += Json.decodeFromStream<ArticleWithTags>(inputStream)
+                }
                 emitProgressData(current = ++currentCount, total = totalCount)
             }
             articleDao.webDavImportData(waitToAddList)
@@ -150,14 +149,18 @@ class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) :
             val startTime = System.currentTimeMillis()
             val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
             val sardine: Sardine = initWebDav(website, username, password)
-            val backupInfoMap: MutableMap<String, BackupInfo> =
+            var backupInfoMap: MutableMap<String, BackupInfo> =
                 getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
             val (excludedList, willBeDeletedMap) = excludeLocalUnchanged(
-                backupInfoMap,
+                backupInfoMap,      // 这里需要md5+uuid map
                 allArticleWithTagsList
             )
+            backupInfoMap = backupInfoMap.values.associateBy { it.uuid }.toMutableMap()
+            val totalCount = excludedList.size + willBeDeletedMap.size
+            var currentCount = 0
             willBeDeletedMap.forEach { (_, u) ->
-                backupInfoMap[u.contentMd5 + u.uuid]?.isDeleted = true
+                backupInfoMap[/*u.contentMd5 + */u.uuid]?.isDeleted = true
+                emitProgressData(current = ++currentCount, total = totalCount)
             }
             excludedList.forEach {
                 val file = toFile(it)
@@ -165,14 +168,15 @@ class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) :
                 file.deleteRecursively()
                 val md5 = it.md5()
                 val uuid = it.article.uuid
-                backupInfoMap[md5 + uuid] = BackupInfo(
+                backupInfoMap[uuid] = BackupInfo(
                     uuid = uuid,
                     contentMd5 = md5,
                     modifiedTime = System.currentTimeMillis(),
                     isDeleted = false
                 )
+                emitProgressData(current = ++currentCount, total = totalCount)
             }
-            updateBackupInfo(sardine, website, backupInfoMap)
+            updateBackupInfo(sardine, website, backupInfoMap.values.toList())
             emitBaseData(BaseData<WebDavInfo>().apply {
                 code = 0
                 data = WebDavResultInfo(
@@ -232,19 +236,13 @@ class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) :
         website: String,
     ): Map<String, BackupInfo> {
         return if (sardine.exists(website + APP_DIR + BACKUP_INFO_FILE)) {
-            val inputAsString = sardine.get(website + APP_DIR + BACKUP_INFO_FILE)
-                .bufferedReader().use { it.readText() }
-            Json.decodeFromString<List<BackupInfo>>(inputAsString)
-                .distinctBy { it.uuid }             // 保证uuid唯一
-                .associateBy { it.contentMd5 + it.uuid }
+            sardine.get(website + APP_DIR + BACKUP_INFO_FILE).use { inputStream ->
+                Json.decodeFromStream<List<BackupInfo>>(inputStream)
+                    .distinctBy { it.uuid }             // 保证uuid唯一
+                    .associateBy { it.contentMd5 + it.uuid }
+            }
         } else mapOf()
     }
-
-    private fun updateBackupInfo(
-        sardine: Sardine,
-        website: String,
-        backupInfoMap: Map<String, BackupInfo>
-    ) = updateBackupInfo(sardine, website, backupInfoMap.values.toList())
 
     private fun updateBackupInfo(
         sardine: Sardine,
