@@ -34,7 +34,7 @@ import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalWebDavServer
 import kotlinx.coroutines.launch
 
-const val WEBDAV_SCREEN_ROUTE = "WebDavScreen"
+const val WEBDAV_SCREEN_ROUTE = "webDavScreen"
 
 @Composable
 fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
@@ -75,7 +75,8 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection), contentPadding = paddingValues
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues
         ) {
             item {
                 CategorySettingsItem(

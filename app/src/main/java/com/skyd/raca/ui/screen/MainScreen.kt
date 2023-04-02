@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Egg
 import androidx.compose.material.icons.filled.Home
@@ -13,9 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.skyd.raca.R
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.ui.screen.home.HomeScreen
@@ -103,7 +103,7 @@ private fun ContentPager(pagerState: PagerState) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
-            count = 2,
+            pageCount = 2,
             userScrollEnabled = false
         ) { page ->
             when (page) {

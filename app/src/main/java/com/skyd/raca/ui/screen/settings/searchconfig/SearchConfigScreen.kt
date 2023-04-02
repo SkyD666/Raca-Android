@@ -1,8 +1,6 @@
 package com.skyd.raca.ui.screen.settings.searchconfig
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
@@ -21,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.flowlayout.FlowRow
 import com.skyd.raca.R
 import com.skyd.raca.base.LoadUiIntent
 import com.skyd.raca.config.allSearchDomain
@@ -153,7 +150,7 @@ fun SearchDomainItem(
             val columns = allSearchDomain[table].orEmpty()
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                mainAxisSpacing = 6.dp,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 repeat(columns.size) { columnIndex ->
                     val (columnName, columnDisplayName) = columns[columnIndex]

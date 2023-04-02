@@ -152,11 +152,13 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
                         currentTagText = ""
                     })
                 )
-                FlowRow(modifier = Modifier.fillMaxWidth()) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
                     repeat(tags.size) { index ->
                         InputChip(
                             selected = false,
-                            modifier = Modifier.padding(horizontal = 4.dp),
                             label = { Text(tags[index].tag) },
                             onClick = { tags.remove(tags[index]) },
                             trailingIcon = {

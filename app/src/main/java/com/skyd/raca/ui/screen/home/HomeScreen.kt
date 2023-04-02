@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.flowlayout.FlowRow
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
@@ -192,7 +191,10 @@ private fun RacaSearchBar(
                 active = active,
                 onActiveChange = {
                     active = it
-                    if (!active) focusManager.clearFocus()
+                    if (!active) {
+                        focusManager.clearFocus()
+                        QueryPreference.put(context, scope, query())
+                    }
                 },
                 placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
                 leadingIcon = {
@@ -215,7 +217,7 @@ private fun RacaSearchBar(
                 trailingIcon = {
                     if (active) {
                         IconButton(onClick = {
-                            QueryPreference.put(context, scope, QueryPreference.default)
+                            onQueryChange(QueryPreference.default)
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
@@ -409,7 +411,7 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
                         .fillMaxWidth()
                         .heightIn(max = 150.dp)
                         .verticalScroll(rememberScrollState()),
-                    mainAxisSpacing = 5.dp,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     repeat(tags.size) { index ->
                         AssistChip(
