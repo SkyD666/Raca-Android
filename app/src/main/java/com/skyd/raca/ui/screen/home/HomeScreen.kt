@@ -44,6 +44,7 @@ import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 private var menuExpanded by mutableStateOf(false)
 private var openDeleteWarningDialog by mutableStateOf(false)
@@ -216,13 +217,15 @@ private fun RacaSearchBar(
                 },
                 trailingIcon = {
                     if (active) {
-                        IconButton(onClick = {
-                            onQueryChange(QueryPreference.default)
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = stringResource(R.string.home_screen_clear_search_text)
-                            )
+                        if (query().isNotEmpty()) {
+                            IconButton(onClick = {
+                                onQueryChange(QueryPreference.default)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = stringResource(R.string.home_screen_clear_search_text)
+                                )
+                            }
                         }
                     } else {
                         IconButton(onClick = {
@@ -263,9 +266,23 @@ private fun SearchResultList(
     dataList: List<Any>,
     onItemClickListener: ((data: ArticleWithTags1) -> Unit)? = null
 ) {
+    Text(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 7.dp, horizontal = 26.dp),
+        text = stringResource(R.string.home_screen_search_result_count, dataList.size),
+        style = MaterialTheme.typography.labelLarge
+    )
+
     if (dataList.isEmpty()) {
+        val resId = remember {
+            arrayOf(
+                R.raw.lottie_genshin_impact_klee_2,
+                R.raw.lottie_genshin_impact_diona_1
+            )[Random.nextInt(2)]
+        }
         AnimatedPlaceholder(
-            resId = R.raw.lottie_genshin_impact_klee_2,
+            resId = resId,
             tip = stringResource(id = R.string.home_screen_no_search_result_tip)
         )
     }
@@ -281,7 +298,7 @@ private fun SearchResultList(
         modifier = Modifier.fillMaxSize(),
         dataList = dataList,
         adapter = adapter,
-        contentPadding = PaddingValues(vertical = 7.dp)
+        contentPadding = PaddingValues(bottom = 7.dp)
     )
 }
 

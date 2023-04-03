@@ -7,6 +7,8 @@ import com.skyd.raca.ext.dataStore
 import com.skyd.raca.ext.get
 import com.skyd.raca.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.raca.model.bean.ArticleBean
+import com.skyd.raca.model.bean.ArticleBean.Companion.ARTICLE_COLUMN
+import com.skyd.raca.model.bean.ArticleBean.Companion.UUID_COLUMN
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import dagger.hilt.EntryPoint
@@ -38,11 +40,11 @@ interface ArticleDao {
     fun getArticleList(): List<ArticleBean>
 
     @Transaction
-    @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE uuid LIKE :articleUuid")
+    @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE $UUID_COLUMN LIKE :articleUuid")
     fun getArticleWithTags(articleUuid: String): ArticleWithTags?
 
     @Transaction
-    @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE article LIKE :article")
+    @Query("SELECT * FROM $ARTICLE_TABLE_NAME WHERE $ARTICLE_COLUMN LIKE :article")
     fun getArticleWithTagsList(article: String): List<ArticleWithTags>
 
     @Transaction
@@ -93,7 +95,7 @@ interface ArticleDao {
     }
 
     @Transaction
-    @Query("DELETE FROM $ARTICLE_TABLE_NAME WHERE uuid LIKE :articleUuid")
+    @Query("DELETE FROM $ARTICLE_TABLE_NAME WHERE $UUID_COLUMN LIKE :articleUuid")
     fun innerDeleteArticle(articleUuid: String): Int
 
     @Transaction

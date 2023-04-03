@@ -2,18 +2,15 @@
     <string name="app_name">Raca</string>
     <string name="navi_bar_more">更多</string>
     <string name="navi_bar_home">首页</string>
-    <string name="delete">删除</string>
     <string name="home_screen_search_hint">输入关键词搜索</string>
     <string name="home_screen_add">添加</string>
     <string name="add_screen_add">添加</string>
     <string name="add_screen_title">标题</string>
     <string name="add_screen_article">段落</string>
     <string name="add_screen_add_tags">添加标签</string>
-    <string name="home_screen_tags">标签</string>
     <string name="add_screen_name">添加段落</string>
     <string name="add_screen_name_edit">修改段落</string>
     <string name="back">返回</string>
-    <string name="add_screen_add_success">添加成功</string>
     <string name="add_screen_article_is_blank">输入段落不能为空！</string>
     <string name="add_screen_copy_article_success">已复制段落！</string>
     <string name="add_screen_tag_field_hint">按下回车以添加</string>
@@ -76,9 +73,6 @@
     <string name="easy_usage_screen_use_auto_fill_not_support_description">Android 8 以下系统不支持此功能。</string>
     <string name="easy_usage_screen_use_auto_fill_description">输入框内输入关键词，长按，选择自动填充，然后清空输入框即可。</string>
     <string name="setting_screen_easy_usage_description">一些方便使用的功能。</string>
-    <string name="request_permission_failed">请求权限失败：%s</string>
-    <string name="request_permissions_success">请求权限成功！</string>
-    <string name="global_input_hint">请输入关键词</string>
     <string name="easy_usage_screen_add_category">添加</string>
     <string name="easy_usage_screen_process_text_add">快速添加选中文本</string>
     <string name="easy_usage_screen_process_text_add_description">选中要添加的段落，在弹出的上下文菜单中选择 %s 。</string>
@@ -100,8 +94,6 @@
     <string name="webdav_screen_download">从远端拉取</string>
     <string name="webdav_screen_download_description">从远端拉取数据，冲突时会覆盖本地内容。若某段落既在本地，也在远端回收站内，则本地的该段落会被删除。若某段落本地有，而远端没有，则该段落不会被修改。</string>
     <string name="webdav_screen_download_success">拉取成功，耗时 %.2f 秒，更新 %d 条</string>
-    <string name="webdav_screen_sync">同步数据</string>
-    <string name="webdav_screen_sync_description">合并本地和远端数据，使其内容一致。</string>
     <string name="webdav_screen_upload_success">推送成功，耗时 %.2f 秒，更新 %d 条</string>
     <string name="webdav_screen_failed">操作失败：%s</string>
     <string name="webdav_screen_waiting">请稍后…</string>
@@ -114,7 +106,6 @@
     <string name="webdav_screen_last_modified_time">上次修改时间：%s</string>
     <string name="webdav_screen_delete">删除</string>
     <string name="webdav_screen_remote_recycle_bin_is_empty">远端回收站为空</string>
-    <string name="theme_dynamic">跟随系统</string>
     <string name="appearance_screen_wallpaper_colors">壁纸颜色</string>
     <string name="primary_color">强调色</string>
     <string name="theme_no_palettes">无调色板</string>
@@ -145,4 +136,5 @@
     <string name="abstract_emoji_screen_reset">清空</string>
     <string name="home_screen_empty_tip">新建段落或从搜索结果中选择一个段落吧~</string>
     <string name="home_screen_no_search_result_tip">空空如也呢~</string>
+    <string name="home_screen_search_result_count">%d 条结果</string>
 </resources>
