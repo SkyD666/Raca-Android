@@ -1,10 +1,6 @@
 package com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy
 
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,8 +10,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.raca.model.bean.ArticleWithTags1
+import com.skyd.raca.ui.component.RacaCard
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 
 class ArticleWithTags1Proxy(
@@ -35,58 +33,34 @@ fun ArticleWithTags1Item(
 ) {
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
-    Card(
+    RacaCard(
         modifier = modifier,
-        colors = CardDefaults.cardColors(Color.Transparent)
+        colors = CardDefaults.cardColors(Color.Transparent),
+        onLongClick = { clipboardManager.setText(AnnotatedString(data.article.article)) },
+        onClick = { onClickListener?.invoke(data) }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .combinedClickable(
-                    onLongClick = {
-                        clipboardManager.setText(AnnotatedString(data.article.article))
-                    },
-                    onClick = {
-                        onClickListener?.invoke(data)
-                    }
-                ),
-        ) {
-            if (data.article.title.isNotBlank()) {
-                Text(
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                        .padding(horizontal = 10.dp),
-                    text = data.article.title,
-                    style = MaterialTheme.typography.titleLarge,
-                    maxLines = 1
-                )
-            }
+        if (data.article.title.isNotBlank()) {
             Text(
                 modifier = Modifier
-                    .padding(
-                        top = if (data.article.title.isNotBlank()) 6.dp else 12.dp,
-                        bottom = 12.dp
-                    )
+                    .padding(top = 12.dp)
                     .padding(horizontal = 10.dp),
-                text = data.article.article,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3
+                text = data.article.title,
+                style = MaterialTheme.typography.titleLarge,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
             )
-//            LazyRow(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(top = 5.dp, bottom = 6.dp)
-//                    .padding(horizontal = 10.dp),
-//            ) {
-//                repeat(data.tags.size) { index ->
-//                    item {
-//                        AssistChip(
-//                            onClick = {},
-//                            label = { Text(text = data.tags[index].tag) }
-//                        )
-//                    }
-//                }
-//            }
         }
+        Text(
+            modifier = Modifier
+                .padding(
+                    top = if (data.article.title.isNotBlank()) 6.dp else 12.dp,
+                    bottom = 12.dp
+                )
+                .padding(horizontal = 10.dp),
+            text = data.article.article,
+            style = MaterialTheme.typography.bodyMedium,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 3
+        )
     }
 }

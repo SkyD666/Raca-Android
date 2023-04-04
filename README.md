@@ -52,7 +52,7 @@
 11. ......
 
 ## 🤩应用截图
-![ic_home_screen](image/ic_home_screen.jpg) ![ic_main_screen_search](image/ic_main_screen_search.jpg)
+![ic_home_screen](image/ic_home_screen.jpg) ![ic_home_screen_search](image/ic_home_screen_search.jpg)
 ![ic_add_screen_edit](image/ic_add_screen_edit.jpg) ![ic_search_config_screen](image/ic_search_config_screen.jpg)
 ![ic_process_text_menu](image/ic_process_text_menu.jpg) ![ic_auto_fill_menu](image/ic_auto_fill_menu.jpg)
 ![ic_import_export_screen](image/ic_import_export_screen.jpg) ![ic_easy_usage_screen](image/ic_easy_usage_screen.jpg)

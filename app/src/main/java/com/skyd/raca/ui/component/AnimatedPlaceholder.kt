@@ -13,10 +13,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AnimatedPlaceholder(@androidx.annotation.RawRes resId: Int, tip: String) {
+fun AnimatedPlaceholder(
+    @androidx.annotation.RawRes resId: Int,
+    sizeFraction: Float = 0.5f,
+    tip: String
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
-            modifier = Modifier.fillMaxSize(fraction = 0.5f),
+            modifier = Modifier.fillMaxSize(fraction = sizeFraction),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RacaLottieAnimation(

@@ -5,9 +5,9 @@
     <string name="home_screen_search_hint">输入关键词搜索</string>
     <string name="home_screen_add">添加</string>
     <string name="add_screen_add">添加</string>
-    <string name="add_screen_title">标题</string>
+    <string name="add_screen_title">标题（可选）</string>
     <string name="add_screen_article">段落</string>
-    <string name="add_screen_add_tags">添加标签</string>
+    <string name="add_screen_add_tags">添加标签（可选）</string>
     <string name="add_screen_name">添加段落</string>
     <string name="add_screen_name_edit">修改段落</string>
     <string name="back">返回</string>
