@@ -138,4 +138,11 @@
     <string name="home_screen_empty_tip">新建段落或从搜索结果中选择一个段落吧~</string>
     <string name="home_screen_no_search_result_tip">空空如也呢~</string>
     <string name="home_screen_open_menu">显示菜单</string>
+    <string name="about_screen_other_works_rays_name">Rays (Record All Your Stickers)</string>
+    <string name="about_screen_other_works_rays_description">一个在本地记录、查找、管理表情包的工具。🥰 您还在为手机中的表情包太多，找不到想要的表情包而苦恼吗？使用这款工具将帮助您管理您存储的表情包，再也不因为找不到表情包而烦恼！😋</string>
+    <string name="about_screen_other_works_rays_url">https://github.com/SkyD666/Rays-Android</string>
+    <string name="about_screen_other_works_night_screen_name">Night Screen</string>
+    <string name="about_screen_other_works_night_screen_description">当您在夜间🌙使用手机时，Night Screen 可以帮助您减少屏幕亮度，减少对眼睛的伤害。</string>
+    <string name="about_screen_other_works_night_screen_url">https://github.com/SkyD666/NightScreen</string>
+    <string name="about_screen_other_works">其他作品</string>
 </resources>
