@@ -79,14 +79,13 @@ fun TopBarIcon(
     tint: Color = LocalContentColor.current,
     contentDescription: String?,
 ) {
-    IconButton(onClick = onClick) {
-        Icon(
-            modifier = modifier.size(24.dp),
-            painter = painter,
-            tint = tint,
-            contentDescription = contentDescription
-        )
-    }
+    RacaIconButton(
+        modifier = modifier,
+        onClick = onClick,
+        painter = painter,
+        contentDescription = contentDescription,
+        tint = tint
+    )
 }
 
 @Composable
@@ -97,14 +96,13 @@ fun TopBarIcon(
     tint: Color = LocalContentColor.current,
     contentDescription: String?,
 ) {
-    IconButton(onClick = onClick) {
-        Icon(
-            modifier = modifier.size(24.dp),
-            imageVector = imageVector,
-            tint = tint,
-            contentDescription = contentDescription
-        )
-    }
+    RacaIconButton(
+        modifier = modifier,
+        onClick = onClick,
+        imageVector = imageVector,
+        contentDescription = contentDescription,
+        tint = tint
+    )
 }
 
 @Composable

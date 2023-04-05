@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +36,7 @@ import com.skyd.raca.model.bean.ArticleWithTags1
 import com.skyd.raca.model.preference.QueryPreference
 import com.skyd.raca.model.preference.rememberQuery
 import com.skyd.raca.ui.component.AnimatedPlaceholder
+import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
@@ -165,7 +167,6 @@ private fun RacaSearchBar(
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
     var active by rememberSaveable { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchBarHorizontalPadding: Dp by animateDpAsState(if (active) 0.dp else 16.dp)
 
@@ -184,7 +185,6 @@ private fun RacaSearchBar(
                 onQueryChange = onQueryChange,
                 query = query(),
                 onSearch = { keyword ->
-                    focusManager.clearFocus()
                     keyboardController?.hide()
                     QueryPreference.put(context, scope, keyword)
                     viewModel.sendUiIntent(HomeIntent.GetArticleWithTagsList(keyword))
@@ -193,49 +193,36 @@ private fun RacaSearchBar(
                 onActiveChange = {
                     active = it
                     if (!active) {
-                        focusManager.clearFocus()
                         QueryPreference.put(context, scope, query())
                     }
                 },
                 placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
                 leadingIcon = {
                     if (active) {
-                        IconButton(onClick = {
-                            focusManager.clearFocus()
-                            active = false
-                        }) {
-                            Icon(
-                                Icons.Default.ArrowBack,
-                                contentDescription = stringResource(id = R.string.home_screen_close_search)
-                            )
-                        }
+                        RacaIconButton(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(id = R.string.home_screen_close_search),
+                            onClick = { active = false }
+                        )
                     } else {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.Menu, contentDescription = null)
-                        }
+                        RacaIconButton(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(id = R.string.home_screen_open_menu),
+                            onClick = { menuExpanded = true }
+                        )
                     }
                 },
                 trailingIcon = {
                     if (active) {
-                        if (query().isNotEmpty()) {
-                            IconButton(onClick = {
-                                onQueryChange(QueryPreference.default)
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = stringResource(R.string.home_screen_clear_search_text)
-                                )
-                            }
+                        TrailingIcon(showClearButton = query().isNotEmpty()) {
+                            onQueryChange(QueryPreference.default)
                         }
                     } else {
-                        IconButton(onClick = {
-                            navController.navigate(ADD_SCREEN_ROUTE)
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.home_screen_add)
-                            )
-                        }
+                        RacaIconButton(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.home_screen_add),
+                            onClick = { navController.navigate(ADD_SCREEN_ROUTE) }
+                        )
                     }
                 },
             ) {
@@ -245,7 +232,6 @@ private fun RacaSearchBar(
                         is SearchResultUiState.Success -> {
                             SearchResultList(dataList = searchResultUiState.articleWithTagsList,
                                 onItemClickListener = {
-                                    focusManager.clearFocus()
                                     active = false
                                     viewModel.sendUiIntent(
                                         HomeIntent.GetArticleDetails(it.article.uuid)
@@ -262,44 +248,60 @@ private fun RacaSearchBar(
 }
 
 @Composable
+private fun TrailingIcon(
+    showClearButton: Boolean = true,
+    onClick: (() -> Unit)? = null
+) {
+    if (showClearButton) {
+        RacaIconButton(
+            imageVector = Icons.Default.Clear,
+            contentDescription = stringResource(R.string.home_screen_clear_search_text),
+            onClick = { onClick?.invoke() }
+        )
+    }
+}
+
+@Composable
 private fun SearchResultList(
     dataList: List<Any>,
     onItemClickListener: ((data: ArticleWithTags1) -> Unit)? = null
 ) {
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 7.dp, horizontal = 26.dp),
-        text = stringResource(R.string.home_screen_search_result_count, dataList.size),
-        style = MaterialTheme.typography.labelLarge
-    )
-
-    if (dataList.isEmpty()) {
-        val resId = remember {
-            arrayOf(
-                R.raw.lottie_genshin_impact_klee_2,
-                R.raw.lottie_genshin_impact_diona_1
-            )[Random.nextInt(2)]
-        }
-        AnimatedPlaceholder(
-            resId = resId,
-            tip = stringResource(id = R.string.home_screen_no_search_result_tip)
-        )
-    }
-
-    val adapter = remember {
-        LazyGridAdapter(
-            mutableListOf(
-                ArticleWithTags1Proxy(onClickListener = onItemClickListener)
+    Box {
+        if (dataList.isEmpty()) {
+            val resId = remember {
+                arrayOf(
+                    R.raw.lottie_genshin_impact_klee_2,
+                    R.raw.lottie_genshin_impact_diona_1
+                )[Random.nextInt(2)]
+            }
+            AnimatedPlaceholder(
+                resId = resId,
+                tip = stringResource(id = R.string.home_screen_no_search_result_tip)
             )
-        )
+        } else {
+            val adapter = remember {
+                LazyGridAdapter(
+                    mutableListOf(
+                        ArticleWithTags1Proxy(onClickListener = onItemClickListener)
+                    )
+                )
+            }
+            RacaLazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
+                dataList = dataList,
+                adapter = adapter,
+                contentPadding = PaddingValues(vertical = 7.dp)
+            )
+        }
+
+        Badge(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 10.dp, end = 10.dp),
+        ) {
+            Text(text = dataList.size.toString())
+        }
     }
-    RacaLazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
-        dataList = dataList,
-        adapter = adapter,
-        contentPadding = PaddingValues(bottom = 7.dp)
-    )
 }
 
 @Composable
@@ -405,7 +407,8 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
                 Text(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .padding(top = 16.dp),
+                        .padding(top = 16.dp)
+                        .basicMarquee(iterations = Int.MAX_VALUE),
                     text = articleBean.title,
                     style = MaterialTheme.typography.titleLarge
                 )

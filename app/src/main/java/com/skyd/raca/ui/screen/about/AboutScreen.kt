@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
 import com.skyd.raca.ext.plus
 import com.skyd.raca.ext.screenIsLand
+import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
@@ -107,9 +108,7 @@ private fun TextArea(modifier: Modifier = Modifier) {
                     val badgeNumber = remember { CommonUtil.getAppVersionName() }
                     Text(
                         badgeNumber,
-                        modifier = Modifier.semantics {
-                            contentDescription = "$badgeNumber new notifications"
-                        }
+                        modifier = Modifier.semantics { contentDescription = badgeNumber }
                     )
                 }
             }
@@ -171,13 +170,11 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(
-                onClick = { navController.navigate(LICENSE_SCREEN_ROUTE) }) {
-                Icon(
-                    imageVector = Icons.Default.Balance,
-                    contentDescription = stringResource(id = R.string.license_screen_name)
-                )
-            }
+            RacaIconButton(
+                imageVector = Icons.Default.Balance,
+                contentDescription = stringResource(id = R.string.license_screen_name),
+                onClick = { navController.navigate(LICENSE_SCREEN_ROUTE) }
+            )
         }
         Box(
             modifier = boxModifier.background(
@@ -186,12 +183,11 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = { openBrowser("https://github.com/SkyD666/Raca-Android") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_github_24),
-                    contentDescription = stringResource(id = R.string.github)
-                )
-            }
+            RacaIconButton(
+                painter = painterResource(id = R.drawable.ic_github_24),
+                contentDescription = stringResource(id = R.string.about_screen_goto_github_repo),
+                onClick = { openBrowser("https://github.com/SkyD666/Raca-Android") }
+            )
         }
         Box(
             modifier = boxModifier.background(
@@ -200,12 +196,11 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = { openBrowser("https://discord.gg/pEWEjeJTa3") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_discord_24),
-                    contentDescription = stringResource(id = R.string.github)
-                )
-            }
+            RacaIconButton(
+                painter = painterResource(id = R.drawable.ic_discord_24),
+                contentDescription = stringResource(id = R.string.about_screen_join_discord),
+                onClick = { openBrowser("https://discord.gg/pEWEjeJTa3") }
+            )
         }
     }
 }

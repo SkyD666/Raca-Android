@@ -6,7 +6,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -18,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.skyd.raca.R
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.More1Bean
+import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
@@ -39,9 +43,7 @@ fun MoreScreen() {
             RacaTopBar(
                 title = { Text(text = stringResource(id = R.string.navi_bar_more)) },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(imageVector = Icons.Default.Egg, contentDescription = null)
-                    }
+                    RacaIconButton(onClick = { }, imageVector = Icons.Default.Egg)
                 }
             )
         },

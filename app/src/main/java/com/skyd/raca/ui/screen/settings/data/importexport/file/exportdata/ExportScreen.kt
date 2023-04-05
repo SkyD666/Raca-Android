@@ -19,10 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
-import com.skyd.raca.ui.component.RacaTopBar
-import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.*
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import kotlinx.coroutines.launch
 
@@ -44,20 +41,17 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                 title = { Text(text = stringResource(R.string.export_screen_name)) },
                 scrollBehavior = scrollBehavior,
                 actions = {
-                    IconButton(
+                    RacaIconButton(
                         enabled = dirUri != null,
+                        imageVector = Icons.Default.Done,
+                        contentDescription = stringResource(R.string.export_screen_start_export),
                         onClick = {
-                            val a = dirUri ?: return@IconButton
+                            val a = dirUri ?: return@RacaIconButton
                             viewModel.sendUiIntent(
                                 ExportDataIntent.StartExport(dirUri = a)
                             )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Done,
-                            contentDescription = stringResource(R.string.export_screen_start_export)
-                        )
-                    }
+                    )
                 }
             )
         }

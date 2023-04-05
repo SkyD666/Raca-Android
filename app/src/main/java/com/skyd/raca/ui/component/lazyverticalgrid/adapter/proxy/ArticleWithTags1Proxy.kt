@@ -1,5 +1,6 @@
 package com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +44,8 @@ fun ArticleWithTags1Item(
             Text(
                 modifier = Modifier
                     .padding(top = 12.dp)
-                    .padding(horizontal = 10.dp),
+                    .padding(horizontal = 10.dp)
+                    .basicMarquee(iterations = Int.MAX_VALUE),
                 text = data.article.title,
                 style = MaterialTheme.typography.titleLarge,
                 overflow = TextOverflow.Ellipsis,
