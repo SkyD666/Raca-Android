@@ -145,4 +145,5 @@
     <string name="about_screen_other_works_night_screen_description">当您在夜间🌙使用手机时，Night Screen 可以帮助您减少屏幕亮度，减少对眼睛的伤害。</string>
     <string name="about_screen_other_works_night_screen_url">https://github.com/SkyD666/NightScreen</string>
     <string name="about_screen_other_works">其他作品</string>
+    <string name="add_screen_article_duplicate">段落重复，已被添加过，正在展示已添加的信息！</string>
 </resources>

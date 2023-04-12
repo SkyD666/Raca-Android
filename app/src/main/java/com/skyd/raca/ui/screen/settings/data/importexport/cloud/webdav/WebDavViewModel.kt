@@ -5,7 +5,10 @@ import com.skyd.raca.base.IUIChange
 import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.model.respository.WebDavRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,11 +65,11 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 username = intent.username,
                 password = intent.password,
                 uuid = intent.uuid
-            ).map {
+            ).flatMapConcat {
                 webDavRepo.requestRemoteRecycleBin(
                     website = intent.website, username = intent.username, password = intent.password
                 )
-            }.flattenConcat().mapToUIChange { data ->
+            }.mapToUIChange { data ->
                 copy(
                     getRemoteRecycleBinResultUiState =
                     GetRemoteRecycleBinResultUiState.Success(data)
@@ -82,11 +85,11 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 username = intent.username,
                 password = intent.password,
                 uuid = intent.uuid
-            ).map {
+            ).flatMapConcat {
                 webDavRepo.requestRemoteRecycleBin(
                     website = intent.website, username = intent.username, password = intent.password
                 )
-            }.flattenConcat().mapToUIChange { data ->
+            }.mapToUIChange { data ->
                 copy(
                     getRemoteRecycleBinResultUiState =
                     GetRemoteRecycleBinResultUiState.Success(data)

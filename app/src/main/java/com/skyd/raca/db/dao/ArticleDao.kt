@@ -48,6 +48,14 @@ interface ArticleDao {
     fun getArticleWithTagsList(article: String): List<ArticleWithTags>
 
     @Transaction
+    @Query("SELECT COUNT(*) FROM $ARTICLE_TABLE_NAME WHERE $UUID_COLUMN LIKE :uuid")
+    fun containsByUuid(uuid: String): Int
+
+    @Transaction
+    @Query("SELECT $UUID_COLUMN FROM $ARTICLE_TABLE_NAME WHERE $ARTICLE_COLUMN LIKE :article")
+    fun containsByArticle(article: String): String?
+
+    @Transaction
     fun addArticleWithTags(articleWithTags: ArticleWithTags): String {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, ArticleDaoEntryPoint::class.java)

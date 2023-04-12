@@ -33,7 +33,14 @@ class AddViewModel @Inject constructor(private var addRepository: AddRepository)
 
         doIsInstance<AddIntent.AddNewArticleWithTags> { intent ->
             addRepository.requestAddArticleWithTags(intent.articleWithTags)
-                .mapToUIChange { data ->
+                .mapToUIChange(onError = { data ->
+                    if (data.code == -2) {
+                        data.data?.let { sendUiIntent(AddIntent.GetArticleWithTags(it)) }
+                        AddEvent(addArticleResultUiEvent = AddArticleResultUiEvent.Duplicate)
+                    } else {
+                        error(data.msg.toString())
+                    }
+                }) { data ->
                     CurrentArticleUuidPreference.put(
                         context = appContext,
                         scope = viewModelScope,

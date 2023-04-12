@@ -11,10 +11,19 @@ import javax.inject.Inject
 class AddRepository @Inject constructor(private val articleDao: ArticleDao) : BaseRepository() {
     suspend fun requestAddArticleWithTags(articleWithTags: ArticleWithTags): Flow<BaseData<String>> {
         return flow {
-            emitBaseData(BaseData<String>().apply {
-                code = 0
-                data = articleDao.addArticleWithTags(articleWithTags)
-            })
+            val containsByArticle = articleDao.containsByArticle(articleWithTags.article.article)
+            if (containsByArticle != null && articleDao.containsByUuid(articleWithTags.article.uuid) == 0) {
+                emitBaseData(BaseData<String>().apply {
+                    code = -2
+                    msg = "Duplicate article!"
+                    data = containsByArticle
+                })
+            } else {
+                emitBaseData(BaseData<String>().apply {
+                    code = 0
+                    data = articleDao.addArticleWithTags(articleWithTags)
+                })
+            }
         }
     }
 

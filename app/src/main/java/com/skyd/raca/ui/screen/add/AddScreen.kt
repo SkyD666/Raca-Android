@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 const val ADD_SCREEN_ROUTE = "addScreen"
 
 @Composable
-fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hiltViewModel()) {
+fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel = hiltViewModel()) {
     var openDialog by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -49,13 +49,16 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
     var titleText by rememberSaveable { mutableStateOf("") }
     var articleText by rememberSaveable { mutableStateOf("") }
     val tags = remember { mutableStateListOf<TagBean>() }
+    var articleUuid by remember { mutableStateOf(initArticleUuid) }
 
-    if (articleUuid.isNotBlank()) {
+    if (initArticleUuid.isNotBlank()) {
         LaunchedEffect(Unit) {
-            viewModel.sendUiIntent(AddIntent.GetArticleWithTags(articleUuid))
+            viewModel.sendUiIntent(AddIntent.GetArticleWithTags(initArticleUuid))
         }
     } else {
-        articleText = article
+        if (article.isNotBlank()) {
+            articleText = article
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -190,25 +193,32 @@ fun AddScreen(articleUuid: String, article: String, viewModel: AddViewModel = hi
                 }
             }
         )
-    }
 
-    viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
-        when (getArticleWithTagsUiState) {
-            is GetArticleWithTagsUiState.Success -> {
-                val articleBean = getArticleWithTagsUiState.articleWithTags.article
-                titleText = articleBean.title
-                articleText = articleBean.article
-                tags.clear()
-                tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
+        viewModel.uiStateFlow.collectAsStateWithLifecycle().value.apply {
+            when (getArticleWithTagsUiState) {
+                is GetArticleWithTagsUiState.Success -> {
+                    val articleBean = getArticleWithTagsUiState.articleWithTags.article
+                    articleUuid = articleBean.uuid
+                    titleText = articleBean.title
+                    articleText = articleBean.article
+                    tags.clear()
+                    tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
+                }
+                GetArticleWithTagsUiState.Failed -> {}
+                GetArticleWithTagsUiState.Init -> {}
             }
-            GetArticleWithTagsUiState.Failed -> {}
-            GetArticleWithTagsUiState.Init -> {}
         }
     }
 
     viewModel.uiEventFlow.collectAsStateWithLifecycle(initialValue = null).value?.apply {
         when (addArticleResultUiEvent) {
-            AddArticleResultUiEvent.Failed -> {
+            AddArticleResultUiEvent.Duplicate -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        appContext.getString(R.string.add_screen_article_duplicate),
+                        withDismissAction = true
+                    )
+                }
             }
             is AddArticleResultUiEvent.Success -> {
                 refreshArticleData.tryEmit(Unit)

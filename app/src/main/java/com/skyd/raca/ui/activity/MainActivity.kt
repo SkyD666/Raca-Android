@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                     arguments = listOf(navArgument("articleUuid") { defaultValue = "" })
                 ) {
                     AddScreen(
-                        articleUuid = it.arguments?.getString("articleUuid").orEmpty(),
+                        initArticleUuid = it.arguments?.getString("articleUuid").orEmpty(),
                         article = it.arguments?.getString("article").orEmpty()
                     )
                 }
