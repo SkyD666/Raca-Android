@@ -175,7 +175,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initIntent() {
-        val text = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT) ?: return
+        val text: String = if (Intent.ACTION_SEND == intent.action && intent.type == "text/plain") {
+            intent.getStringExtra(Intent.EXTRA_TEXT)
+        } else {
+            intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+        } ?: return
+
 //        TODO
 //        val readonly = intent.getBooleanExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true)
 //        navController.currentBackStackEntry?.savedStateHandle?.set("article", text)
