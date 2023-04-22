@@ -2,6 +2,7 @@ package com.skyd.raca.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -22,15 +23,17 @@ fun SwitchSettingsItem(
     icon: ImageVector,
     text: String,
     description: String? = null,
-    checked: MutableState<Boolean> = mutableStateOf(false),
+    checked: Boolean = false,
     onCheckedChange: ((Boolean) -> Unit)?,
+    onLongClick: (() -> Unit)? = null,
 ) {
     SwitchSettingsItem(
         icon = rememberVectorPainter(image = icon),
         text = text,
         description = description,
         checked = checked,
-        onCheckedChange = onCheckedChange
+        onCheckedChange = onCheckedChange,
+        onLongClick = onLongClick,
     )
 }
 
@@ -39,22 +42,20 @@ fun SwitchSettingsItem(
     icon: Painter,
     text: String,
     description: String? = null,
-    checked: MutableState<Boolean> = mutableStateOf(false),
+    checked: Boolean = false,
     onCheckedChange: ((Boolean) -> Unit)?,
+    onLongClick: (() -> Unit)? = null,
 ) {
     BaseSettingsItem(
         icon = icon,
         text = text,
         descriptionText = description,
+        onLongClick = onLongClick,
         onClick = {
-            checked.value = !checked.value
-            onCheckedChange?.invoke(checked.value)
-        }
+            onCheckedChange?.invoke(!checked)
+        },
     ) {
-        Switch(checked = checked.value, onCheckedChange = {
-            checked.value = it
-            onCheckedChange?.invoke(it)
-        })
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
@@ -108,6 +109,7 @@ fun BaseSettingsItem(
     text: String,
     descriptionText: String? = null,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     content: (@Composable () -> Unit)? = null
 ) {
     BaseSettingsItem(
@@ -125,6 +127,7 @@ fun BaseSettingsItem(
             }
         } else null,
         onClick = onClick,
+        onLongClick = onLongClick,
         content = content,
     )
 }
@@ -135,12 +138,16 @@ fun BaseSettingsItem(
     text: String,
     description: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     content: (@Composable () -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .run { if (onClick != null) clickable { onClick() } else this }
+            .run {
+                if (onClick != null) combinedClickable(onLongClick = onLongClick) { onClick() }
+                else this
+            }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

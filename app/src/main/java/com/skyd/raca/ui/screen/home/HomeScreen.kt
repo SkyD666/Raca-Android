@@ -33,8 +33,8 @@ import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.ArticleWithTags1
+import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.model.preference.QueryPreference
-import com.skyd.raca.model.preference.rememberQuery
 import com.skyd.raca.ui.component.AnimatedPlaceholder
 import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
@@ -43,12 +43,12 @@ import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
 import com.skyd.raca.ui.local.LocalCurrentArticleUuid
 import com.skyd.raca.ui.local.LocalNavController
+import com.skyd.raca.ui.local.LocalQuery
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
 import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-private var menuExpanded by mutableStateOf(false)
 private var openDeleteWarningDialog by mutableStateOf(false)
 
 @Composable
@@ -57,7 +57,8 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val currentArticleUuid = LocalCurrentArticleUuid.current
-    var query by rememberQuery()
+    val initQuery = LocalQuery.current
+    var query by remember(initQuery) { mutableStateOf(initQuery) }
     var articleWithTags by remember { mutableStateOf<ArticleWithTags?>(null) }
 
     refreshArticleData.collectAsStateWithLifecycle(initialValue = null).apply {
@@ -90,7 +91,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 .padding(innerPaddings)
                 .fillMaxSize()
         ) {
-            RacaSearchBar(query = { query }, onQueryChange = { query = it })
+            RacaSearchBar(query = query, onQueryChange = { query = it })
 
             AnimatedVisibility(
                 visible = articleWithTags != null,
@@ -159,10 +160,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 
 @Composable
 private fun RacaSearchBar(
-    query: () -> String,
+    query: String,
     onQueryChange: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    var menuExpanded by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
@@ -183,7 +185,7 @@ private fun RacaSearchBar(
         ) {
             SearchBar(
                 onQueryChange = onQueryChange,
-                query = query(),
+                query = query,
                 onSearch = { keyword ->
                     keyboardController?.hide()
                     QueryPreference.put(context, scope, keyword)
@@ -191,10 +193,10 @@ private fun RacaSearchBar(
                 },
                 active = active,
                 onActiveChange = {
-                    active = it
-                    if (!active) {
-                        QueryPreference.put(context, scope, query())
+                    if (!it) {
+                        QueryPreference.put(context, scope, query)
                     }
+                    active = it
                 },
                 placeholder = { Text(text = stringResource(R.string.home_screen_search_hint)) },
                 leadingIcon = {
@@ -214,7 +216,7 @@ private fun RacaSearchBar(
                 },
                 trailingIcon = {
                     if (active) {
-                        TrailingIcon(showClearButton = query().isNotEmpty()) {
+                        TrailingIcon(showClearButton = query.isNotEmpty()) {
                             onQueryChange(QueryPreference.default)
                         }
                     } else {
@@ -242,7 +244,7 @@ private fun RacaSearchBar(
                     }
                 }
             }
-            HomeMenu(viewModel = viewModel)
+            HomeMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false })
         }
     }
 }
@@ -305,7 +307,11 @@ private fun SearchResultList(
 }
 
 @Composable
-private fun HomeMenu(viewModel: HomeViewModel) {
+private fun HomeMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
     val navController = LocalNavController.current
     val currentArticleUuid = LocalCurrentArticleUuid.current
     var editMenuItemEnabled by remember { mutableStateOf(false) }
@@ -322,15 +328,31 @@ private fun HomeMenu(viewModel: HomeViewModel) {
     }
 
     DropdownMenu(
-        expanded = menuExpanded,
-        onDismissRequest = { menuExpanded = false }
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
     ) {
+        DropdownMenuItem(
+            enabled = editMenuItemEnabled,
+            text = { Text(stringResource(R.string.home_screen_clear_current_article)) },
+            onClick = {
+                viewModel.sendUiIntent(
+                    HomeIntent.GetArticleDetails(CurrentArticleUuidPreference.default)
+                )
+                onDismissRequest()
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Replay,
+                    contentDescription = null
+                )
+            }
+        )
         DropdownMenuItem(
             enabled = editMenuItemEnabled,
             text = { Text(stringResource(R.string.home_screen_edit)) },
             onClick = {
                 navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
-                menuExpanded = false
+                onDismissRequest()
             },
             leadingIcon = {
                 Icon(
@@ -343,7 +365,7 @@ private fun HomeMenu(viewModel: HomeViewModel) {
             enabled = deleteMenuItemEnabled,
             text = { Text(stringResource(R.string.home_screen_delete)) },
             onClick = {
-                menuExpanded = false
+                onDismissRequest()
                 openDeleteWarningDialog = true
             },
             leadingIcon = {
@@ -358,7 +380,7 @@ private fun HomeMenu(viewModel: HomeViewModel) {
             text = { Text(stringResource(R.string.search_config_screen_name)) },
             onClick = {
                 navController.navigate(SEARCH_CONFIG_SCREEN_ROUTE)
-                menuExpanded = false
+                onDismissRequest()
             },
             leadingIcon = {
                 Icon(

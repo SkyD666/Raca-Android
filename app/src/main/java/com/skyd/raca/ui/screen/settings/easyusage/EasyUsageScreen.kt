@@ -15,9 +15,7 @@ import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -44,7 +42,7 @@ fun EasyUsageScreen() {
             )
         }
     ) { paddingValues ->
-        val useAutoFill = remember {
+        var useAutoFill by remember {
             mutableStateOf(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     true == getSystemService(context, AutofillManager::class.java)
@@ -58,7 +56,7 @@ fun EasyUsageScreen() {
         val useAutoFillLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
-            useAutoFill.value = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            useAutoFill = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 true == getSystemService(context, AutofillManager::class.java)
                     ?.hasEnabledAutofillServices()
             } else false

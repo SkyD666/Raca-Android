@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.config.refreshArticleData
+import com.skyd.raca.ext.addIfAny
 import com.skyd.raca.ext.plus
 import com.skyd.raca.ext.popBackStackWithLifecycle
 import com.skyd.raca.model.bean.ArticleBean
@@ -95,7 +96,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                                 val articleWithTags = ArticleWithTags(
                                     article = ArticleBean(title = titleText, article = articleText)
                                         .apply { uuid = articleUuid },
-                                    tags = tags.toList()
+                                    tags = tags.distinct().toList()
                                 )
                                 viewModel.sendUiIntent(
                                     AddIntent.AddNewArticleWithTags(articleWithTags)
@@ -147,7 +148,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         if (currentTagText.isNotBlank()) {
-                            tags.add(TagBean(tag = currentTagText))
+                            tags.addIfAny(TagBean(tag = currentTagText)) { it.tag != currentTagText }
                         } else {
                             keyboardController?.hide()
                             focusManager.clearFocus()
@@ -202,7 +203,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                     titleText = articleBean.title
                     articleText = articleBean.article
                     tags.clear()
-                    tags.addAll(getArticleWithTagsUiState.articleWithTags.tags)
+                    tags.addAll(getArticleWithTagsUiState.articleWithTags.tags.distinct())
                 }
                 GetArticleWithTagsUiState.Failed -> {}
                 GetArticleWithTagsUiState.Init -> {}
