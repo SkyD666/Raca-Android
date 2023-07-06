@@ -1,15 +1,40 @@
 package com.skyd.raca.ui.screen.add
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
@@ -126,16 +151,6 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                 )
             }
             item {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    value = articleText,
-                    onValueChange = { articleText = it },
-                    label = { Text(stringResource(R.string.add_screen_article)) }
-                )
-            }
-            item {
                 var currentTagText by rememberSaveable { mutableStateOf("") }
                 OutlinedTextField(
                     modifier = Modifier
@@ -145,6 +160,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                     onValueChange = { currentTagText = it },
                     placeholder = { Text(text = stringResource(R.string.add_screen_tag_field_hint)) },
                     label = { Text(stringResource(R.string.add_screen_add_tags)) },
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         if (currentTagText.isNotBlank()) {
@@ -156,24 +172,43 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                         currentTagText = ""
                     })
                 )
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+            }
+            item {
+                AnimatedVisibility(
+                    visible = tags.isNotEmpty(),
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
                 ) {
-                    repeat(tags.size) { index ->
-                        InputChip(
-                            selected = false,
-                            label = { Text(tags[index].tag) },
-                            onClick = { tags.remove(tags[index]) },
-                            trailingIcon = {
-                                Icon(
-                                    modifier = Modifier.size(AssistChipDefaults.IconSize),
-                                    imageVector = Icons.Default.Close, contentDescription = null
-                                )
-                            }
-                        )
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    ) {
+                        repeat(tags.size) { index ->
+                            InputChip(
+                                selected = false,
+                                label = { Text(tags[index].tag) },
+                                onClick = { tags.remove(tags[index]) },
+                                trailingIcon = {
+                                    Icon(
+                                        modifier = Modifier.size(AssistChipDefaults.IconSize),
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
+            }
+            item {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = if (tags.isEmpty()) 20.dp else 10.dp),
+                    value = articleText,
+                    onValueChange = { articleText = it },
+                    label = { Text(stringResource(R.string.add_screen_article)) }
+                )
             }
         }
 
@@ -205,6 +240,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                     tags.clear()
                     tags.addAll(getArticleWithTagsUiState.articleWithTags.tags.distinct())
                 }
+
                 GetArticleWithTagsUiState.Failed -> {}
                 GetArticleWithTagsUiState.Init -> {}
             }
@@ -221,10 +257,12 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                     )
                 }
             }
+
             is AddArticleResultUiEvent.Success -> {
                 refreshArticleData.tryEmit(Unit)
                 openDialog = true
             }
+
             null -> {}
         }
     }
