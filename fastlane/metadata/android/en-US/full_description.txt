@@ -1,0 +1,13 @@
+🤗 Are you still struggling to remember the content of your short essays, facing the embarrassing situation of forgetting the beginning, middle, and end? This tool will help you record the short essays you encounter, so you’ll never worry about forgetting again!😋
+<ul>
+<li>Supports tagging paragraphs</li>
+<li>Supports setting search fields in the database</li>
+<li>Supports searching with regular expressions</li>
+<li>Supports importing and exporting the database as files</li>
+<li>Supports WebDAV data synchronization</li>
+<li>Supports auto-filling input fields based on keywords</li>
+<li>Supports quickly adding paragraphs through the context menu after selecting a paragraph</li>
+<li>Supports converting paragraphs into abstract Emoji form</li>
+<li>Supports changing and customizing theme colors</li>
+<li>Supports dark mode</li>
+</ul>
