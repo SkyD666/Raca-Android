@@ -25,18 +25,18 @@ fun String.checkColorHex(): String? {
 
 @Composable
 infix fun Color.onLight(lightColor: Color): Color =
-    if (!DarkModePreference.isInDark(value = LocalDarkMode.current)) lightColor else this
+    if (!DarkModePreference.inDark(value = LocalDarkMode.current)) lightColor else this
 
 @Composable
 infix fun Color.onDark(darkColor: Color): Color =
-    if (DarkModePreference.isInDark(value = LocalDarkMode.current)) darkColor else this
+    if (DarkModePreference.inDark(value = LocalDarkMode.current)) darkColor else this
 
 @Stable
 @Composable
 @ReadOnlyComposable
 infix fun Color.alwaysLight(isAlways: Boolean): Color {
     val colorScheme = MaterialTheme.colorScheme
-    return if (isAlways && DarkModePreference.isInDark(value = LocalDarkMode.current)) {
+    return if (isAlways && DarkModePreference.inDark(value = LocalDarkMode.current)) {
         when (this) {
             colorScheme.primary -> colorScheme.onPrimary
             colorScheme.secondary -> colorScheme.onSecondary

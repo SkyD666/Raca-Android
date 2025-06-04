@@ -9,15 +9,12 @@ import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.respository.ImportDataRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge
 import java.io.InputStream
-import java.util.*
-import javax.inject.Inject
+import java.util.UUID
 
-@HiltViewModel
-class ImportDataViewModel @Inject constructor(private var importDataRepo: ImportDataRepository) :
+class ImportDataViewModel(private var importDataRepo: ImportDataRepository) :
     BaseViewModel<IUiState, ImportDataEvent, ImportDataIntent>() {
     override fun initUiState(): IUiState {
         return object : IUiState {}

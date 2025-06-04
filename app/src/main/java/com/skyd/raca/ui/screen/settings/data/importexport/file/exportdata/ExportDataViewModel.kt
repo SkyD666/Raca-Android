@@ -4,13 +4,10 @@ import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUIChange
 import com.skyd.raca.base.IUiState
 import com.skyd.raca.model.respository.ExportDataRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge
-import javax.inject.Inject
 
-@HiltViewModel
-class ExportDataViewModel @Inject constructor(private var exportDataRepo: ExportDataRepository) :
+class ExportDataViewModel(private var exportDataRepo: ExportDataRepository) :
     BaseViewModel<IUiState, ExportDataEvent, ExportDataIntent>() {
     override fun initUiState(): IUiState {
         return object : IUiState {}

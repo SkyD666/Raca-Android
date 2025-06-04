@@ -1,6 +1,11 @@
 package com.skyd.raca.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.raca.appContext
 import com.skyd.raca.ext.dataStore
@@ -11,22 +16,12 @@ import com.skyd.raca.model.bean.ArticleBean.Companion.ARTICLE_COLUMN
 import com.skyd.raca.model.bean.ArticleBean.Companion.UUID_COLUMN
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.preference.CurrentArticleUuidPreference
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import java.util.*
+import java.util.UUID
 
 @Dao
 interface ArticleDao {
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface ArticleDaoEntryPoint {
-        val tagDao: TagDao
-    }
-
     @Transaction
     @RawQuery
     fun getArticleWithTagsList(sql: SupportSQLiteQuery): List<ArticleWithTags>
@@ -57,8 +52,6 @@ interface ArticleDao {
 
     @Transaction
     fun addArticleWithTags(articleWithTags: ArticleWithTags): String {
-        val hiltEntryPoint =
-            EntryPointAccessors.fromApplication(appContext, ArticleDaoEntryPoint::class.java)
         var articleUuid = articleWithTags.article.uuid
         runCatching {
             UUID.fromString(articleUuid)
@@ -70,7 +63,7 @@ interface ArticleDao {
         articleWithTags.tags.forEach {
             it.articleUuid = articleUuid
         }
-        hiltEntryPoint.tagDao.apply {
+        com.skyd.raca.di.get<TagDao>().apply {
             deleteTags(articleUuid)
             addTags(articleWithTags.tags)
         }

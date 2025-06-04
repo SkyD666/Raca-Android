@@ -10,12 +10,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.PostAdd
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material.icons.outlined.PostAdd
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -23,22 +27,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.getSystemService
 import com.skyd.raca.R
-import com.skyd.raca.ui.component.*
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.SwitchSettingsItem
+import kotlinx.serialization.Serializable
 
 
-const val EASY_USAGE_SCREEN_ROUTE = "easyUsageScreen"
+@Serializable
+data object EasyUseRoute
 
 @Composable
-fun EasyUsageScreen() {
+fun EasyUseScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val context = LocalContext.current
 
     Scaffold(
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 scrollBehavior = scrollBehavior,
-                title = { Text(text = stringResource(R.string.easy_usage_screen_name)) },
+                title = { Text(text = stringResource(R.string.easy_use_screen_name)) },
             )
         }
     ) { paddingValues ->
@@ -69,27 +79,28 @@ fun EasyUsageScreen() {
         ) {
             item {
                 CategorySettingsItem(
-                    text = stringResource(id = R.string.easy_usage_screen_send_category)
+                    text = stringResource(id = R.string.easy_use_screen_send_category)
                 )
             }
             item {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     SwitchSettingsItem(
-                        icon = Icons.Default.EditNote,
+                        icon = Icons.Outlined.EditNote,
                         text = stringResource(id = R.string.easy_usage_screen_use_auto_fill),
                         description = stringResource(id = R.string.easy_usage_screen_use_auto_fill_description),
                         checked = useAutoFill,
                         onCheckedChange = {
-                            useAutoFillLauncher.launch(Intent(ACTION_REQUEST_SET_AUTOFILL_SERVICE)
-                                .apply {
-                                    data = Uri.parse("package:com.android.settings")
-                                }
+                            useAutoFillLauncher.launch(
+                                Intent(ACTION_REQUEST_SET_AUTOFILL_SERVICE)
+                                    .apply {
+                                        data = Uri.parse("package:com.android.settings")
+                                    }
                             )
                         },
                     )
                 } else {
                     BaseSettingsItem(
-                        icon = rememberVectorPainter(image = Icons.Default.EditNote),
+                        icon = rememberVectorPainter(image = Icons.Outlined.EditNote),
                         text = stringResource(id = R.string.easy_usage_screen_use_auto_fill),
                         descriptionText = stringResource(id = R.string.easy_usage_screen_use_auto_fill_not_support_description)
                     )
@@ -103,7 +114,7 @@ fun EasyUsageScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.PostAdd),
+                    icon = rememberVectorPainter(image = Icons.Outlined.PostAdd),
                     text = stringResource(id = R.string.easy_usage_screen_process_text_add),
                     descriptionText = stringResource(
                         id = R.string.easy_usage_screen_process_text_add_description,

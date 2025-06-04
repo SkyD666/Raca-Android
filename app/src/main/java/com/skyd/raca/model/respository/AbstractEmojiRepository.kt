@@ -11,21 +11,18 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
-import javax.inject.Inject
 
 
-class AbstractEmojiRepository @Inject constructor() : BaseRepository() {
+class AbstractEmojiRepository : BaseRepository() {
     private lateinit var abstractEmojiDict: MutableMap<String, String>
     private lateinit var abstractEmojiPinyinDict: MutableMap<String, String>
 
-    suspend fun requestConvert(article: String): Flow<BaseData<String>> {
-        return flow {
-            checkDict()
-            emitBaseData(BaseData<String>().apply {
-                code = 0
-                data = getResultString(article)
-            })
-        }
+    fun requestConvert(article: String): Flow<BaseData<String>> = flow {
+        checkDict()
+        emitBaseData(BaseData<String>().apply {
+            code = 0
+            data = getResultString(article)
+        })
     }
 
     @OptIn(ExperimentalSerializationApi::class)

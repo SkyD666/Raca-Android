@@ -4,13 +4,10 @@ import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUIChange
 import com.skyd.raca.base.IUiEvent
 import com.skyd.raca.model.respository.SearchConfigRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge
-import javax.inject.Inject
 
-@HiltViewModel
-class SearchConfigViewModel @Inject constructor(private var searchConfigRepo: SearchConfigRepository) :
+class SearchConfigViewModel(private var searchConfigRepo: SearchConfigRepository) :
     BaseViewModel<SearchConfigState, IUiEvent, SearchConfigIntent>() {
     override fun initUiState(): SearchConfigState {
         return SearchConfigState(

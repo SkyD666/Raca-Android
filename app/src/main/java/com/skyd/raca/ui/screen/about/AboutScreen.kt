@@ -3,13 +3,33 @@ package com.skyd.raca.ui.screen.about
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Balance
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.Balance
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,40 +37,55 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.skyd.raca.R
+import com.skyd.raca.config.Const
+import com.skyd.raca.ext.isCompact
 import com.skyd.raca.ext.plus
-import com.skyd.raca.ext.screenIsLand
+import com.skyd.raca.ext.safeOpenUri
 import com.skyd.raca.model.bean.OtherWorksBean
 import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
-import com.skyd.raca.ui.screen.about.license.LICENSE_SCREEN_ROUTE
+import com.skyd.raca.ui.local.LocalWindowSizeClass
+import com.skyd.raca.ui.screen.about.license.LicenseRoute
 import com.skyd.raca.util.CommonUtil
 import com.skyd.raca.util.CommonUtil.openBrowser
+import kotlinx.serialization.Serializable
 
-const val ABOUT_SCREEN_ROUTE = "aboutScreen"
+@Serializable
+data object AboutRoute
 
 @Composable
 fun AboutScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val context = LocalContext.current
+    val navController = LocalNavController.current
+
     Scaffold(
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.about)) },
+                actions = {
+                    RacaIconButton(
+                        imageVector = Icons.Outlined.Balance,
+                        contentDescription = stringResource(R.string.license_screen_name),
+                        onClick = { navController.navigate(LicenseRoute) }
+                    )
+                },
             )
         }
     ) { paddingValues ->
+        val windowSizeClass = LocalWindowSizeClass.current
         val otherWorksList = rememberOtherWorksList()
 
         LazyColumn(
@@ -60,29 +95,24 @@ fun AboutScreen() {
             contentPadding = paddingValues + PaddingValues(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (context.screenIsLand) {
+            if (windowSizeClass.isCompact) {
+                item { IconArea() }
+                item { TextArea() }
+                item { ButtonArea() }
+            } else {
                 item {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            modifier = Modifier.weight(0.95f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             IconArea()
                             ButtonArea()
                         }
+                        Spacer(modifier = Modifier.width(16.dp))
                         TextArea(modifier = Modifier.weight(1f))
                     }
                     Spacer(modifier = Modifier.height(10.dp))
-                }
-            } else {
-                item {
-                    IconArea()
-                }
-                item {
-                    TextArea()
-                }
-                item {
-                    ButtonArea()
                 }
             }
 
@@ -173,50 +203,49 @@ private fun TextArea(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ButtonArea() {
-    val navController = LocalNavController.current
-
+    val uriHandler = LocalUriHandler.current
     Row(
-        modifier = Modifier.fillMaxWidth(0.8f),
+        modifier = Modifier.padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.Center
     ) {
-        val boxModifier = Modifier.padding(vertical = 20.dp, horizontal = 10.dp)
+        val boxModifier = Modifier.padding(vertical = 16.dp, horizontal = 6.dp)
         Box(
             modifier = boxModifier.background(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(30)
+                shape = MaterialShapes.Cookie9Sided.toShape(),
             ),
             contentAlignment = Alignment.Center
         ) {
             RacaIconButton(
-                imageVector = Icons.Default.Balance,
-                contentDescription = stringResource(id = R.string.license_screen_name),
-                onClick = { navController.navigate(LICENSE_SCREEN_ROUTE) }
+                painter = painterResource(R.drawable.ic_github_24),
+                contentDescription = stringResource(R.string.about_screen_visit_github),
+                onClick = { uriHandler.safeOpenUri(Const.GITHUB_REPO) }
             )
         }
         Box(
             modifier = boxModifier.background(
                 color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(30)
+                shape = MaterialShapes.Pill.toShape(),
             ),
             contentAlignment = Alignment.Center
         ) {
             RacaIconButton(
-                painter = painterResource(id = R.drawable.ic_github_24),
-                contentDescription = stringResource(id = R.string.about_screen_goto_github_repo),
-                onClick = { openBrowser("https://github.com/SkyD666/Raca-Android") }
+                painter = painterResource(R.drawable.ic_telegram_24),
+                contentDescription = stringResource(R.string.about_screen_join_telegram),
+                onClick = { uriHandler.safeOpenUri(Const.TELEGRAM_GROUP) }
             )
         }
         Box(
             modifier = boxModifier.background(
                 color = MaterialTheme.colorScheme.tertiaryContainer,
-                shape = RoundedCornerShape(30)
+                shape = MaterialShapes.Clover4Leaf.toShape(),
             ),
             contentAlignment = Alignment.Center
         ) {
             RacaIconButton(
-                painter = painterResource(id = R.drawable.ic_discord_24),
-                contentDescription = stringResource(id = R.string.about_screen_join_discord),
-                onClick = { openBrowser("https://discord.gg/pEWEjeJTa3") }
+                painter = painterResource(R.drawable.ic_discord_24),
+                contentDescription = stringResource(R.string.about_screen_join_discord),
+                onClick = { uriHandler.safeOpenUri(Const.DISCORD_SERVER) }
             )
         }
     }

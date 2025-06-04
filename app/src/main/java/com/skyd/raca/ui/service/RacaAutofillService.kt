@@ -3,28 +3,31 @@ package com.skyd.raca.ui.service
 import android.app.assist.AssistStructure
 import android.os.Build
 import android.os.CancellationSignal
-import android.service.autofill.*
+import android.service.autofill.AutofillService
+import android.service.autofill.Dataset
+import android.service.autofill.FillCallback
+import android.service.autofill.FillRequest
+import android.service.autofill.FillResponse
+import android.service.autofill.SaveCallback
+import android.service.autofill.SaveRequest
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import com.skyd.raca.R
 import com.skyd.raca.db.dao.ArticleDao
+import com.skyd.raca.di.inject
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.respository.HomeRepository
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@AndroidEntryPoint
 class RacaAutofillService : AutofillService() {
-    @Inject
-    lateinit var articleDao: ArticleDao
+    private val articleDao: ArticleDao by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onFillRequest(

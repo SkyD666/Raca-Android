@@ -1,27 +1,21 @@
 package com.skyd.raca.ui.theme
 
-import android.app.WallpaperManager
+import android.app.UiModeManager
+import android.content.Context
 import android.os.Build
-import android.view.View
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import com.kyant.monet.LocalTonalPalettes
-import com.kyant.monet.PaletteStyle
-import com.kyant.monet.TonalPalettes
-import com.kyant.monet.TonalPalettes.Companion.toTonalPalettes
-import com.kyant.monet.dynamicColorScheme
-import com.skyd.raca.ext.activity
-import com.skyd.raca.ext.toColorOrNull
+import com.materialkolor.Contrast
+import com.materialkolor.dynamicColorScheme
+import com.materialkolor.rememberDynamicColorScheme
+import com.skyd.raca.di.get
 import com.skyd.raca.model.preference.theme.DarkModePreference
 import com.skyd.raca.model.preference.theme.ThemeNamePreference
-import com.skyd.raca.ui.local.LocalCustomPrimaryColor
 import com.skyd.raca.ui.local.LocalThemeName
 
 @Composable
@@ -30,7 +24,7 @@ fun RacaTheme(
     content: @Composable () -> Unit
 ) {
     RacaTheme(
-        darkTheme = DarkModePreference.isInDark(darkTheme),
+        darkTheme = DarkModePreference.inDark(darkTheme),
         content = content
     )
 }
@@ -38,76 +32,70 @@ fun RacaTheme(
 @Composable
 fun RacaTheme(
     darkTheme: Boolean,
-    wallpaperPalettes: Map<String, TonalPalettes> = extractAllTonalPalettes(),
+    colors: Map<String, ColorScheme> = extractAllColors(darkTheme),
     content: @Composable () -> Unit
 ) {
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            setSystemBarsColor(view, darkTheme)
-        }
-    }
+    val themeName = LocalThemeName.current
+    val isAmoled = false//AmoledDarkModePreference.current
 
-    val tonalPalettes = wallpaperPalettes.getOrElse(LocalThemeName.current) {
-        ThemeNamePreference.values[0].keyColor.toTonalPalettes(style = PaletteStyle.Content)
-    }
+    MaterialExpressiveTheme(
+        colorScheme = remember(themeName, darkTheme, isAmoled) {
+            colors.getOrElse(themeName) {
+                val (primary, secondary, tertiary) = ThemeNamePreference.toColors(
+                    ThemeNamePreference.basicValues[0]
+                )
+                dynamicColorScheme(
+                    seedColor = primary,
+                    isDark = darkTheme,
+                    isAmoled = isAmoled,
+                    secondary = secondary,
+                    tertiary = tertiary,
+                    contrastLevel = contrastLevel(),
+                )
+            }
+        },
+        typography = Typography,
+        content = content
+    )
+}
 
-    CompositionLocalProvider(
-        LocalTonalPalettes provides tonalPalettes,
-    ) {
-        MaterialTheme(
-            colorScheme = dynamicColorScheme(isLight = !darkTheme),
-            typography = Typography,
-            content = content
+fun contrastLevel(): Double {
+    var contrastLevel: Double = Contrast.Default.value
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        val uiModeManager =
+            get<Context>().getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        contrastLevel = uiModeManager.contrast.toDouble()
+    }
+    return contrastLevel
+}
+
+@Composable
+fun extractAllColors(darkTheme: Boolean): Map<String, ColorScheme> {
+    return extractDynamicColor(darkTheme) + extractColors(darkTheme)
+}
+
+@Composable
+fun extractColors(darkTheme: Boolean): Map<String, ColorScheme> {
+    return ThemeNamePreference.basicValues.associateWith {
+        val (primary, secondary, tertiary) = ThemeNamePreference.toColors(it)
+        rememberDynamicColorScheme(
+            primary = primary,
+            isDark = darkTheme,
+            isAmoled = false,//AmoledDarkModePreference.current,
+            secondary = secondary,
+            tertiary = tertiary,
+            contrastLevel = contrastLevel(),
+        )
+    }.toMutableMap()
+}
+
+@Composable
+fun extractDynamicColor(darkTheme: Boolean): Map<String, ColorScheme> = buildMap {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val context = LocalContext.current
+        put(
+            ThemeNamePreference.DYNAMIC,
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         )
     }
-}
-
-private fun setSystemBarsColor(view: View, darkMode: Boolean) {
-    val window = view.context.activity.window
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    window.apply {
-        statusBarColor = android.graphics.Color.TRANSPARENT
-        navigationBarColor = android.graphics.Color.TRANSPARENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            navigationBarDividerColor = android.graphics.Color.TRANSPARENT
-        }
-        // 状态栏和导航栏字体颜色
-        WindowInsetsControllerCompat(this, view).apply {
-            isAppearanceLightStatusBars = !darkMode
-            isAppearanceLightNavigationBars = !darkMode
-        }
-    }
-}
-
-@Composable
-fun extractAllTonalPalettes(): Map<String, TonalPalettes> {
-    return extractTonalPalettes() + extractTonalPalettesFromWallpaper()
-}
-
-@Composable
-fun extractTonalPalettes(): Map<String, TonalPalettes> {
-    return ThemeNamePreference.values.associate { it.name to it.keyColor.toTonalPalettes() }
-        .toMutableMap().also { map ->
-            val customPrimaryColor =
-                LocalCustomPrimaryColor.current.toColorOrNull() ?: Color.Transparent
-            map[ThemeNamePreference.CUSTOM_THEME_NAME] = customPrimaryColor.toTonalPalettes()
-        }
-}
-
-@Composable
-fun extractTonalPalettesFromWallpaper(): Map<String, TonalPalettes> {
-    val preset = mutableMapOf<String, TonalPalettes>()
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && !LocalView.current.isInEditMode) {
-        val colors = WallpaperManager.getInstance(LocalContext.current)
-            .getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
-        val primary = colors?.primaryColor?.toArgb()
-        val secondary = colors?.secondaryColor?.toArgb()
-        val tertiary = colors?.tertiaryColor?.toArgb()
-        if (primary != null) preset["WallpaperPrimary"] = Color(primary).toTonalPalettes()
-        if (secondary != null) preset["WallpaperSecondary"] = Color(secondary).toTonalPalettes()
-        if (tertiary != null) preset["WallpaperTertiary"] = Color(tertiary).toTonalPalettes()
-    }
-    return preset
 }

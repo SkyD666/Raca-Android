@@ -1,7 +1,20 @@
 package com.skyd.raca.ui.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -43,6 +56,7 @@ fun RacaIconButton(
                 interactionSource = interactionSource,
                 content = icon,
             )
+
             RacaIconButtonStyle.Filled -> FilledIconButton(
                 modifier = it,
                 onClick = onClick,
@@ -51,6 +65,7 @@ fun RacaIconButton(
                 interactionSource = interactionSource,
                 content = icon,
             )
+
             RacaIconButtonStyle.FilledTonal -> FilledTonalIconButton(
                 modifier = it,
                 onClick = onClick,
@@ -59,6 +74,7 @@ fun RacaIconButton(
                 interactionSource = interactionSource,
                 content = icon,
             )
+
             RacaIconButtonStyle.Outlined -> OutlinedIconButton(
                 modifier = it,
                 onClick = onClick,
@@ -71,13 +87,20 @@ fun RacaIconButton(
     }
 
     if (contentDescription.isNullOrEmpty()) {
-        iconButton(modifier = modifier)
+        iconButton(modifier)
     } else {
-        PlainTooltipBox(
-            modifier = modifier,
-            tooltip = { Text(contentDescription) }
-        ) {
-            iconButton(modifier = Modifier.tooltipAnchor())
+        Box(modifier = modifier) {  // It is necessary to use Modifier.align
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip {
+                        Text(contentDescription)
+                    }
+                },
+                state = rememberTooltipState()
+            ) {
+                iconButton(Modifier)
+            }
         }
     }
 }

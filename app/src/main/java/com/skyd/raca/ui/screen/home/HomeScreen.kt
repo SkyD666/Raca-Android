@@ -16,25 +16,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ManageSearch
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ManageSearch
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -53,6 +57,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -63,10 +68,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
@@ -74,27 +79,29 @@ import com.skyd.raca.base.LoadUiIntent
 import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.ext.screenIsLand
 import com.skyd.raca.model.bean.ArticleWithTags
-import com.skyd.raca.model.bean.ArticleWithTags1
 import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.model.preference.QueryPreference
 import com.skyd.raca.ui.component.AnimatedPlaceholder
+import com.skyd.raca.ui.component.RacaCard
 import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
-import com.skyd.raca.ui.component.lazyverticalgrid.RacaLazyVerticalGrid
-import com.skyd.raca.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.raca.ui.component.lazyverticalgrid.adapter.proxy.ArticleWithTags1Proxy
 import com.skyd.raca.ui.local.LocalCurrentArticleUuid
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.local.LocalQuery
 import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.searchconfig.SEARCH_CONFIG_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.searchconfig.SearchConfigRoute
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
 
 private var openDeleteWarningDialog by mutableStateOf(false)
 
+@Serializable
+data object HomeRoute
+
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -206,7 +213,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 private fun RacaSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = koinViewModel()
 ) {
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
@@ -247,13 +254,13 @@ private fun RacaSearchBar(
                 leadingIcon = {
                     if (active) {
                         RacaIconButton(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(id = R.string.home_screen_close_search),
                             onClick = { active = false }
                         )
                     } else {
                         RacaIconButton(
-                            imageVector = Icons.Default.Menu,
+                            imageVector = Icons.Outlined.Menu,
                             contentDescription = stringResource(id = R.string.home_screen_open_menu),
                             onClick = { menuExpanded = true }
                         )
@@ -266,7 +273,7 @@ private fun RacaSearchBar(
                         }
                     } else {
                         RacaIconButton(
-                            imageVector = Icons.Default.Add,
+                            imageVector = Icons.Outlined.Add,
                             contentDescription = stringResource(R.string.home_screen_add),
                             onClick = { navController.navigate(ADD_SCREEN_ROUTE) }
                         )
@@ -303,7 +310,7 @@ private fun TrailingIcon(
 ) {
     if (showClearButton) {
         RacaIconButton(
-            imageVector = Icons.Default.Clear,
+            imageVector = Icons.Outlined.Clear,
             contentDescription = stringResource(R.string.home_screen_clear_search_text),
             onClick = { onClick?.invoke() }
         )
@@ -313,8 +320,8 @@ private fun TrailingIcon(
 @Composable
 private fun SearchResultList(
     state: LazyGridState,
-    dataList: List<Any>,
-    onItemClickListener: ((data: ArticleWithTags1) -> Unit)? = null
+    dataList: List<ArticleWithTags>,
+    onItemClickListener: ((data: ArticleWithTags) -> Unit)? = null
 ) {
     Box {
         if (dataList.isEmpty()) {
@@ -329,20 +336,19 @@ private fun SearchResultList(
                 tip = stringResource(id = R.string.home_screen_no_search_result_tip)
             )
         } else {
-            val adapter = remember {
-                LazyGridAdapter(
-                    mutableListOf(
-                        ArticleWithTags1Proxy(onClickListener = onItemClickListener)
-                    )
-                )
-            }
-            RacaLazyVerticalGrid(
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(300.dp),
                 modifier = Modifier.fillMaxSize(),
                 state = state,
-                dataList = dataList,
-                adapter = adapter,
                 contentPadding = PaddingValues(vertical = 7.dp)
-            )
+            ) {
+                items(dataList) { item ->
+                    ArticleWithTagsItem(
+                        data = item,
+                        onClickListener = onItemClickListener
+                    )
+                }
+            }
         }
 
         Badge(
@@ -356,10 +362,51 @@ private fun SearchResultList(
 }
 
 @Composable
+private fun ArticleWithTagsItem(
+    modifier: Modifier = Modifier,
+    data: ArticleWithTags,
+    onClickListener: ((data: ArticleWithTags) -> Unit)? = null
+) {
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+
+    RacaCard(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(Color.Transparent),
+        onLongClick = { clipboardManager.setText(AnnotatedString(data.article.article)) },
+        onClick = { onClickListener?.invoke(data) }
+    ) {
+        if (data.article.title.isNotBlank()) {
+            Text(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .padding(horizontal = 10.dp)
+                    .basicMarquee(iterations = Int.MAX_VALUE),
+                text = data.article.title,
+                style = MaterialTheme.typography.titleLarge,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        }
+        Text(
+            modifier = Modifier
+                .padding(
+                    top = if (data.article.title.isNotBlank()) 6.dp else 12.dp,
+                    bottom = 12.dp
+                )
+                .padding(horizontal = 10.dp),
+            text = data.article.article,
+            style = MaterialTheme.typography.bodyMedium,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 3
+        )
+    }
+}
+
+@Composable
 private fun HomeMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = koinViewModel()
 ) {
     val navController = LocalNavController.current
     val currentArticleUuid = LocalCurrentArticleUuid.current
@@ -389,12 +436,7 @@ private fun HomeMenu(
                 )
                 onDismissRequest()
             },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Replay,
-                    contentDescription = null
-                )
-            }
+            leadingIcon = { Icon(Icons.Outlined.Replay, contentDescription = null) }
         )
         DropdownMenuItem(
             enabled = editMenuItemEnabled,
@@ -403,12 +445,7 @@ private fun HomeMenu(
                 navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
                 onDismissRequest()
             },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Edit,
-                    contentDescription = null
-                )
-            }
+            leadingIcon = { Icon(Icons.Outlined.Edit, contentDescription = null) }
         )
         DropdownMenuItem(
             enabled = deleteMenuItemEnabled,
@@ -417,23 +454,18 @@ private fun HomeMenu(
                 onDismissRequest()
                 openDeleteWarningDialog = true
             },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = null
-                )
-            }
+            leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) }
         )
-        Divider()
+        HorizontalDivider()
         DropdownMenuItem(
             text = { Text(stringResource(R.string.search_config_screen_name)) },
             onClick = {
-                navController.navigate(SEARCH_CONFIG_SCREEN_ROUTE)
+                navController.navigate(SearchConfigRoute)
                 onDismissRequest()
             },
             leadingIcon = {
                 Icon(
-                    Icons.Default.ManageSearch,
+                    Icons.AutoMirrored.Outlined.ManageSearch,
                     contentDescription = null
                 )
             }

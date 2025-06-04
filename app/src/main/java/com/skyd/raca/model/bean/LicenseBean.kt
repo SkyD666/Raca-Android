@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 class LicenseBean(
     val name: String,
     val license: String,
-    val url: String
+    val link: String
 ) : BaseBean

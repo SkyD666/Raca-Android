@@ -9,6 +9,5 @@
 .cxx
 local.properties
 /key.jks
-/gradle
-/secret.gradle
+/secret.gradle.kts
 /app/schemas

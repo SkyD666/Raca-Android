@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.skyd.raca.R
 import com.skyd.raca.appContext
+import com.skyd.raca.di.get
 import com.skyd.raca.ext.dataStore
 import com.skyd.raca.ext.put
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +40,7 @@ object DarkModePreference {
 
     @Composable
     @ReadOnlyComposable
-    fun isInDark(value: Int) = when (value) {
+    fun inDark(value: Int) = when (value) {
         AppCompatDelegate.MODE_NIGHT_YES -> true
         AppCompatDelegate.MODE_NIGHT_NO -> false
         else -> isSystemInDarkTheme()
@@ -54,7 +55,7 @@ object DarkModePreference {
         }
     )
 
-    fun put(context: Context, scope: CoroutineScope, value: Int) {
+    fun put(scope: CoroutineScope, value: Int) {
         if (value != AppCompatDelegate.MODE_NIGHT_YES &&
             value != AppCompatDelegate.MODE_NIGHT_NO &&
             value != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -62,7 +63,7 @@ object DarkModePreference {
             throw IllegalArgumentException("darkMode value invalid!!!")
         }
         scope.launch(Dispatchers.IO) {
-            context.dataStore.put(key, value)
+            get<Context>().dataStore.put(key, value)
             withContext(Dispatchers.Main) {
                 AppCompatDelegate.setDefaultNightMode(value)
             }

@@ -6,27 +6,42 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.*
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaIconButton
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
-const val EXPORT_SCREEN_ROUTE = "exportScreen"
+@Serializable
+data object ExportRoute
 
 @Composable
-fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
+fun ExportScreen(viewModel: ExportDataViewModel = koinViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -37,13 +52,13 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 title = { Text(text = stringResource(R.string.export_screen_name)) },
                 scrollBehavior = scrollBehavior,
                 actions = {
                     RacaIconButton(
                         enabled = dirUri != null,
-                        imageVector = Icons.Default.Done,
+                        imageVector = Icons.Outlined.Done,
                         contentDescription = stringResource(R.string.export_screen_start_export),
                         onClick = {
                             val a = dirUri ?: return@RacaIconButton
@@ -74,7 +89,7 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Folder),
+                    icon = rememberVectorPainter(image = Icons.Outlined.Folder),
                     text = stringResource(id = R.string.export_screen_select_dir),
                     descriptionText = dirUri?.path,
                     onClick = {
@@ -97,6 +112,7 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                         )
                     }
                 }
+
                 is LoadUiIntent.ShowMainView -> {}
                 is LoadUiIntent.Loading -> {
                     openWaitingDialog = loadUiIntent.isShow
@@ -116,6 +132,7 @@ fun ExportScreen(viewModel: ExportDataViewModel = hiltViewModel()) {
                         )
                     }
                 }
+
                 null -> {}
             }
         }

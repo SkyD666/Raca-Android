@@ -12,6 +12,15 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+inline fun Modifier.thenIf(condition: Boolean, block: Modifier.() -> Modifier): Modifier {
+    contract {
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    return if (condition) block() else this
+}
 
 fun Modifier.simpleVerticalScrollbar(
     state: LazyGridState,

@@ -15,8 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
@@ -44,8 +44,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.navDeepLink
+import androidx.navigation.toRoute
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.config.refreshArticleData
@@ -55,16 +57,41 @@ import com.skyd.raca.ext.popBackStackWithLifecycle
 import com.skyd.raca.model.bean.ArticleBean
 import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
+import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaTopBar
-import com.skyd.raca.ui.component.TopBarIcon
 import com.skyd.raca.ui.component.dialog.RacaDialog
 import com.skyd.raca.ui.local.LocalNavController
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
 const val ADD_SCREEN_ROUTE = "addScreen"
 
+@Serializable
+data class AddRoute(
+    val initArticleUuid: String?,
+    val article: String?,
+) {
+    companion object {
+        val deepLinks = listOf(navDeepLink { mimeType = "text/*" })
+
+        @Composable
+        fun AddLauncher(entry: NavBackStackEntry) {
+            val entry = entry.toRoute<AddRoute>()
+            AddScreen(
+                initArticleUuid = entry.initArticleUuid,
+                article = entry.article,
+            )
+        }
+    }
+}
+
 @Composable
-fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel = hiltViewModel()) {
+fun AddScreen(
+    initArticleUuid: String?,
+    article: String?,
+    viewModel: AddViewModel = koinViewModel(),
+) {
     var openDialog by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -77,12 +104,12 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
     val tags = remember { mutableStateListOf<TagBean>() }
     var articleUuid by remember { mutableStateOf(initArticleUuid) }
 
-    if (initArticleUuid.isNotBlank()) {
+    if (!initArticleUuid.isNullOrBlank()) {
         LaunchedEffect(Unit) {
             viewModel.sendUiIntent(AddIntent.GetArticleWithTags(initArticleUuid))
         }
     } else {
-        if (article.isNotBlank()) {
+        if (!article.isNullOrBlank()) {
             articleText = article
         }
     }
@@ -98,14 +125,14 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                 title = {
                     Text(
                         text = stringResource(
-                            if (articleUuid.isBlank()) R.string.add_screen_name
+                            if (articleUuid.isNullOrBlank()) R.string.add_screen_name
                             else R.string.add_screen_name_edit
                         )
                     )
                 },
                 actions = {
-                    TopBarIcon(
-                        imageVector = Icons.Default.Done,
+                    RacaIconButton(
+                        imageVector = Icons.Outlined.Done,
                         contentDescription = stringResource(R.string.add_screen_add),
                         onClick = {
                             if (articleText.isBlank()) {
@@ -120,7 +147,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                                 focusManager.clearFocus()
                                 val articleWithTags = ArticleWithTags(
                                     article = ArticleBean(title = titleText, article = articleText)
-                                        .apply { uuid = articleUuid },
+                                        .apply { articleUuid?.let { uuid = it } },
                                     tags = tags.distinct().toList()
                                 )
                                 viewModel.sendUiIntent(
@@ -191,7 +218,7 @@ fun AddScreen(initArticleUuid: String, article: String, viewModel: AddViewModel 
                                 trailingIcon = {
                                     Icon(
                                         modifier = Modifier.size(AssistChipDefaults.IconSize),
-                                        imageVector = Icons.Default.Close,
+                                        imageVector = Icons.Outlined.Close,
                                         contentDescription = null
                                     )
                                 }

@@ -14,24 +14,21 @@ import com.skyd.raca.model.bean.TAG_TABLE_NAME
 import com.skyd.raca.model.bean.TagBean
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class ExportDataRepository @Inject constructor(
+class ExportDataRepository(
     private val articleDao: ArticleDao,
     private val tagDao: TagDao,
 ) : BaseRepository() {
-    suspend fun requestExportData(dirUri: Uri): Flow<BaseData<Long>> {
-        return flow {
-            val startTime = System.currentTimeMillis()
-            val articleList = articleDao.getArticleList()
-            val tagList = tagDao.getTagList()
-            val (success, msg) = export(dirUri, articleList, tagList)
-            emitBaseData(BaseData<Long>().apply {
-                code = if (success) 0 else -1
-                data = System.currentTimeMillis() - startTime
-                this.msg = msg
-            })
-        }
+    fun requestExportData(dirUri: Uri): Flow<BaseData<Long>> = flow {
+        val startTime = System.currentTimeMillis()
+        val articleList = articleDao.getArticleList()
+        val tagList = tagDao.getTagList()
+        val (success, msg) = export(dirUri, articleList, tagList)
+        emitBaseData(BaseData<Long>().apply {
+            code = if (success) 0 else -1
+            data = System.currentTimeMillis() - startTime
+            this.msg = msg
+        })
     }
 
     private fun export(

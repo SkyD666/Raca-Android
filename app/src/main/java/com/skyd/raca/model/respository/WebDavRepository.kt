@@ -4,187 +4,177 @@ import com.skyd.raca.appContext
 import com.skyd.raca.base.BaseData
 import com.skyd.raca.base.BaseRepository
 import com.skyd.raca.db.dao.ArticleDao
-import com.skyd.raca.model.bean.*
+import com.skyd.raca.model.bean.ArticleWithTags
+import com.skyd.raca.model.bean.BackupInfo
+import com.skyd.raca.model.bean.WebDavInfo
+import com.skyd.raca.model.bean.WebDavResultInfo
+import com.skyd.raca.model.bean.WebDavWaitingInfo
 import com.skyd.raca.util.md5
 import com.thegrizzlylabs.sardineandroid.Sardine
 import com.thegrizzlylabs.sardineandroid.impl.OkHttpSardine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
-import javax.inject.Inject
 
 
-class WebDavRepository @Inject constructor(private val articleDao: ArticleDao) : BaseRepository() {
+class WebDavRepository(private val articleDao: ArticleDao) : BaseRepository() {
     companion object {
         const val APP_DIR = "Raca/"
         const val BACKUP_DIR = "Backup/"
         const val BACKUP_INFO_FILE = "BackupInfo"
     }
 
-    suspend fun requestRemoteRecycleBin(
+    fun requestRemoteRecycleBin(
         website: String,
         username: String,
         password: String
-    ): Flow<BaseData<List<BackupInfo>>> {
-        return flow {
-            val sardine: Sardine = initWebDav(website, username, password)
-            val backupInfoMap: List<BackupInfo> = getMd5UuidKeyBackupInfoMap(sardine, website)
-                .filter { it.value.isDeleted }.values.toList()
-            emitBaseData(BaseData<List<BackupInfo>>().apply {
-                code = 0
-                data = backupInfoMap
-            })
-        }
+    ): Flow<BaseData<List<BackupInfo>>> = flow {
+        val sardine: Sardine = initWebDav(website, username, password)
+        val backupInfoMap: List<BackupInfo> = getMd5UuidKeyBackupInfoMap(sardine, website)
+            .filter { it.value.isDeleted }.values.toList()
+        emitBaseData(BaseData<List<BackupInfo>>().apply {
+            code = 0
+            data = backupInfoMap
+        })
     }
 
-    suspend fun requestRestoreFromRemoteRecycleBin(
+    fun requestRestoreFromRemoteRecycleBin(
         website: String,
         username: String,
         password: String,
         uuid: String
-    ): Flow<BaseData<Unit>> {
-        return flow {
-            val sardine: Sardine = initWebDav(website, username, password)
-            val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
-                .associateBy { it.uuid }.toMutableMap()
-            backupInfoMap[uuid]?.let {
-                backupInfoMap[uuid] = it.copy(isDeleted = false)
-            }
-            updateBackupInfo(sardine, website, backupInfoMap.values.toList())
-            emitBaseData(BaseData<Unit>().apply {
-                code = 0
-                data = Unit
-            })
+    ): Flow<BaseData<Unit>> = flow {
+        val sardine: Sardine = initWebDav(website, username, password)
+        val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
+            .associateBy { it.uuid }.toMutableMap()
+        backupInfoMap[uuid]?.let {
+            backupInfoMap[uuid] = it.copy(isDeleted = false)
         }
+        updateBackupInfo(sardine, website, backupInfoMap.values.toList())
+        emitBaseData(BaseData<Unit>().apply {
+            code = 0
+            data = Unit
+        })
     }
 
-    suspend fun requestDeleteFromRemoteRecycleBin(
+    fun requestDeleteFromRemoteRecycleBin(
         website: String,
         username: String,
         password: String,
         uuid: String
-    ): Flow<BaseData<Unit>> {
-        return flow {
-            val sardine: Sardine = initWebDav(website, username, password)
-            val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
-                .associateBy { it.uuid }.toMutableMap()
-            backupInfoMap.remove(uuid)
-            updateBackupInfo(sardine, website, backupInfoMap.values.toList())
-            sardine.delete(website + APP_DIR + BACKUP_DIR + uuid)
-            emitBaseData(BaseData<Unit>().apply {
-                code = 0
-                data = Unit
-            })
-        }
+    ): Flow<BaseData<Unit>> = flow {
+        val sardine: Sardine = initWebDav(website, username, password)
+        val backupInfoMap = getMd5UuidKeyBackupInfoMap(sardine, website).values
+            .associateBy { it.uuid }.toMutableMap()
+        backupInfoMap.remove(uuid)
+        updateBackupInfo(sardine, website, backupInfoMap.values.toList())
+        sardine.delete(website + APP_DIR + BACKUP_DIR + uuid)
+        emitBaseData(BaseData<Unit>().apply {
+            code = 0
+            data = Unit
+        })
     }
 
-    suspend fun requestClearRemoteRecycleBin(
+    fun requestClearRemoteRecycleBin(
         website: String,
         username: String,
         password: String,
-    ): Flow<BaseData<Unit>> {
-        return flow {
-            val sardine: Sardine = initWebDav(website, username, password)
-            val (willBeDeletedMap, othersMap) = getMd5UuidKeyBackupInfoMap(sardine, website).run {
-                filter { it.value.isDeleted } to filter { !it.value.isDeleted }
-            }
-            updateBackupInfo(sardine, website, othersMap.values.toList())
-            willBeDeletedMap.forEach { (_, u) ->
-                sardine.delete(website + APP_DIR + BACKUP_DIR + u.uuid)
-            }
-            emitBaseData(BaseData<Unit>().apply {
-                code = 0
-                data = Unit
-            })
+    ): Flow<BaseData<Unit>> = flow {
+        val sardine: Sardine = initWebDav(website, username, password)
+        val (willBeDeletedMap, othersMap) = getMd5UuidKeyBackupInfoMap(sardine, website).run {
+            filter { it.value.isDeleted } to filter { !it.value.isDeleted }
         }
+        updateBackupInfo(sardine, website, othersMap.values.toList())
+        willBeDeletedMap.forEach { (_, u) ->
+            sardine.delete(website + APP_DIR + BACKUP_DIR + u.uuid)
+        }
+        emitBaseData(BaseData<Unit>().apply {
+            code = 0
+            data = Unit
+        })
     }
 
-    suspend fun requestDownload(
+    fun requestDownload(
         website: String,
         username: String,
         password: String
-    ): Flow<BaseData<WebDavInfo>> {
-        return flow {
-            val startTime = System.currentTimeMillis()
-            val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
-            val sardine: Sardine = initWebDav(website, username, password)
-            val backupInfoMap: MutableMap<String, BackupInfo> =
-                getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
-            val waitToAddList = mutableListOf<ArticleWithTags>()
-            val (excludedMap, willBeDeletedList) =
-                excludeRemoteUnchanged(backupInfoMap, allArticleWithTagsList)
-            val totalCount = excludedMap.size + willBeDeletedList.size
-            var currentCount = 0
-            willBeDeletedList.forEach {
-                articleDao.deleteArticleWithTags(articleUuid = it)
-                emitProgressData(current = ++currentCount, total = totalCount)
-            }
-            excludedMap.forEach { entry ->
-                sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid).use { inputStream ->
-                    waitToAddList += Json.decodeFromStream<ArticleWithTags>(inputStream)
-                }
-                emitProgressData(current = ++currentCount, total = totalCount)
-            }
-            articleDao.webDavImportData(waitToAddList)
-            emitBaseData(BaseData<WebDavInfo>().apply {
-                code = 0
-                data = WebDavResultInfo(
-                    time = System.currentTimeMillis() - startTime,
-                    count = totalCount
-                )
-            })
+    ): Flow<BaseData<WebDavInfo>> = flow {
+        val startTime = System.currentTimeMillis()
+        val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
+        val sardine: Sardine = initWebDav(website, username, password)
+        val backupInfoMap: MutableMap<String, BackupInfo> =
+            getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
+        val waitToAddList = mutableListOf<ArticleWithTags>()
+        val (excludedMap, willBeDeletedList) =
+            excludeRemoteUnchanged(backupInfoMap, allArticleWithTagsList)
+        val totalCount = excludedMap.size + willBeDeletedList.size
+        var currentCount = 0
+        willBeDeletedList.forEach {
+            articleDao.deleteArticleWithTags(articleUuid = it)
+            emitProgressData(current = ++currentCount, total = totalCount)
         }
-    }
-
-    suspend fun requestUpload(
-        website: String,
-        username: String,
-        password: String
-    ): Flow<BaseData<WebDavInfo>> {
-        return flow {
-            val startTime = System.currentTimeMillis()
-            val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
-            val sardine: Sardine = initWebDav(website, username, password)
-            var backupInfoMap: MutableMap<String, BackupInfo> =
-                getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
-            val (excludedList, willBeDeletedMap) = excludeLocalUnchanged(
-                backupInfoMap,      // 这里需要md5+uuid map
-                allArticleWithTagsList
+        excludedMap.forEach { entry ->
+            sardine.get(website + APP_DIR + BACKUP_DIR + entry.value.uuid).use { inputStream ->
+                waitToAddList += Json.decodeFromStream<ArticleWithTags>(inputStream)
+            }
+            emitProgressData(current = ++currentCount, total = totalCount)
+        }
+        articleDao.webDavImportData(waitToAddList)
+        emitBaseData(BaseData<WebDavInfo>().apply {
+            code = 0
+            data = WebDavResultInfo(
+                time = System.currentTimeMillis() - startTime,
+                count = totalCount
             )
-            backupInfoMap = backupInfoMap.values.associateBy { it.uuid }.toMutableMap()
-            val totalCount = excludedList.size + willBeDeletedMap.size
-            var currentCount = 0
-            willBeDeletedMap.forEach { (_, u) ->
-                backupInfoMap[/*u.contentMd5 + */u.uuid]?.isDeleted = true
-                emitProgressData(current = ++currentCount, total = totalCount)
-            }
-            excludedList.forEach {
-                val file = toFile(it)
-                sardine.put(website + APP_DIR + BACKUP_DIR + file.name, file, "text/*")
-                file.deleteRecursively()
-                val md5 = it.md5()
-                val uuid = it.article.uuid
-                backupInfoMap[uuid] = BackupInfo(
-                    uuid = uuid,
-                    contentMd5 = md5,
-                    modifiedTime = System.currentTimeMillis(),
-                    isDeleted = false
-                )
-                emitProgressData(current = ++currentCount, total = totalCount)
-            }
-            updateBackupInfo(sardine, website, backupInfoMap.values.toList())
-            emitBaseData(BaseData<WebDavInfo>().apply {
-                code = 0
-                data = WebDavResultInfo(
-                    time = System.currentTimeMillis() - startTime,
-                    count = excludedList.size + willBeDeletedMap.size
-                )
-            })
+        })
+    }
+
+    fun requestUpload(
+        website: String,
+        username: String,
+        password: String
+    ): Flow<BaseData<WebDavInfo>> = flow {
+        val startTime = System.currentTimeMillis()
+        val allArticleWithTagsList = articleDao.getAllArticleWithTagsList()
+        val sardine: Sardine = initWebDav(website, username, password)
+        var backupInfoMap: MutableMap<String, BackupInfo> =
+            getMd5UuidKeyBackupInfoMap(sardine, website).toMutableMap()
+        val (excludedList, willBeDeletedMap) = excludeLocalUnchanged(
+            backupInfoMap,      // 这里需要md5+uuid map
+            allArticleWithTagsList
+        )
+        backupInfoMap = backupInfoMap.values.associateBy { it.uuid }.toMutableMap()
+        val totalCount = excludedList.size + willBeDeletedMap.size
+        var currentCount = 0
+        willBeDeletedMap.forEach { (_, u) ->
+            backupInfoMap[/*u.contentMd5 + */u.uuid]?.isDeleted = true
+            emitProgressData(current = ++currentCount, total = totalCount)
         }
+        excludedList.forEach {
+            val file = toFile(it)
+            sardine.put(website + APP_DIR + BACKUP_DIR + file.name, file, "text/*")
+            file.deleteRecursively()
+            val md5 = it.md5()
+            val uuid = it.article.uuid
+            backupInfoMap[uuid] = BackupInfo(
+                uuid = uuid,
+                contentMd5 = md5,
+                modifiedTime = System.currentTimeMillis(),
+                isDeleted = false
+            )
+            emitProgressData(current = ++currentCount, total = totalCount)
+        }
+        updateBackupInfo(sardine, website, backupInfoMap.values.toList())
+        emitBaseData(BaseData<WebDavInfo>().apply {
+            code = 0
+            data = WebDavResultInfo(
+                time = System.currentTimeMillis() - startTime,
+                count = excludedList.size + willBeDeletedMap.size
+            )
+        })
     }
 
     private fun excludeRemoteUnchanged(

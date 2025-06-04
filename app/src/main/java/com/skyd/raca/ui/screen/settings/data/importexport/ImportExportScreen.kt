@@ -3,9 +3,9 @@ package com.skyd.raca.ui.screen.settings.data.importexport
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudSync
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.outlined.CloudSync
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -20,11 +20,13 @@ import com.skyd.raca.ui.component.CategorySettingsItem
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.local.LocalNavController
-import com.skyd.raca.ui.screen.settings.data.importexport.cloud.webdav.WEBDAV_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.data.importexport.file.exportdata.EXPORT_SCREEN_ROUTE
-import com.skyd.raca.ui.screen.settings.data.importexport.file.importdata.IMPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.importexport.cloud.webdav.WebDavRoute
+import com.skyd.raca.ui.screen.settings.data.importexport.file.exportdata.ExportRoute
+import com.skyd.raca.ui.screen.settings.data.importexport.file.importdata.ImportRoute
+import kotlinx.serialization.Serializable
 
-const val IMPORT_EXPORT_SCREEN_ROUTE = "importExportScreen"
+@Serializable
+data object ImportExportRoute
 
 @Composable
 fun ImportExportScreen() {
@@ -34,7 +36,7 @@ fun ImportExportScreen() {
     Scaffold(
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.import_export_screen_name)) },
             )
@@ -52,16 +54,16 @@ fun ImportExportScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.FileDownload),
+                    icon = rememberVectorPainter(image = Icons.Outlined.FileDownload),
                     text = stringResource(id = R.string.import_screen_name),
                     descriptionText = stringResource(id = R.string.import_export_screen_import_description),
-                    onClick = { navController.navigate(IMPORT_SCREEN_ROUTE) }
+                    onClick = { navController.navigate(ImportRoute) }
                 )
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.FileUpload),
+                    icon = rememberVectorPainter(image = Icons.Outlined.FileUpload),
                     text = stringResource(id = R.string.export_screen_name),
                     descriptionText = stringResource(id = R.string.import_export_screen_export_description),
-                    onClick = { navController.navigate(EXPORT_SCREEN_ROUTE) }
+                    onClick = { navController.navigate(ExportRoute) }
                 )
             }
             item {
@@ -71,10 +73,10 @@ fun ImportExportScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.CloudSync),
+                    icon = rememberVectorPainter(image = Icons.Outlined.CloudSync),
                     text = stringResource(id = R.string.webdav_screen_name),
                     descriptionText = stringResource(id = R.string.import_export_screen_webdav_description),
-                    onClick = { navController.navigate(WEBDAV_SCREEN_ROUTE) }
+                    onClick = { navController.navigate(WebDavRoute) }
                 )
             }
         }

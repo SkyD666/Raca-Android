@@ -4,15 +4,12 @@ import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUIChange
 import com.skyd.raca.config.refreshArticleData
 import com.skyd.raca.model.respository.WebDavRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
-import javax.inject.Inject
 
-@HiltViewModel
-class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavRepository) :
+class WebDavViewModel(private var webDavRepo: WebDavRepository) :
     BaseViewModel<WebDavState, WebDavEvent, WebDavIntent>() {
     override fun initUiState(): WebDavState {
         return WebDavState(
@@ -53,7 +50,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 .mapToUIChange { data ->
                     copy(
                         getRemoteRecycleBinResultUiState =
-                        GetRemoteRecycleBinResultUiState.Success(data)
+                            GetRemoteRecycleBinResultUiState.Success(data)
                     )
                 }
                 .defaultFinally()
@@ -72,7 +69,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
             }.mapToUIChange { data ->
                 copy(
                     getRemoteRecycleBinResultUiState =
-                    GetRemoteRecycleBinResultUiState.Success(data)
+                        GetRemoteRecycleBinResultUiState.Success(data)
                 )
             }.defaultFinally().onCompletion {
                 refreshArticleData.tryEmit(Unit)
@@ -92,7 +89,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
             }.mapToUIChange { data ->
                 copy(
                     getRemoteRecycleBinResultUiState =
-                    GetRemoteRecycleBinResultUiState.Success(data)
+                        GetRemoteRecycleBinResultUiState.Success(data)
                 )
             }.defaultFinally()
         },
@@ -107,7 +104,7 @@ class WebDavViewModel @Inject constructor(private var webDavRepo: WebDavReposito
                 .mapToUIChange { data ->
                     copy(
                         getRemoteRecycleBinResultUiState =
-                        GetRemoteRecycleBinResultUiState.Success(data)
+                            GetRemoteRecycleBinResultUiState.Success(data)
                     )
                 }
                 .defaultFinally()

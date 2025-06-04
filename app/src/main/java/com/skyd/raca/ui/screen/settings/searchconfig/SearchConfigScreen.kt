@@ -1,14 +1,30 @@
 package com.skyd.raca.ui.screen.settings.searchconfig
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Domain
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.JoinInner
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Domain
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.JoinInner
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -17,7 +33,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.base.LoadUiIntent
@@ -25,15 +40,22 @@ import com.skyd.raca.config.allSearchDomain
 import com.skyd.raca.model.bean.SearchDomainBean
 import com.skyd.raca.model.preference.IntersectSearchBySpacePreference
 import com.skyd.raca.model.preference.UseRegexSearchPreference
-import com.skyd.raca.ui.component.*
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
+import com.skyd.raca.ui.component.SwitchSettingsItem
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalIntersectSearchBySpace
 import com.skyd.raca.ui.local.LocalUseRegexSearch
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
-const val SEARCH_CONFIG_SCREEN_ROUTE = "searchConfigScreen"
+@Serializable
+data object SearchConfigRoute
 
 @Composable
-fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
+fun SearchConfigScreen(viewModel: SearchConfigViewModel = koinViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -49,7 +71,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
     Scaffold(
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.search_config_screen_name)) },
             )
@@ -70,7 +92,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
             }
             item {
                 SwitchSettingsItem(
-                    icon = Icons.Default.Code,
+                    icon = Icons.Outlined.Code,
                     text = stringResource(id = R.string.search_config_screen_use_regex),
                     description = stringResource(id = R.string.search_config_screen_use_regex_description),
                     checked = useRegexSearch,
@@ -81,7 +103,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
             }
             item {
                 SwitchSettingsItem(
-                    icon = Icons.Default.JoinInner,
+                    icon = Icons.Outlined.JoinInner,
                     text = stringResource(id = R.string.search_config_screen_intersect_search_by_space),
                     description = stringResource(id = R.string.search_config_screen_intersect_search_by_space_description),
                     checked = intersectSearchBySpace,
@@ -117,6 +139,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
                 is LoadUiIntent.Loading -> {
                     openWaitingDialog = it.isShow
                 }
+
                 is LoadUiIntent.ShowMainView -> {}
             }
         }
@@ -126,6 +149,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = hiltViewModel()) {
                     searchDomainMap.clear()
                     searchDomainMap.putAll(searchDomainResultUiState.searchDomainMap)
                 }
+
                 SearchDomainResultUiState.Init -> {}
             }
         }
@@ -139,7 +163,7 @@ fun SearchDomainItem(
     table: Pair<String, String>,
     searchDomain: Map<String, Boolean>,
     onSetSearchDomain: (SearchDomainBean) -> Unit,
-    icon: Painter = rememberVectorPainter(image = Icons.Default.Domain),
+    icon: Painter = rememberVectorPainter(image = Icons.Outlined.Domain),
 ) {
     val (tableName, tableDisplayName) = table
     BaseSettingsItem(
@@ -172,7 +196,7 @@ fun SearchDomainItem(
                         leadingIcon = if (selected[columnIndex] == true) {
                             {
                                 Icon(
-                                    imageVector = Icons.Default.Done,
+                                    imageVector = Icons.Outlined.Done,
                                     contentDescription = null,
                                     modifier = Modifier.size(FilterChipDefaults.IconSize)
                                 )

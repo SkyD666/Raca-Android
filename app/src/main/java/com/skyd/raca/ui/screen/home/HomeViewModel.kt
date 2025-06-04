@@ -9,14 +9,11 @@ import com.skyd.raca.ext.dataStore
 import com.skyd.raca.ext.get
 import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.model.respository.HomeRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(private var homeRepo: HomeRepository) :
+class HomeViewModel(private var homeRepo: HomeRepository) :
     BaseViewModel<HomeState, IUiEvent, HomeIntent>() {
     override fun initUiState(): HomeState {
         return HomeState(

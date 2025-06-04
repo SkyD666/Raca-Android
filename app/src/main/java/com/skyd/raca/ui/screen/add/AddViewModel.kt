@@ -6,13 +6,10 @@ import com.skyd.raca.base.BaseViewModel
 import com.skyd.raca.base.IUIChange
 import com.skyd.raca.model.preference.CurrentArticleUuidPreference
 import com.skyd.raca.model.respository.AddRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge
-import javax.inject.Inject
 
-@HiltViewModel
-class AddViewModel @Inject constructor(private var addRepository: AddRepository) :
+class AddViewModel(private var addRepository: AddRepository) :
     BaseViewModel<AddState, AddEvent, AddIntent>() {
     override fun initUiState(): AddState {
         return AddState(

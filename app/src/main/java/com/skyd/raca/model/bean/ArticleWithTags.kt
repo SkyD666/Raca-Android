@@ -13,5 +13,3 @@ data class ArticleWithTags(
     )
     val tags: List<TagBean>
 )
-
-typealias ArticleWithTags1 = ArticleWithTags

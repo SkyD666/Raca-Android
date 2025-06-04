@@ -16,57 +16,38 @@ import com.skyd.raca.model.bean.ArticleWithTags
 import com.skyd.raca.model.bean.TagBean
 import com.skyd.raca.model.preference.IntersectSearchBySpacePreference
 import com.skyd.raca.model.preference.UseRegexSearchPreference
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class HomeRepository @Inject constructor(private val articleDao: ArticleDao) : BaseRepository() {
-    suspend fun requestArticleWithTagsList(keyword: String): Flow<BaseData<List<ArticleWithTags>>> {
-        return flow {
-            emitBaseData(BaseData<List<ArticleWithTags>>().apply {
-                code = 0
-                data = articleDao.getArticleWithTagsList(genSql(keyword))
-            })
-        }
+class HomeRepository(private val articleDao: ArticleDao) : BaseRepository() {
+    fun requestArticleWithTagsList(keyword: String): Flow<BaseData<List<ArticleWithTags>>> = flow {
+        emitBaseData(BaseData<List<ArticleWithTags>>().apply {
+            code = 0
+            data = articleDao.getArticleWithTagsList(genSql(keyword))
+        })
     }
 
-    suspend fun requestArticleWithTagsDetail(articleUuid: String): Flow<BaseData<ArticleWithTags>> {
-        return flow {
-            val articleWithTags = articleDao.getArticleWithTags(articleUuid)
-            emitBaseData(BaseData<ArticleWithTags>().apply {
-                code = if (articleWithTags == null) 1 else 0
-                data = articleWithTags
-            })
-        }
+    fun requestArticleWithTagsDetail(articleUuid: String): Flow<BaseData<ArticleWithTags>> = flow {
+        val articleWithTags = articleDao.getArticleWithTags(articleUuid)
+        emitBaseData(BaseData<ArticleWithTags>().apply {
+            code = if (articleWithTags == null) 1 else 0
+            data = articleWithTags
+        })
     }
 
-    suspend fun requestDeleteArticleWithTagsDetail(articleUuid: String): Flow<BaseData<Int>> {
-        return flow {
-            emitBaseData(BaseData<Int>().apply {
-                code = 0
-                data = articleDao.deleteArticleWithTags(articleUuid)
-            })
-        }
+    fun requestDeleteArticleWithTagsDetail(articleUuid: String): Flow<BaseData<Int>> = flow {
+        emitBaseData(BaseData<Int>().apply {
+            code = 0
+            data = articleDao.deleteArticleWithTags(articleUuid)
+        })
     }
 
     companion object {
-        @EntryPoint
-        @InstallIn(SingletonComponent::class)
-        interface HomeRepositoryEntryPoint {
-            val searchDomainDao: SearchDomainDao
-        }
-
         fun genSql(k: String): SimpleSQLiteQuery {
-            val hiltEntryPoint = EntryPointAccessors.fromApplication(
-                appContext, HomeRepositoryEntryPoint::class.java
-            )
+            val searchDomainDao: SearchDomainDao = com.skyd.raca.di.get()
             // 是否使用多个关键字并集查询
             val intersectSearchBySpace =
-                appContext.dataStore.get(IntersectSearchBySpacePreference.key) ?: true
+                appContext.dataStore.get(IntersectSearchBySpacePreference.key) != false
             return if (intersectSearchBySpace) {
                 // 以多个连续的空格/制表符/换行符分割
                 val keywords = k.trim().split("\\s+".toRegex()).toSet()
@@ -75,7 +56,7 @@ class HomeRepository @Inject constructor(private val articleDao: ArticleDao) : B
                         if (index > 0) append("INTERSECT \n")
                         append(
                             "SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${
-                                getFilter(s, hiltEntryPoint.searchDomainDao)
+                                getFilter(s, searchDomainDao)
                             } \n"
                         )
                     }
@@ -84,7 +65,7 @@ class HomeRepository @Inject constructor(private val articleDao: ArticleDao) : B
             } else {
                 SimpleSQLiteQuery(
                     "SELECT * FROM $ARTICLE_TABLE_NAME WHERE ${
-                        getFilter(k, hiltEntryPoint.searchDomainDao)
+                        getFilter(k, searchDomainDao)
                     }"
                 )
             }

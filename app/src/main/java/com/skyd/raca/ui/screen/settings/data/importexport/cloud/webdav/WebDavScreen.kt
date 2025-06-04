@@ -1,12 +1,40 @@
 package com.skyd.raca.ui.screen.settings.data.importexport.cloud.webdav
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.CloudDownload
+import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.Dns
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.Recycling
+import androidx.compose.material.icons.outlined.RestoreFromTrash
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -15,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
@@ -27,17 +54,26 @@ import com.skyd.raca.model.bean.BackupInfo
 import com.skyd.raca.model.bean.WebDavResultInfo
 import com.skyd.raca.model.bean.WebDavWaitingInfo
 import com.skyd.raca.model.preference.WebDavServerPreference
-import com.skyd.raca.ui.component.*
+import com.skyd.raca.ui.component.BaseSettingsItem
+import com.skyd.raca.ui.component.CategorySettingsItem
+import com.skyd.raca.ui.component.RacaIconButton
+import com.skyd.raca.ui.component.RacaLottieAnimation
+import com.skyd.raca.ui.component.RacaTopBar
+import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.TextFieldDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalWebDavServer
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
-const val WEBDAV_SCREEN_ROUTE = "webDavScreen"
+
+@Serializable
+data object WebDavRoute
 
 @Composable
-fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
+fun WebDavScreen(viewModel: WebDavViewModel = koinViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -57,7 +93,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.webdav_screen_name)) },
             )
@@ -85,7 +121,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Dns),
+                    icon = rememberVectorPainter(image = Icons.Outlined.Dns),
                     text = stringResource(id = R.string.webdav_screen_server),
                     descriptionText = server.ifBlank {
                         stringResource(id = R.string.webdav_screen_server_description)
@@ -106,7 +142,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                     }
                 )
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.AccountCircle),
+                    icon = rememberVectorPainter(image = Icons.Outlined.AccountCircle),
                     text = stringResource(id = R.string.webdav_screen_account),
                     descriptionText = account.ifBlank {
                         stringResource(id = R.string.webdav_screen_account_description)
@@ -124,7 +160,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                     }
                 )
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Key),
+                    icon = rememberVectorPainter(image = Icons.Outlined.Key),
                     text = stringResource(id = R.string.webdav_screen_password),
                     descriptionText = stringResource(
                         id = if (password.isBlank()) R.string.webdav_screen_password_description
@@ -160,7 +196,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                     }
                 }
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.CloudDownload),
+                    icon = rememberVectorPainter(image = Icons.Outlined.CloudDownload),
                     text = stringResource(id = R.string.webdav_screen_download),
                     descriptionText = stringResource(id = R.string.webdav_screen_download_description),
                     onClick = {
@@ -176,7 +212,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                     }
                 )
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.CloudUpload),
+                    icon = rememberVectorPainter(image = Icons.Outlined.CloudUpload),
                     text = stringResource(id = R.string.webdav_screen_upload),
                     descriptionText = stringResource(id = R.string.webdav_screen_upload_description),
                     onClick = {
@@ -192,7 +228,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                     }
                 )
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Recycling),
+                    icon = rememberVectorPainter(image = Icons.Outlined.Recycling),
                     text = stringResource(id = R.string.webdav_screen_remote_recycle_bin),
                     descriptionText = stringResource(id = R.string.webdav_screen_remote_recycle_bin_description),
                     onClick = {
@@ -224,6 +260,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                         )
                     }
                 }
+
                 is LoadUiIntent.ShowMainView -> {}
                 is LoadUiIntent.Loading -> {
                     openWaitingDialog = loadUiIntent.isShow
@@ -304,12 +341,14 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                             )
                         }
                     }
+
                     is WebDavWaitingInfo -> {
                         waitingDialogCurrent = result.current
                         waitingDialogTotal = result.total
                     }
                 }
             }
+
             null -> {}
         }
         when (downloadResultUiEvent) {
@@ -330,6 +369,7 @@ fun WebDavScreen(viewModel: WebDavViewModel = hiltViewModel()) {
                     waitingDialogTotal = state.total
                 }
             }
+
             null -> {}
         }
     }
@@ -341,7 +381,7 @@ private fun RecycleBinBottomSheet(
     onRestore: (String) -> Unit,
     onDelete: (String) -> Unit,
     onClear: () -> Unit,
-    viewModel: WebDavViewModel = hiltViewModel()
+    viewModel: WebDavViewModel = koinViewModel(),
 ) {
     var list: List<BackupInfo>
 
@@ -406,19 +446,19 @@ private fun RecycleBinBottomSheet(
                     trailingContent = {
                         Row {
                             RacaIconButton(
-                                imageVector = Icons.Default.RestoreFromTrash,
+                                imageVector = Icons.Outlined.RestoreFromTrash,
                                 contentDescription = stringResource(R.string.webdav_screen_restore),
                                 onClick = { onRestore(list[it].uuid) }
                             )
                             RacaIconButton(
-                                imageVector = Icons.Default.DeleteForever,
+                                imageVector = Icons.Outlined.DeleteForever,
                                 contentDescription = stringResource(R.string.webdav_screen_delete),
                                 onClick = { onDelete(list[it].uuid) }
                             )
                         }
                     }
                 )
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             }
         }
     }

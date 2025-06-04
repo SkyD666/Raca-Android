@@ -3,16 +3,24 @@ package com.skyd.raca.ui.screen.settings.data
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ImportExport
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.ImportExport
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
@@ -23,13 +31,17 @@ import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalNavController
-import com.skyd.raca.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.settings.data.importexport.ImportExportRoute
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
-const val DATA_SCREEN_ROUTE = "dataScreen"
+
+@Serializable
+data object DataRoute
 
 @Composable
-fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
+fun DataScreen(viewModel: DataViewModel = koinViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
@@ -41,7 +53,7 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             RacaTopBar(
-                style = RacaTopBarStyle.Large,
+                style = RacaTopBarStyle.LargeFlexible,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.data_screen_name)) },
             )
@@ -54,13 +66,13 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
         ) {
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.ImportExport),
+                    icon = rememberVectorPainter(image = Icons.Outlined.ImportExport),
                     text = stringResource(id = R.string.import_export_screen_name),
                     descriptionText = stringResource(id = R.string.data_screen_import_export_description),
-                    onClick = { navController.navigate(IMPORT_EXPORT_SCREEN_ROUTE) }
+                    onClick = { navController.navigate(ImportExportRoute) }
                 )
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.Delete),
+                    icon = rememberVectorPainter(image = Icons.Outlined.Delete),
                     text = stringResource(id = R.string.data_screen_delete_all),
                     descriptionText = stringResource(id = R.string.data_screen_delete_all_description),
                     onClick = { openDeleteWarningDialog = true }
@@ -80,6 +92,7 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
                         )
                     }
                 }
+
                 is LoadUiIntent.ShowMainView -> {}
                 is LoadUiIntent.Loading -> {
                     openWaitingDialog = loadUiIntent.isShow
@@ -99,6 +112,7 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
                         )
                     }
                 }
+
                 null -> {}
             }
         }

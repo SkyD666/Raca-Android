@@ -1,16 +1,14 @@
 package com.skyd.raca.model.bean
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.graphics.shapes.RoundedPolygon
 
 data class MoreBean(
     val title: String,
     val icon: ImageVector,
     val iconTint: Color,
-    val shape: Shape,
+    val shape: RoundedPolygon,
     val shapeColor: Color,
-    val action: () -> Unit
+    val action: () -> Unit,
 ) : BaseBean
-
-typealias More1Bean = MoreBean

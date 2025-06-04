@@ -11,6 +11,9 @@ import com.skyd.raca.model.preference.theme.ThemeNamePreference
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("LocalNavController not initialized!")
 }
+val LocalGlobalNavController = compositionLocalOf<NavHostController> {
+    error("LocalGlobalNavController not initialized!")
+}
 
 val LocalWindowSizeClass = compositionLocalOf<WindowSizeClass> {
     error("LocalWindowSizeClass not initialized!")

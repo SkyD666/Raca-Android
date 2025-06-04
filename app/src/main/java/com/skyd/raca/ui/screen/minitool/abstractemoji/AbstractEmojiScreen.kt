@@ -3,12 +3,25 @@ package com.skyd.raca.ui.screen.minitool.abstractemoji
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
@@ -16,17 +29,19 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.base.LoadUiIntent
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.dialog.WaitingDialog
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
-const val ABSTRACT_EMOJI_SCREEN_ROUTE = "abstractEmojiScreen"
+@Serializable
+data object AbstractEmojiRoute
 
 @Composable
-fun AbstractEmojiScreen(viewModel: AbstractEmojiViewModel = hiltViewModel()) {
+fun AbstractEmojiScreen(viewModel: AbstractEmojiViewModel = koinViewModel()) {
     var openWaitingDialog by remember { mutableStateOf(false) }
     var isInputState by remember { mutableStateOf(true) }
     Scaffold(
@@ -70,7 +85,7 @@ fun AbstractEmojiScreen(viewModel: AbstractEmojiViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun ResultArea(viewModel: AbstractEmojiViewModel = hiltViewModel()) {
+private fun ResultArea(viewModel: AbstractEmojiViewModel = koinViewModel()) {
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     var abstractArticle = ""
 
@@ -95,7 +110,7 @@ private fun ResultArea(viewModel: AbstractEmojiViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun InputArea(viewModel: AbstractEmojiViewModel = hiltViewModel()) {
+private fun InputArea(viewModel: AbstractEmojiViewModel = koinViewModel()) {
     var articleText by rememberSaveable { mutableStateOf("") }
     Column(
         modifier = Modifier
