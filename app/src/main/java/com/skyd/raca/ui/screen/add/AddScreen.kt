@@ -65,12 +65,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
-const val ADD_SCREEN_ROUTE = "addScreen"
 
 @Serializable
 data class AddRoute(
-    val initArticleUuid: String?,
-    val article: String?,
+    val initArticleUuid: String? = null,
+    val article: String? = null,
 ) {
     companion object {
         val deepLinks = listOf(navDeepLink { mimeType = "text/*" })

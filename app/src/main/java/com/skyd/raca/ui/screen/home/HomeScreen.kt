@@ -88,7 +88,7 @@ import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.local.LocalCurrentArticleUuid
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.local.LocalQuery
-import com.skyd.raca.ui.screen.add.ADD_SCREEN_ROUTE
+import com.skyd.raca.ui.screen.add.AddRoute
 import com.skyd.raca.ui.screen.settings.searchconfig.SearchConfigRoute
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -275,7 +275,7 @@ private fun RacaSearchBar(
                         RacaIconButton(
                             imageVector = Icons.Outlined.Add,
                             contentDescription = stringResource(R.string.home_screen_add),
-                            onClick = { navController.navigate(ADD_SCREEN_ROUTE) }
+                            onClick = { navController.navigate(AddRoute()) }
                         )
                     }
                 },
@@ -442,7 +442,7 @@ private fun HomeMenu(
             enabled = editMenuItemEnabled,
             text = { Text(stringResource(R.string.home_screen_edit)) },
             onClick = {
-                navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
+                navController.navigate(AddRoute(initArticleUuid = currentArticleUuid))
                 onDismissRequest()
             },
             leadingIcon = { Icon(Icons.Outlined.Edit, contentDescription = null) }
@@ -501,7 +501,7 @@ private fun MainCard(articleWithTags: ArticleWithTags, snackbarHostState: Snackb
                         }
                     },
                     onDoubleClick = {
-                        navController.navigate("$ADD_SCREEN_ROUTE?articleUuid=${currentArticleUuid}")
+                        navController.navigate(AddRoute(initArticleUuid = currentArticleUuid))
                     },
                     onClick = {}
                 )
