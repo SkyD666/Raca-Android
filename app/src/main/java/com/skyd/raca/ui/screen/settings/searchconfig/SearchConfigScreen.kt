@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Domain
@@ -40,14 +39,15 @@ import com.skyd.raca.config.allSearchDomain
 import com.skyd.raca.model.bean.SearchDomainBean
 import com.skyd.raca.model.preference.IntersectSearchBySpacePreference
 import com.skyd.raca.model.preference.UseRegexSearchPreference
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
-import com.skyd.raca.ui.component.SwitchSettingsItem
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalIntersectSearchBySpace
 import com.skyd.raca.ui.local.LocalUseRegexSearch
+import com.skyd.settings.BaseSettingsItem
+import com.skyd.settings.SettingsLazyColumn
+import com.skyd.settings.SwitchSettingsItem
+import com.skyd.settings.dsl.SettingsBaseItemScope
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -80,56 +80,55 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = koinViewModel()) {
         val selected = remember { mutableStateMapOf<Int, SnapshotStateMap<Int, Boolean>>() }
         val tables = remember { allSearchDomain.keys.toList() }
 
-        LazyColumn(
+        SettingsLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection), contentPadding = paddingValues
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues,
         ) {
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.search_config_screen_common_category)
-                )
-            }
-            item {
-                SwitchSettingsItem(
-                    icon = Icons.Outlined.Code,
-                    text = stringResource(id = R.string.search_config_screen_use_regex),
-                    description = stringResource(id = R.string.search_config_screen_use_regex_description),
-                    checked = useRegexSearch,
-                    onCheckedChange = {
-                        UseRegexSearchPreference.put(context = context, scope = scope, value = it)
-                    },
-                )
-            }
-            item {
-                SwitchSettingsItem(
-                    icon = Icons.Outlined.JoinInner,
-                    text = stringResource(id = R.string.search_config_screen_intersect_search_by_space),
-                    description = stringResource(id = R.string.search_config_screen_intersect_search_by_space_description),
-                    checked = intersectSearchBySpace,
-                    onCheckedChange = {
-                        IntersectSearchBySpacePreference.put(
-                            context = context, scope = scope, value = it
-                        )
-                    },
-                )
-            }
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.search_config_screen_domain_category)
-                )
-            }
-            repeat(tables.size) { tableIndex ->
-                selected[tableIndex] = mutableStateMapOf()
+            group(text = { context.getString(R.string.search_config_screen_common_category) }) {
                 item {
-                    SearchDomainItem(
-                        selected = selected[tableIndex]!!,
-                        table = tables[tableIndex],
-                        searchDomain = searchDomainMap,
-                        onSetSearchDomain = {
-                            viewModel.sendUiIntent(SearchConfigIntent.SetSearchDomain(it))
-                        }
+                    SwitchSettingsItem(
+                        imageVector = Icons.Outlined.Code,
+                        text = stringResource(id = R.string.search_config_screen_use_regex),
+                        description = stringResource(id = R.string.search_config_screen_use_regex_description),
+                        checked = useRegexSearch,
+                        onCheckedChange = {
+                            UseRegexSearchPreference.put(
+                                context = context,
+                                scope = scope,
+                                value = it
+                            )
+                        },
                     )
+                }
+                item {
+                    SwitchSettingsItem(
+                        imageVector = Icons.Outlined.JoinInner,
+                        text = stringResource(id = R.string.search_config_screen_intersect_search_by_space),
+                        description = stringResource(id = R.string.search_config_screen_intersect_search_by_space_description),
+                        checked = intersectSearchBySpace,
+                        onCheckedChange = {
+                            IntersectSearchBySpacePreference.put(
+                                context = context, scope = scope, value = it
+                            )
+                        },
+                    )
+                }
+            }
+            group(text = { context.getString(R.string.search_config_screen_domain_category) }) {
+                repeat(tables.size) { tableIndex ->
+                    selected[tableIndex] = mutableStateMapOf()
+                    item {
+                        SearchDomainItem(
+                            selected = selected[tableIndex]!!,
+                            table = tables[tableIndex],
+                            searchDomain = searchDomainMap,
+                            onSetSearchDomain = {
+                                viewModel.sendUiIntent(SearchConfigIntent.SetSearchDomain(it))
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -158,7 +157,7 @@ fun SearchConfigScreen(viewModel: SearchConfigViewModel = koinViewModel()) {
 }
 
 @Composable
-fun SearchDomainItem(
+fun SettingsBaseItemScope.SearchDomainItem(
     selected: SnapshotStateMap<Int, Boolean>,
     table: Pair<String, String>,
     searchDomain: Map<String, Boolean>,

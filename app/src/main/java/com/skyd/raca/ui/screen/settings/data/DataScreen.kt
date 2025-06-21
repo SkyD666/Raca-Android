@@ -1,7 +1,6 @@
 package com.skyd.raca.ui.screen.settings.data
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.ImportExport
@@ -25,13 +24,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.BaseSettingsItem
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalNavController
 import com.skyd.raca.ui.screen.settings.data.importexport.ImportExportRoute
+import com.skyd.settings.BaseSettingsItem
+import com.skyd.settings.SettingsLazyColumn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -59,24 +59,29 @@ fun DataScreen(viewModel: DataViewModel = koinViewModel()) {
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        SettingsLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection), contentPadding = paddingValues
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues,
         ) {
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.ImportExport),
-                    text = stringResource(id = R.string.import_export_screen_name),
-                    descriptionText = stringResource(id = R.string.data_screen_import_export_description),
-                    onClick = { navController.navigate(ImportExportRoute) }
-                )
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.Delete),
-                    text = stringResource(id = R.string.data_screen_delete_all),
-                    descriptionText = stringResource(id = R.string.data_screen_delete_all_description),
-                    onClick = { openDeleteWarningDialog = true }
-                )
+            group {
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.ImportExport),
+                        text = stringResource(id = R.string.import_export_screen_name),
+                        descriptionText = stringResource(id = R.string.data_screen_import_export_description),
+                        onClick = { navController.navigate(ImportExportRoute) }
+                    )
+                }
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.Delete),
+                        text = stringResource(id = R.string.data_screen_delete_all),
+                        descriptionText = stringResource(id = R.string.data_screen_delete_all_description),
+                        onClick = { openDeleteWarningDialog = true }
+                    )
+                }
             }
         }
 

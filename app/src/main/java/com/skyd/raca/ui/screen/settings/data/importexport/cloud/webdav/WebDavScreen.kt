@@ -54,8 +54,6 @@ import com.skyd.raca.model.bean.BackupInfo
 import com.skyd.raca.model.bean.WebDavResultInfo
 import com.skyd.raca.model.bean.WebDavWaitingInfo
 import com.skyd.raca.model.preference.WebDavServerPreference
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
 import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaLottieAnimation
 import com.skyd.raca.ui.component.RacaTopBar
@@ -64,6 +62,8 @@ import com.skyd.raca.ui.component.dialog.DeleteWarningDialog
 import com.skyd.raca.ui.component.dialog.TextFieldDialog
 import com.skyd.raca.ui.component.dialog.WaitingDialog
 import com.skyd.raca.ui.local.LocalWebDavServer
+import com.skyd.settings.BaseSettingsItem
+import com.skyd.settings.SettingsLazyColumn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -108,142 +108,143 @@ fun WebDavScreen(viewModel: WebDavViewModel = koinViewModel()) {
             password = secretSharedPreferences().getString("webDavPassword", null).orEmpty()
         }
 
-        LazyColumn(
+        SettingsLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentPadding = paddingValues
+            contentPadding = paddingValues,
         ) {
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.webdav_screen_service_category)
-                )
+            group(text = { context.getString(R.string.webdav_screen_service_category) }) {
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.Dns),
+                        text = stringResource(id = R.string.webdav_screen_server),
+                        descriptionText = server.ifBlank {
+                            stringResource(id = R.string.webdav_screen_server_description)
+                        },
+                        onClick = {
+                            inputDialogInfo = Triple(
+                                appContext.getString(R.string.webdav_screen_input_server), server
+                            ) {
+                                openInputDialog = false
+                                WebDavServerPreference.put(
+                                    context = context,
+                                    scope = scope,
+                                    value = if (!it.endsWith("/")) "$it/" else it
+                                )
+                            }
+                            inputDialogIsPassword = false
+                            openInputDialog = true
+                        }
+                    )
+                }
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.AccountCircle),
+                        text = stringResource(id = R.string.webdav_screen_account),
+                        descriptionText = account.ifBlank {
+                            stringResource(id = R.string.webdav_screen_account_description)
+                        },
+                        onClick = {
+                            inputDialogInfo = Triple(
+                                appContext.getString(R.string.webdav_screen_input_account), account
+                            ) {
+                                account = it
+                                openInputDialog = false
+                                secretSharedPreferences().editor { putString("webDavAccount", it) }
+                            }
+                            inputDialogIsPassword = false
+                            openInputDialog = true
+                        }
+                    )
+                }
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.Key),
+                        text = stringResource(id = R.string.webdav_screen_password),
+                        descriptionText = stringResource(
+                            id = if (password.isBlank()) R.string.webdav_screen_password_description
+                            else R.string.webdav_screen_password_entered
+                        ),
+                        onClick = {
+                            inputDialogInfo = Triple(
+                                appContext.getString(R.string.webdav_screen_input_password),
+                                password
+                            ) {
+                                password = it
+                                openInputDialog = false
+                                secretSharedPreferences().editor { putString("webDavPassword", it) }
+                            }
+                            inputDialogIsPassword = true
+                            openInputDialog = true
+                        }
+                    )
+                }
             }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.Dns),
-                    text = stringResource(id = R.string.webdav_screen_server),
-                    descriptionText = server.ifBlank {
-                        stringResource(id = R.string.webdav_screen_server_description)
-                    },
-                    onClick = {
-                        inputDialogInfo = Triple(
-                            appContext.getString(R.string.webdav_screen_input_server), server
-                        ) {
-                            openInputDialog = false
-                            WebDavServerPreference.put(
-                                context = context,
-                                scope = scope,
-                                value = if (!it.endsWith("/")) "$it/" else it
-                            )
-                        }
-                        inputDialogIsPassword = false
-                        openInputDialog = true
-                    }
-                )
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.AccountCircle),
-                    text = stringResource(id = R.string.webdav_screen_account),
-                    descriptionText = account.ifBlank {
-                        stringResource(id = R.string.webdav_screen_account_description)
-                    },
-                    onClick = {
-                        inputDialogInfo = Triple(
-                            appContext.getString(R.string.webdav_screen_input_account), account
-                        ) {
-                            account = it
-                            openInputDialog = false
-                            secretSharedPreferences().editor { putString("webDavAccount", it) }
-                        }
-                        inputDialogIsPassword = false
-                        openInputDialog = true
-                    }
-                )
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.Key),
-                    text = stringResource(id = R.string.webdav_screen_password),
-                    descriptionText = stringResource(
-                        id = if (password.isBlank()) R.string.webdav_screen_password_description
-                        else R.string.webdav_screen_password_entered
-                    ),
-                    onClick = {
-                        inputDialogInfo = Triple(
-                            appContext.getString(R.string.webdav_screen_input_password), password
-                        ) {
-                            password = it
-                            openInputDialog = false
-                            secretSharedPreferences().editor { putString("webDavPassword", it) }
-                        }
-                        inputDialogIsPassword = true
-                        openInputDialog = true
-                    }
-                )
-            }
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.webdav_screen_sync_category)
-                )
-            }
-            item {
-                val webDavIncompleteInfo = remember {
-                    {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = appContext.getString(R.string.webdav_screen_info_incomplete),
-                                withDismissAction = true
-                            )
-                        }
+            group(text = { context.getString(R.string.webdav_screen_sync_category) }) {
+                val webDavIncompleteInfo = {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = appContext.getString(R.string.webdav_screen_info_incomplete),
+                            withDismissAction = true
+                        )
                     }
                 }
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.CloudDownload),
-                    text = stringResource(id = R.string.webdav_screen_download),
-                    descriptionText = stringResource(id = R.string.webdav_screen_download_description),
-                    onClick = {
-                        if (server.isNotBlank() && account.isNotBlank() && password.isNotBlank()) {
-                            viewModel.sendUiIntent(
-                                WebDavIntent.StartDownload(
-                                    website = server, username = account, password = password
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.CloudDownload),
+                        text = stringResource(id = R.string.webdav_screen_download),
+                        descriptionText = stringResource(id = R.string.webdav_screen_download_description),
+                        onClick = {
+                            if (server.isNotBlank() && account.isNotBlank() && password.isNotBlank()) {
+                                viewModel.sendUiIntent(
+                                    WebDavIntent.StartDownload(
+                                        website = server, username = account, password = password
+                                    )
                                 )
-                            )
-                        } else {
-                            webDavIncompleteInfo()
+                            } else {
+                                webDavIncompleteInfo()
+                            }
                         }
-                    }
-                )
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.CloudUpload),
-                    text = stringResource(id = R.string.webdav_screen_upload),
-                    descriptionText = stringResource(id = R.string.webdav_screen_upload_description),
-                    onClick = {
-                        if (server.isNotBlank() && account.isNotBlank() && password.isNotBlank()) {
-                            viewModel.sendUiIntent(
-                                WebDavIntent.StartUpload(
-                                    website = server, username = account, password = password
+                    )
+                }
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.CloudUpload),
+                        text = stringResource(id = R.string.webdav_screen_upload),
+                        descriptionText = stringResource(id = R.string.webdav_screen_upload_description),
+                        onClick = {
+                            if (server.isNotBlank() && account.isNotBlank() && password.isNotBlank()) {
+                                viewModel.sendUiIntent(
+                                    WebDavIntent.StartUpload(
+                                        website = server, username = account, password = password
+                                    )
                                 )
-                            )
-                        } else {
-                            webDavIncompleteInfo()
+                            } else {
+                                webDavIncompleteInfo()
+                            }
                         }
-                    }
-                )
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.Recycling),
-                    text = stringResource(id = R.string.webdav_screen_remote_recycle_bin),
-                    descriptionText = stringResource(id = R.string.webdav_screen_remote_recycle_bin_description),
-                    onClick = {
-                        if (server.isNotBlank() && account.isNotBlank() && password.isNotBlank()) {
-                            viewModel.sendUiIntent(
-                                WebDavIntent.GetRemoteRecycleBin(
-                                    website = server, username = account, password = password
+                    )
+                }
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.Recycling),
+                        text = stringResource(id = R.string.webdav_screen_remote_recycle_bin),
+                        descriptionText = stringResource(id = R.string.webdav_screen_remote_recycle_bin_description),
+                        onClick = {
+                            if (server.isNotBlank() && account.isNotBlank() && password.isNotBlank()) {
+                                viewModel.sendUiIntent(
+                                    WebDavIntent.GetRemoteRecycleBin(
+                                        website = server, username = account, password = password
+                                    )
                                 )
-                            )
-                            openRecycleBinBottomSheet = true
-                        } else {
-                            webDavIncompleteInfo()
+                                openRecycleBinBottomSheet = true
+                            } else {
+                                webDavIncompleteInfo()
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
 

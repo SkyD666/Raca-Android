@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Folder
@@ -27,12 +26,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
 import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.WaitingDialog
+import com.skyd.settings.BaseSettingsItem
+import com.skyd.settings.CategorySettingsItem
+import com.skyd.settings.SettingsLazyColumn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -76,26 +76,27 @@ fun ExportScreen(viewModel: ExportDataViewModel = koinViewModel()) {
         ) { uri ->
             dirUri = uri
         }
-        LazyColumn(
+        SettingsLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentPadding = it
+            contentPadding = it,
         ) {
-            item {
+            group(category = {
                 CategorySettingsItem(
                     text = stringResource(id = R.string.export_screen_select_dir_category)
                 )
-            }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.Folder),
-                    text = stringResource(id = R.string.export_screen_select_dir),
-                    descriptionText = dirUri?.path,
-                    onClick = {
-                        pickDirLauncher.launch(null)
-                    }
-                )
+            }) {
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.Outlined.Folder),
+                        text = stringResource(id = R.string.export_screen_select_dir),
+                        descriptionText = dirUri?.path,
+                        onClick = {
+                            pickDirLauncher.launch(null)
+                        }
+                    )
+                }
             }
         }
 

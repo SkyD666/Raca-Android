@@ -4,11 +4,9 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.Done
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,12 +26,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.raca.R
 import com.skyd.raca.appContext
 import com.skyd.raca.base.LoadUiIntent
-import com.skyd.raca.ui.component.BaseSettingsItem
-import com.skyd.raca.ui.component.CategorySettingsItem
 import com.skyd.raca.ui.component.RacaIconButton
 import com.skyd.raca.ui.component.RacaTopBar
 import com.skyd.raca.ui.component.RacaTopBarStyle
 import com.skyd.raca.ui.component.dialog.WaitingDialog
+import com.skyd.settings.BaseSettingsItem
+import com.skyd.settings.CategorySettingsItem
+import com.skyd.settings.SettingsLazyColumn
+import com.skyd.settings.TipSettingsItem
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -85,49 +85,45 @@ fun ImportScreen(viewModel: ImportDataViewModel = koinViewModel()) {
         ) { fileUri ->
             tagUri = fileUri
         }
-        LazyColumn(
+        SettingsLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentPadding = it
+            contentPadding = it,
         ) {
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.import_screen_select_file_category)
-                )
+            group(category = {
+                CategorySettingsItem(text = stringResource(R.string.import_screen_select_file_category))
+            }) {
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Article),
+                        text = stringResource(id = R.string.import_screen_select_article_table),
+                        descriptionText = articleUri?.path,
+                        onClick = {
+                            pickArticleFileLauncher.launch("text/*")
+                        }
+                    )
+                }
+                item {
+                    BaseSettingsItem(
+                        icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Article),
+                        text = stringResource(id = R.string.import_screen_select_tag_table),
+                        descriptionText = tagUri?.path,
+                        onClick = {
+                            pickTagFileLauncher.launch("text/*")
+                        }
+                    )
+                }
             }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Article),
-                    text = stringResource(id = R.string.import_screen_select_article_table),
-                    descriptionText = articleUri?.path,
-                    onClick = {
-                        pickArticleFileLauncher.launch("text/*")
-                    }
-                )
-            }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Article),
-                    text = stringResource(id = R.string.import_screen_select_tag_table),
-                    descriptionText = tagUri?.path,
-                    onClick = {
-                        pickTagFileLauncher.launch("text/*")
-                    }
-                )
-            }
-            item {
-                CategorySettingsItem(
-                    text = stringResource(id = R.string.import_screen_strategy_category)
-                )
-            }
-            item {
-                BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Outlined.Warning),
-                    text = stringResource(id = R.string.import_screen_conflict_strategy),
-                    descriptionText = stringResource(id = R.string.import_screen_conflict_strategy_description),
-                    onClick = {}
-                )
+            group(category = {
+                CategorySettingsItem(text = stringResource(R.string.import_screen_strategy_category))
+            }) {
+                otherItem {
+                    TipSettingsItem(
+                        text = stringResource(R.string.import_screen_conflict_strategy) + "\n\n"
+                                + stringResource(R.string.import_screen_conflict_strategy_description),
+                    )
+                }
             }
         }
 

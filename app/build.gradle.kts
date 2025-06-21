@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 apply(from = "../secret.gradle.kts")
@@ -26,9 +27,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
-        }
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 
@@ -140,6 +138,10 @@ composeCompiler {
 //    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 tasks.withType(KotlinCompile::class).configureEach {
     compilerOptions {
         freeCompilerArgs.addAll(
@@ -176,7 +178,7 @@ dependencies {
     implementation(libs.android.material)
     implementation(libs.jetbrains.lifecycle.runtime.compose)
     implementation(libs.jetbrains.navigation.compose)
-    implementation("androidx.security:security-crypto:1.1.0-alpha07")
+    implementation("androidx.security:security-crypto:1.1.0-beta01")
     implementation(libs.coil.compose)
     implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.core.splashscreen)
@@ -189,6 +191,7 @@ dependencies {
     implementation(libs.material.kolor)
     implementation(libs.androidx.datastore.preferences)
     implementation("com.github.stuxuhai:jpinyin:1.1.8")
+    implementation(libs.settings)
 
     implementation(libs.compottie)
 
@@ -197,5 +200,4 @@ dependencies {
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.viewmodel.navigation)
     implementation(libs.kermit)
-
 }
